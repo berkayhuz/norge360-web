@@ -29,12 +29,12 @@ importers:
 
   apps/auth-web:
     dependencies:
-      '@norge360/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@workspace/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@workspace/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       lucide-react:
         specifier: ^1.17.0
         version: 1.17.0(react@19.2.4)
