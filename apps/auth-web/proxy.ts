@@ -9,9 +9,9 @@ import {
 } from "@/src/lib/routes"
 
 const ACCESS_COOKIE_NAME =
-  process.env.AUTH_ACCESS_COOKIE_NAME ?? "__Secure-Norge360-access"
+  process.env.AUTH_ACCESS_COOKIE_NAME ?? "Norge360-access"
 const SESSION_COOKIE_NAME =
-  process.env.AUTH_SESSION_COOKIE_NAME ?? "__Secure-Norge360-session"
+  process.env.AUTH_SESSION_COOKIE_NAME ?? "Norge360-session"
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl

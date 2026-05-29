@@ -34,9 +34,9 @@ export function getServerEnv(): ServerEnv {
       process.env.AUTH_WEB_APP_URL ??
       (isProduction ? undefined : DEFAULT_AUTH_WEB_APP_URL),
     cookieNames: {
-      access: process.env.AUTH_ACCESS_COOKIE_NAME ?? "__Secure-Norge360-access",
-      refresh: process.env.AUTH_REFRESH_COOKIE_NAME ?? "__Secure-Norge360-refresh",
-      session: process.env.AUTH_SESSION_COOKIE_NAME ?? "__Secure-Norge360-session",
+      access: process.env.AUTH_ACCESS_COOKIE_NAME ?? "Norge360-access",
+      refresh: process.env.AUTH_REFRESH_COOKIE_NAME ?? "Norge360-refresh",
+      session: process.env.AUTH_SESSION_COOKIE_NAME ?? "Norge360-session",
     },
     isProduction,
     postLoginRedirectUrl:
@@ -59,9 +59,9 @@ export function tryGetServerEnv() {
         ? undefined
         : DEFAULT_AUTH_WEB_APP_URL),
     cookieNames: {
-      access: process.env.AUTH_ACCESS_COOKIE_NAME ?? "__Secure-Norge360-access",
-      refresh: process.env.AUTH_REFRESH_COOKIE_NAME ?? "__Secure-Norge360-refresh",
-      session: process.env.AUTH_SESSION_COOKIE_NAME ?? "__Secure-Norge360-session",
+      access: process.env.AUTH_ACCESS_COOKIE_NAME ?? "Norge360-access",
+      refresh: process.env.AUTH_REFRESH_COOKIE_NAME ?? "Norge360-refresh",
+      session: process.env.AUTH_SESSION_COOKIE_NAME ?? "Norge360-session",
     },
     isProduction: process.env.NODE_ENV === "production",
     postLoginRedirectUrl:
