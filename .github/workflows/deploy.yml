@@ -10,7 +10,7 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Deploy on frontend server
+      - name: Deploy auth-web on frontend server
         run: |
           set -e
 
@@ -19,7 +19,6 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
 
-          pnpm install --frozen-lockfile
-          pnpm build
+          docker compose up -d --build
 
-          # Docker compose varsa sonra burayı compose'a çeviririz.
+          docker image prune -f
