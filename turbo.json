@@ -1,6 +1,17 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "ALLOWED_REDIRECT_ORIGINS",
+    "AUTH_ACCESS_COOKIE_NAME",
+    "AUTH_API_BASE_URL",
+    "AUTH_COOKIE_DOMAIN",
+    "AUTH_REFRESH_COOKIE_NAME",
+    "AUTH_SESSION_COOKIE_NAME",
+    "AUTH_WEB_APP_URL",
+    "NODE_ENV",
+    "POST_LOGIN_REDIRECT_URL"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -9,6 +20,9 @@
     },
     "lint": {
       "dependsOn": ["^lint"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
     },
     "format": {
       "dependsOn": ["^format"]

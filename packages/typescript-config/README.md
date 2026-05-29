@@ -1,3 +1,3 @@
-# `@workspace/typescript-config`
+# `@norge360/typescript-config`
 
-Shared typescript configuration for the workspace.
+Shared TypeScript configuration for the monorepo.

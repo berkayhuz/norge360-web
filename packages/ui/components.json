@@ -11,11 +11,11 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@workspace/ui/components",
-    "utils": "@workspace/ui/lib/utils",
-    "hooks": "@workspace/ui/hooks",
-    "lib": "@workspace/ui/lib",
-    "ui": "@workspace/ui/components"
+    "components": "@norge360/ui/components",
+    "utils": "@norge360/ui/lib/utils",
+    "hooks": "@norge360/ui/hooks",
+    "lib": "@norge360/ui/lib",
+    "ui": "@norge360/ui/components"
   },
   "rtl": true,
   "menuColor": "default",

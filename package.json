@@ -6,12 +6,13 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
+    "test": "turbo test",
     "format": "turbo format",
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {
-    "@workspace/eslint-config": "workspace:*",
-    "@workspace/typescript-config": "workspace:*",
+    "@norge360/eslint-config": "workspace:*",
+    "@norge360/typescript-config": "workspace:*",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "turbo": "^2.9.15",

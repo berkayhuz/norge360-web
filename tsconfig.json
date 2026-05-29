@@ -1,4 +1,4 @@
 {
-  "extends": "@workspace/typescript-config/base.json"
+  "extends": "@norge360/typescript-config/base.json"
 }
 
