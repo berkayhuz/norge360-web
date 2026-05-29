@@ -12,7 +12,13 @@ type ThemeToggleProps = {
 
 export function ThemeToggle({ darkLabel, lightLabel }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme()
-  const isDark = resolvedTheme === "dark"
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const isDark = mounted && resolvedTheme === "dark"
 
   return (
     <Button
@@ -23,7 +29,7 @@ export function ThemeToggle({ darkLabel, lightLabel }: ThemeToggleProps) {
       variant="outline"
       rounded="lg"
     >
-      {isDark ? <Sun /> : <Moon />}
+      {!mounted ? null : isDark ? <Sun /> : <Moon />}
     </Button>
   )
 }

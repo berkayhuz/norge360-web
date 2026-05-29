@@ -57,7 +57,7 @@ export function CompactAuthShell({
         </FieldDescription>
         {footer ? <div className="mt-4 text-center text-sm text-muted-foreground">{footer}</div> : null}
       </div>
-      <section className="fixed w-full bottom-0 left-0 right-0 border-t border-border">
+      <section className="max-md:sticky md:fixed bg-background w-full bottom-0 left-0 right-0 border-t border-border">
         <div className="text-xs font-medium text-muted-foreground p-4">
           <footer className="flex flex-row gap-4 text-xs text-muted-foreground md:items-center md:justify-between">
             <div className="flex gap-2 flex-col md:flex-row md:items-center md:gap-4">

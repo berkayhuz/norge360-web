@@ -90,7 +90,6 @@ export function RegisterForm({ locale = "en-US", returnUrl }: RegisterFormProps)
     <form action="/register" className="flex flex-col gap-6" method="post" noValidate onSubmit={onSubmit}>
       <FieldGroup>
         {message ? <FieldMessage tone={message.tone}>{message.text}</FieldMessage> : null}
-
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField autoComplete="given-name" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("firstNameLabel")} name="firstName" />
           <TextField autoComplete="family-name" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("lastNameLabel")} name="lastName" />
