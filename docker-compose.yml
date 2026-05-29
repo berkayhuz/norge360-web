@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile.auth-web
     container_name: norge360-auth-web
     restart: unless-stopped
+    env_file:
+      - /opt/norge360-env/auth-web.env
     environment:
       NODE_ENV: production
       PORT: 3000
