@@ -15,9 +15,9 @@ const baseEnv = {
   authCookieDomain: ".norge360.com",
   authWebAppUrl: "https://auth.norge360.com",
   cookieNames: {
-    access: "Norge360-access",
-    refresh: "Norge360-refresh",
-    session: "Norge360-session",
+    access: "__Secure-Norge360-access",
+    refresh: "__Secure-Norge360-refresh",
+    session: "__Secure-Norge360-session",
   },
   isProduction: true,
   postLoginRedirectUrl: "/session",
@@ -85,14 +85,14 @@ describe("proxyAuthRequest", () => {
 
     expect(
       cookies.some((value) =>
-        hasCookieAttributes(value, "Norge360-access", "/", ".norge360.com")
+        hasCookieAttributes(value, "__Secure-Norge360-access", "/", ".norge360.com")
       )
     ).toBe(true)
     expect(
       cookies.some((value) =>
         hasCookieAttributes(
           value,
-          "Norge360-refresh",
+          "__Secure-Norge360-refresh",
           "/api/auth",
           ".norge360.com"
         )
@@ -102,7 +102,7 @@ describe("proxyAuthRequest", () => {
       cookies.some((value) =>
         hasCookieAttributes(
           value,
-          "Norge360-session",
+          "__Secure-Norge360-session",
           "/api/auth",
           ".norge360.com"
         )
@@ -127,7 +127,7 @@ describe("proxyAuthRequest", () => {
     expect(
       cookies.some(
         (value) =>
-          hasCookieAttributes(value, "Norge360-access", "/", ".norge360.com") &&
+          hasCookieAttributes(value, "__Secure-Norge360-access", "/", ".norge360.com") &&
           value.toLowerCase().includes("max-age=0")
       )
     ).toBe(true)
@@ -136,7 +136,7 @@ describe("proxyAuthRequest", () => {
         (value) =>
           hasCookieAttributes(
             value,
-            "Norge360-refresh",
+            "__Secure-Norge360-refresh",
             "/api/auth",
             ".norge360.com"
           ) && value.toLowerCase().includes("max-age=0")
@@ -147,7 +147,7 @@ describe("proxyAuthRequest", () => {
         (value) =>
           hasCookieAttributes(
             value,
-            "Norge360-session",
+            "__Secure-Norge360-session",
             "/api/auth",
             ".norge360.com"
           ) && value.toLowerCase().includes("max-age=0")
