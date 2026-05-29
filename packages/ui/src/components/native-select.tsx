@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 import { ChevronDownIcon } from "lucide-react"
 
 type NativeSelectProps = Omit<React.ComponentProps<"select">, "size"> & {
@@ -59,3 +59,4 @@ function NativeSelectOptGroup({
 }
 
 export { NativeSelect, NativeSelectOptGroup, NativeSelectOption }
+

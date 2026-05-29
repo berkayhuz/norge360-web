@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Popover as PopoverPrimitive } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 function Popover({
   ...props
@@ -87,3 +87,4 @@ export {
   PopoverTitle,
   PopoverTrigger,
 }
+

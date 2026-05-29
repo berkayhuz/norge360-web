@@ -3,18 +3,18 @@
 import * as React from "react"
 import { Command as CommandPrimitive } from "cmdk"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@norge360/ui/components/dialog"
+} from "@workspace/ui/components/dialog"
 import {
   InputGroup,
   InputGroupAddon,
-} from "@norge360/ui/components/input-group"
+} from "@workspace/ui/components/input-group"
 import { SearchIcon, CheckIcon } from "lucide-react"
 
 function Command({
@@ -193,3 +193,4 @@ export {
   CommandShortcut,
   CommandSeparator,
 }
+

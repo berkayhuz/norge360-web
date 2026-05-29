@@ -2,8 +2,8 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
-import { Separator } from "@norge360/ui/components/separator"
+import { cn } from "@workspace/ui/lib/utils"
+import { Separator } from "@workspace/ui/components/separator"
 
 function ItemGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -194,3 +194,4 @@ export {
   ItemHeader,
   ItemFooter,
 }
+

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Slot } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
@@ -120,3 +120,4 @@ export {
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
 }
+

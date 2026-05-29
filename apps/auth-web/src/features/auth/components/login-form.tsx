@@ -1,39 +1,38 @@
 "use client"
-
-import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import * as React from "react"
+import { Button } from "@workspace/ui/components/button"
+import { Checkbox } from "@workspace/ui/components/checkbox"
 
-import { ApiProblemError } from "@/src/lib/api/problem"
+import { Field, FieldGroup } from "@workspace/ui/components/field"
+
+import { ApiProblemError, getProblemMessageKey } from "@/src/lib/api/problem"
 import { authRequest } from "@/src/lib/api/auth-client"
 import type { AuthIssuedSessionResponse, ValidationErrors } from "@/src/lib/api/types"
-import { APP_ROUTES, AUTH_API_PATHS, buildCallbackUrl } from "@/src/lib/routes"
+import { AUTH_API_PATHS, buildCallbackUrl } from "@/src/lib/routes"
 
-import {
-  FieldMessage,
-  PasswordField,
-  SubmitButton,
-  TextField,
-} from "./form-fields"
-import {
-  getFormBoolean,
-  getFormString,
-  getOptionalFormString,
-  zodFieldErrors,
-} from "./form-utils"
+import { FieldMessage, PasswordField, TextField } from "./form-fields"
+import { getFormBoolean, getFormString, getOptionalFormString, getTurnstileToken, zodFieldErrors } from "./form-utils"
 import { loginSchema } from "../schemas/auth-schemas"
-
+import { cn } from "@workspace/ui/lib/utils"
+import { TurnstileWidget, type TurnstileWidgetHandle } from "./turnstile-widget"
 type LoginFormProps = {
   returnUrl?: string
+  className?: string
 }
 
-export function LoginForm({ returnUrl }: LoginFormProps) {
+export function LoginForm({ className, returnUrl }: LoginFormProps) {
   const router = useRouter()
+  const t = useTranslations("auth.login.form")
+  const tErrors = useTranslations("auth.errors")
+
   const [fieldErrors, setFieldErrors] = React.useState<ValidationErrors>({})
   const [formMessage, setFormMessage] = React.useState<string | null>(null)
   const [isMfaRequired, setIsMfaRequired] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const submitLockRef = React.useRef(false)
+  const turnstileRef = React.useRef<TurnstileWidgetHandle>(null)
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -49,10 +48,14 @@ export function LoginForm({ returnUrl }: LoginFormProps) {
       password: getFormString(formData, "password"),
       recoveryCode: getOptionalFormString(formData, "recoveryCode"),
       rememberMe: getFormBoolean(formData, "rememberMe"),
+      turnstileToken: getTurnstileToken(formData),
     })
 
     if (!parsed.success) {
       setFieldErrors(zodFieldErrors(parsed.error))
+      if (parsed.error.issues.some((issue) => issue.path[0] === "turnstileToken")) {
+        setFormMessage(t("fallbackError"))
+      }
       return
     }
 
@@ -61,25 +64,23 @@ export function LoginForm({ returnUrl }: LoginFormProps) {
     try {
       await authRequest<AuthIssuedSessionResponse>(AUTH_API_PATHS.login, {
         body: parsed.data,
-        method: "POST",
+        method: "POST"
       })
       router.push(buildCallbackUrl(returnUrl))
       router.refresh()
     } catch (error) {
       if (error instanceof ApiProblemError) {
         setFieldErrors(error.fieldErrors)
-        setFormMessage(error.userMessage)
+        setFormMessage(tErrors(getProblemMessageKey(error.problem)))
         if (error.problem.errorCode === "mfa_required") {
           setIsMfaRequired(true)
         }
+        turnstileRef.current?.reset()
         return
       }
 
-      setFormMessage(
-        error instanceof Error
-          ? error.message
-          : "Giriş tamamlanamadı. Lütfen tekrar deneyin."
-      )
+      setFormMessage(t("fallbackError"))
+      turnstileRef.current?.reset()
     } finally {
       submitLockRef.current = false
       setIsSubmitting(false)
@@ -87,73 +88,42 @@ export function LoginForm({ returnUrl }: LoginFormProps) {
   }
 
   return (
-    <form className="grid gap-4" method="post" noValidate onSubmit={onSubmit}>
-      {formMessage ? (
-        <FieldMessage tone="danger">{formMessage}</FieldMessage>
-      ) : null}
+    <div className={cn("flex flex-col gap-6", className)}>
+      <form method="post" noValidate onSubmit={onSubmit}>
+        <FieldGroup>
+          {formMessage ? <FieldMessage tone="danger">{formMessage}</FieldMessage> : null}
+          <Field>
+            <TextField
+              autoComplete="username" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("emailOrUserNameLabel")} maxLength={256} name="emailOrUserName" required
+            />
+          </Field>
+          <Field>
+            <PasswordField autoComplete="current-password" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("passwordLabel")} maxLength={256} name="password" required
+            />
+            {isMfaRequired ? (
+              <div className="grid gap-4">
+                <TextField autoComplete="one-time-code" disabled={isSubmitting} fieldErrors={fieldErrors} inputMode="numeric" label={t("mfaCodeLabel")} maxLength={32} name="mfaCode" />
+                <TextField autoComplete="one-time-code" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("recoveryCodeLabel")} maxLength={128} name="recoveryCode" placeholder={t("recoveryCodePlaceholder")} />
+              </div>
+            ) : null}
 
-      <TextField
-        autoComplete="username"
-        disabled={isSubmitting}
-        fieldErrors={fieldErrors}
-        label="E-posta veya kullanıcı adı"
-        maxLength={256}
-        name="emailOrUserName"
-        required
-      />
-      <PasswordField
-        autoComplete="current-password"
-        disabled={isSubmitting}
-        fieldErrors={fieldErrors}
-        label="Şifre"
-        maxLength={256}
-        name="password"
-        required
-      />
-      {isMfaRequired ? (
-        <div className="grid gap-4">
-          <TextField
-            autoComplete="one-time-code"
-            disabled={isSubmitting}
-            fieldErrors={fieldErrors}
-            inputMode="numeric"
-            label="MFA kodu"
-            maxLength={32}
-            name="mfaCode"
-          />
-          <TextField
-            autoComplete="one-time-code"
-            disabled={isSubmitting}
-            fieldErrors={fieldErrors}
-            label="Kurtarma kodu"
-            maxLength={128}
-            name="recoveryCode"
-            placeholder="MFA kodunuz yoksa"
-          />
-        </div>
-      ) : null}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm">
+                <Checkbox disabled={isSubmitting} name="rememberMe" />
+                {t("rememberMe")}
+              </label>
+              <a href="/forgot-password" className="text-sm hover:underline">
+                {t("forgotPassword")}
+              </a>
+            </div>
 
-      <div className="flex items-center justify-between gap-3 text-sm">
-        <label className="flex items-center gap-2">
-          <input
-            className="size-4 rounded border-input accent-primary"
-            disabled={isSubmitting}
-            name="rememberMe"
-            type="checkbox"
-          />
-          Beni hatırla
-        </label>
-        <Link
-          className="font-medium text-primary hover:underline"
-          href={APP_ROUTES.forgotPassword}
-        >
-          Şifremi unuttum
-        </Link>
-      </div>
-
-      <SubmitButton disabled={isSubmitting}>
-        {isSubmitting ? "Giriş yapılıyor..." : "Giriş yap"}
-      </SubmitButton>
-    </form>
+            <TurnstileWidget ref={turnstileRef} disabled={isSubmitting} />
+            <Button disabled={isSubmitting}>
+              {isSubmitting ? t("submitting") : t("submit")}
+            </Button>
+          </Field>
+        </FieldGroup>
+      </form>
+    </div>
   )
 }

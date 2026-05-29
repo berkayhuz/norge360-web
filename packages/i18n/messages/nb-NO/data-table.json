@@ -1,0 +1,9 @@
+{
+  "search": "Sok",
+  "noResults": "Ingen resultater",
+  "rowsPerPage": "Rader per side",
+  "selectedRows": "{count, plural, =0 {Ingen rader valgt} one {# rad valgt} other {# rader valgt}}",
+  "clearSelection": "Fjern valg",
+  "previousPage": "Forrige side",
+  "nextPage": "Neste side"
+}

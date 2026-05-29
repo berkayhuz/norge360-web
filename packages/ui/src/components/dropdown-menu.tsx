@@ -3,7 +3,7 @@
 import * as React from "react"
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
 function DropdownMenu({
@@ -267,3 +267,4 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 }
+

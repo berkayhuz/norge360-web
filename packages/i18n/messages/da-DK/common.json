@@ -1,0 +1,20 @@
+{
+  "save": "Gem",
+  "cancel": "Annuller",
+  "close": "Luk",
+  "confirm": "Bekraeft",
+  "delete": "Slet",
+  "edit": "Rediger",
+  "create": "Opret",
+  "update": "Opdater",
+  "search": "Sog",
+  "clear": "Ryd",
+  "loading": "Indlaeser",
+  "error": "Noget gik galt",
+  "success": "Gennemfort",
+  "empty": "Ingen elementer",
+  "welcome": "Velkommen, {name}",
+  "itemCount": "{count, plural, =0 {Ingen elementer} one {# element} other {# elementer}}",
+  "scheduledAt": "Planlagt til {date, date, medium} {date, time, short}",
+  "balance": "Saldo: {amount, number, ::currency/DKK}"
+}

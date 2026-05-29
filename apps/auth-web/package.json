@@ -14,9 +14,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@norge360/ui": "workspace:*",
+    "@workspace/i18n": "workspace:*",
+    "@workspace/ui": "workspace:*",
     "lucide-react": "^1.17.0",
     "next": "16.2.6",
+    "next-intl": "^4.4.0",
     "next-themes": "^0.4.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -39,3 +41,4 @@
     "vitest": "^4.0.14"
   }
 }
+

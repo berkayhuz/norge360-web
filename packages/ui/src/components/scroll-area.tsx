@@ -3,7 +3,7 @@
 import * as React from "react"
 import { ScrollArea as ScrollAreaPrimitive } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 function ScrollArea({
   className,
@@ -53,3 +53,4 @@ function ScrollBar({
 }
 
 export { ScrollArea, ScrollBar }
+

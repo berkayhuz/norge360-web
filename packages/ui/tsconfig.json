@@ -2,9 +2,10 @@
   "extends": "@norge360/typescript-config/react-library.json",
   "compilerOptions": {
     "paths": {
-      "@norge360/ui/*": ["./src/*"]
+      "@workspace/ui/*": ["./src/*"]
     }
   },
   "include": ["."],
   "exclude": ["node_modules", "dist"]
 }
+

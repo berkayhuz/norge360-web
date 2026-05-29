@@ -1,5 +1,5 @@
 {
-  "name": "@norge360/ui",
+  "name": "@workspace/ui",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -51,3 +51,4 @@
     "./hooks/*": "./src/hooks/*.ts"
   }
 }
+

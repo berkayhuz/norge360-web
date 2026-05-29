@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Menubar as MenubarPrimitive } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
 function Menubar({
@@ -275,3 +275,4 @@ export {
   MenubarSubTrigger,
   MenubarSubContent,
 }
+

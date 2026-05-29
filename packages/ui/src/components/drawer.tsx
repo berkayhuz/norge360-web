@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 function Drawer({
   ...props
@@ -132,3 +132,4 @@ export {
   DrawerTitle,
   DrawerDescription,
 }
+

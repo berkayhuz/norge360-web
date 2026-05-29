@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 function Card({
   className,
@@ -98,3 +98,4 @@ export {
   CardDescription,
   CardContent,
 }
+

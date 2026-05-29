@@ -1,31 +1,30 @@
 import type { ProblemDetails, ValidationErrors } from "./types"
 
-const RATE_LIMIT_MESSAGE =
-  "Çok fazla deneme yapıldı. Lütfen biraz sonra tekrar deneyin."
-
-const ERROR_MESSAGES = {
-  account_locked: "Hesap geçici olarak kilitli. Bir süre sonra tekrar deneyin.",
-  auth_body_too_large: "İstek çok büyük. Lütfen formu kontrol edin.",
-  auth_rate_limit_exceeded: RATE_LIMIT_MESSAGE,
-  cookie_origin_validation_failed:
-    "Güvenlik doğrulaması başarısız oldu. Sayfayı yenileyip tekrar deneyin.",
-  duplicate_email: "Bu e-posta adresi ile zaten bir hesap var.",
-  email_confirmation_required:
-    "Devam etmek için önce e-posta adresinizi doğrulamanız gerekiyor.",
-  email_unavailable: "Bu e-posta adresi kullanılamıyor.",
-  invalid_credentials: "E-posta/kullanıcı adı veya şifre hatalı.",
-  invalid_email_change_token:
-    "E-posta değişikliği bağlantısı geçersiz veya süresi dolmuş.",
-  invalid_email_confirmation_token:
-    "E-posta doğrulama bağlantısı geçersiz veya süresi dolmuş.",
-  invalid_mfa_code: "Doğrulama kodu hatalı.",
-  invalid_password_reset_token:
-    "Şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş.",
-  invalid_recovery_code: "Kurtarma kodu hatalı.",
-  mfa_required: "Devam etmek için iki aşamalı doğrulama kodu gerekiyor.",
-  registration_conflict:
-    "Kayıt tamamlanamadı. Lütfen bilgileri kontrol edip tekrar deneyin.",
+const ERROR_MESSAGE_KEYS = {
+  account_locked: "account_locked",
+  auth_body_too_large: "auth_body_too_large",
+  auth_rate_limit_exceeded: "auth_rate_limit_exceeded",
+  cookie_origin_validation_failed: "cookie_origin_validation_failed",
+  duplicate_email: "duplicate_email",
+  email_confirmation_required: "email_confirmation_required",
+  email_unavailable: "email_unavailable",
+  invalid_credentials: "invalid_credentials",
+  invalid_email_change_token: "invalid_email_change_token",
+  invalid_email_confirmation_token: "invalid_email_confirmation_token",
+  invalid_mfa_code: "invalid_mfa_code",
+  invalid_password_reset_token: "invalid_password_reset_token",
+  invalid_recovery_code: "invalid_recovery_code",
+  mfa_required: "mfa_required",
+  registration_conflict: "registration_conflict"
 } as const
+type KnownErrorMessageKey = (typeof ERROR_MESSAGE_KEYS)[keyof typeof ERROR_MESSAGE_KEYS]
+export type AuthErrorMessageKey =
+  | KnownErrorMessageKey
+  | "validation"
+  | "unauthorized"
+  | "forbidden"
+  | "server"
+  | "default"
 
 export class ApiProblemError extends Error {
   readonly problem: ProblemDetails
@@ -33,67 +32,48 @@ export class ApiProblemError extends Error {
   readonly userMessage: string
 
   constructor(problem: ProblemDetails) {
-    const userMessage = getProblemUserMessage(problem)
-    super(userMessage)
+    super(getDefaultProblemUserMessage(problem))
     this.name = "ApiProblemError"
     this.problem = problem
     this.fieldErrors = normalizeValidationErrors(problem.errors)
-    this.userMessage = userMessage
+    this.userMessage = getDefaultProblemUserMessage(problem)
   }
 }
 
-export function getProblemUserMessage(problem: ProblemDetails) {
-  const knownMessage = getKnownErrorMessage(problem.errorCode)
+export function getProblemMessageKey(problem: ProblemDetails): AuthErrorMessageKey {
+  const knownMessage = getKnownErrorMessageKey(problem.errorCode)
+  if (knownMessage) return knownMessage
 
-  if (knownMessage) {
-    return knownMessage
-  }
+  if (problem.status === 429) return "auth_rate_limit_exceeded"
+  if (problem.status === 400 && problem.errors) return "validation"
+  if (problem.status === 401) return "unauthorized"
+  if (problem.status === 403) return "forbidden"
+  if (problem.status && problem.status >= 500) return "server"
 
-  if (problem.status === 429) {
-    return RATE_LIMIT_MESSAGE
-  }
-
-  if (problem.status === 400 && problem.errors) {
-    return "Formdaki bazı alanlar geçersiz. Lütfen işaretli alanları kontrol edin."
-  }
-
-  if (problem.status === 401) {
-    return "Oturum doğrulanamadı. Lütfen tekrar giriş yapın."
-  }
-
-  if (problem.status === 403) {
-    return "Bu işlem için yetkiniz yok."
-  }
-
-  if (problem.status && problem.status >= 500) {
-    return "Şu anda işlem tamamlanamadı. Lütfen biraz sonra tekrar deneyin."
-  }
-
-  return "İşlem tamamlanamadı. Lütfen bilgileri kontrol edip tekrar deneyin."
+  return "default"
 }
 
-function getKnownErrorMessage(errorCode: string | undefined) {
-  if (!errorCode || !(errorCode in ERROR_MESSAGES)) {
+function getDefaultProblemUserMessage(problem: ProblemDetails): string {
+  return problem.title?.trim() || "Request failed"
+}
+
+function getKnownErrorMessageKey(errorCode: string | undefined) {
+  if (!errorCode || !(errorCode in ERROR_MESSAGE_KEYS)) {
     return undefined
   }
 
-  return ERROR_MESSAGES[errorCode as keyof typeof ERROR_MESSAGES]
+  return ERROR_MESSAGE_KEYS[errorCode as keyof typeof ERROR_MESSAGE_KEYS]
 }
 
-export function normalizeValidationErrors(
-  errors: ValidationErrors | undefined
-) {
+export function normalizeValidationErrors(errors: ValidationErrors | undefined) {
   if (!errors) {
     return {}
   }
 
-  return Object.entries(errors).reduce<ValidationErrors>(
-    (accumulator, [field, messages]) => {
-      accumulator[toCamelCaseField(field)] = messages
-      return accumulator
-    },
-    {}
-  )
+  return Object.entries(errors).reduce<ValidationErrors>((accumulator, [field, messages]) => {
+    accumulator[toCamelCaseField(field)] = messages
+    return accumulator
+  }, {})
 }
 
 export function toCamelCaseField(field: string) {
@@ -116,14 +96,14 @@ export async function parseProblemResponse(response: Response) {
     if (isProblemDetails(payload)) {
       return new ApiProblemError({
         ...payload,
-        status: payload.status ?? response.status,
+        status: payload.status ?? response.status
       })
     }
   }
 
   return new ApiProblemError({
     status: response.status,
-    title: response.statusText,
+    title: response.statusText
   })
 }
 

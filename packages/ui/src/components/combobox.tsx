@@ -3,14 +3,14 @@
 import * as React from "react"
 import { Combobox as ComboboxPrimitive } from "@base-ui/react"
 
-import { cn } from "@norge360/ui/lib/utils"
-import { Button } from "@norge360/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
+import { Button } from "@workspace/ui/components/button"
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from "@norge360/ui/components/input-group"
+} from "@workspace/ui/components/input-group"
 import { ChevronDownIcon, XIcon, CheckIcon } from "lucide-react"
 
 const Combobox = ComboboxPrimitive.Root
@@ -297,3 +297,4 @@ export {
   ComboboxValue,
   useComboboxAnchor,
 }
+

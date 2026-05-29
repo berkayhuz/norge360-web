@@ -3,7 +3,7 @@
 import * as React from "react"
 import { HoverCard as HoverCardPrimitive } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 function HoverCard({
   ...props
@@ -42,3 +42,4 @@ function HoverCardContent({
 }
 
 export { HoverCard, HoverCardTrigger, HoverCardContent }
+

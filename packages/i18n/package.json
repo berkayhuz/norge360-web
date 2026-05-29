@@ -1,0 +1,63 @@
+{
+  "name": "@workspace/i18n",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "i18n:check": "tsx scripts/check-i18n.ts"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "default": "./dist/core/index.js"
+    },
+    "./messages": {
+      "types": "./dist/messages/index.d.ts",
+      "default": "./dist/messages/index.js"
+    },
+    "./format": {
+      "types": "./dist/format/index.d.ts",
+      "default": "./dist/format/index.js"
+    },
+    "./next": {
+      "types": "./dist/next/index.d.ts",
+      "default": "./dist/next/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "default": "./dist/testing/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "messages"
+  ],
+  "peerDependencies": {
+    "next-intl": "^4.4.0"
+  },
+  "devDependencies": {
+    "@norge360/eslint-config": "workspace:*",
+    "@norge360/typescript-config": "workspace:*",
+    "@formatjs/icu-messageformat-parser": "^2.11.4",
+    "@types/node": "^25.5.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "^9",
+    "next-intl": "^4.4.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

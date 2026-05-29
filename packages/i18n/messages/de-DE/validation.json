@@ -1,0 +1,1 @@
+{"required":"{field} ist erforderlich","invalidEmail":"Bitte geben Sie eine gueltige E-Mail-Adresse ein","minLength":"{field} muss mindestens {min, number} Zeichen haben","maxLength":"{field} darf hoechstens {max, number} Zeichen haben"}

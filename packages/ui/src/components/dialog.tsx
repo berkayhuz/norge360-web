@@ -3,8 +3,8 @@
 import * as React from "react"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
-import { Button } from "@norge360/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
+import { Button } from "@workspace/ui/components/button"
 import { XIcon } from "lucide-react"
 
 function Dialog({
@@ -166,3 +166,4 @@ export {
   DialogTitle,
   DialogTrigger,
 }
+

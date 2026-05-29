@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import * as React from "react"
 
 import { authRequest } from "@/src/lib/api/auth-client"
@@ -10,19 +11,21 @@ import { FieldMessage } from "./form-fields"
 
 export function LogoutPanel() {
   const router = useRouter()
-  const [message, setMessage] = React.useState("Oturum kapatılıyor...")
+  const t = useTranslations("auth.logout.panel")
+
+  const [message, setMessage] = React.useState(t("inProgress"))
 
   React.useEffect(() => {
     let cancelled = false
 
     authRequest(AUTH_API_PATHS.logout, {
       body: {},
-      method: "POST",
+      method: "POST"
     })
       .catch(() => undefined)
       .finally(() => {
         if (cancelled) return
-        setMessage("Oturum kapatıldı. Giriş sayfasına yönlendiriliyorsunuz.")
+        setMessage(t("done"))
         router.replace(APP_ROUTES.login)
         router.refresh()
       })
@@ -30,7 +33,7 @@ export function LogoutPanel() {
     return () => {
       cancelled = true
     }
-  }, [router])
+  }, [router, t])
 
   return <FieldMessage>{message}</FieldMessage>
 }

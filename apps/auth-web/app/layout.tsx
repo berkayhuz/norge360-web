@@ -1,10 +1,12 @@
 import type { Metadata } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
+import { NextIntlClientProvider } from "next-intl"
 
-import "@norge360/ui/globals.css"
-import { cn } from "@norge360/ui/lib/utils"
+import "@workspace/ui/globals.css"
+import { cn } from "@workspace/ui/lib/utils"
 
 import { ThemeProvider } from "@/components/theme-provider"
+import { getRequestI18n } from "@/src/lib/i18n/request"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -18,25 +20,21 @@ export const metadata: Metadata = {
   title: "Norge360 Auth",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const { locale, messages } = await getRequestI18n()
+
   return (
-    <html
-      className={cn(
-        "antialiased",
-        fontMono.variable,
-        "font-sans",
-        inter.variable
-      )}
-      lang="tr"
-      suppressHydrationWarning
-    >
+    <html className={cn("antialiased", fontMono.variable, "font-sans", inter.variable)} lang={locale} suppressHydrationWarning>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+           <ThemeProvider>{children}</ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   )
 }
+

@@ -1,0 +1,6 @@
+{
+  "required": "{field} er obligatorisk",
+  "invalidEmail": "Skriv inn en gyldig e-postadresse",
+  "minLength": "{field} ma vaere minst {min, number} tegn",
+  "maxLength": "{field} ma vaere maks {max, number} tegn"
+}

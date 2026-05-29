@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Slider as SliderPrimitive } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 function Slider({
   className,
@@ -57,3 +57,4 @@ function Slider({
 }
 
 export { Slider }
+

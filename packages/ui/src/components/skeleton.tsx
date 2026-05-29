@@ -1,4 +1,4 @@
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -11,3 +11,4 @@ function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 export { Skeleton }
+

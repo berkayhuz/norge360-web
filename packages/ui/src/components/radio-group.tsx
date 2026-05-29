@@ -3,7 +3,7 @@
 import * as React from "react"
 import { RadioGroup as RadioGroupPrimitive } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 function RadioGroup({
   className,
@@ -42,3 +42,4 @@ function RadioGroupItem({
 }
 
 export { RadioGroup, RadioGroupItem }
+

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Tooltip as TooltipPrimitive } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 function TooltipProvider({
   delayDuration = 0,
@@ -55,3 +55,4 @@ function TooltipContent({
 }
 
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger }
+

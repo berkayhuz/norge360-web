@@ -1,0 +1,20 @@
+{
+  "save": "Save",
+  "cancel": "Cancel",
+  "close": "Close",
+  "confirm": "Confirm",
+  "delete": "Delete",
+  "edit": "Edit",
+  "create": "Create",
+  "update": "Update",
+  "search": "Search",
+  "clear": "Clear",
+  "loading": "Loading",
+  "error": "Something went wrong",
+  "success": "Success",
+  "empty": "No items",
+  "welcome": "Welcome, {name}",
+  "itemCount": "{count, plural, =0 {No items} one {# item} other {# items}}",
+  "scheduledAt": "Scheduled for {date, date, medium} at {date, time, short}",
+  "balance": "Balance: {amount, number, ::currency/USD}"
+}

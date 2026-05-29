@@ -1,14 +1,22 @@
-import { AuthShell } from "@/src/features/auth/components/auth-shell"
+import { CompactAuthShell } from "@/src/features/auth/components/compact-auth-shell"
 import { LogoutPanel } from "@/src/features/auth/components/logout-panel"
+import { getRequestI18n } from "@/src/lib/i18n/request"
 
-export default function LogoutPage() {
+export default async function LogoutPage() {
+  const { messages } = await getRequestI18n()
+  const auth = messages.auth
+
   return (
-    <AuthShell
-      eyebrow="Çıkış"
-      subtitle="Oturumunuz güvenli şekilde kapatılıyor."
-      title="Güvenli çıkış"
+    <CompactAuthShell
+      description={auth.logout.subtitle}
+      footerDescription={auth.compactShell.footerLegal}
+      localeLabel={auth.authShell.localeLabel}
+      logoAlt={auth.compactShell.logoAlt}
+      title={auth.logout.title}
+      themeDarkLabel={auth.compactShell.themeDark}
+      themeLightLabel={auth.compactShell.themeLight}
     >
       <LogoutPanel />
-    </AuthShell>
+    </CompactAuthShell>
   )
 }

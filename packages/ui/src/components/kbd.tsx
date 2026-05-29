@@ -1,4 +1,4 @@
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
   return (
@@ -24,3 +24,4 @@ function KbdGroup({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 export { Kbd, KbdGroup }
+

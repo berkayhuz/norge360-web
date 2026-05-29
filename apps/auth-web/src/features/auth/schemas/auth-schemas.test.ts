@@ -16,6 +16,7 @@ describe("auth schemas", () => {
         emailOrUserName: "user@norge360.com",
         password: "secret",
         rememberMe: true,
+        turnstileToken: "token",
       }).success
     ).toBe(true)
   })
@@ -25,6 +26,7 @@ describe("auth schemas", () => {
       culture: "tr-TR",
       email: "user@norge360.com",
       password: "short",
+      turnstileToken: "token",
       userName: "acme-user",
     })
 
@@ -36,6 +38,7 @@ describe("auth schemas", () => {
       culture: "tr-TR",
       email: "user@norge360.com",
       password: validPassword,
+      turnstileToken: "token",
       userName: "acme-user",
     })
 
@@ -47,6 +50,7 @@ describe("auth schemas", () => {
       confirmPassword: validPassword,
       newPassword: validPassword,
       token: "",
+      turnstileToken: "token",
       userId: "11111111-1111-1111-1111-111111111111",
     })
 

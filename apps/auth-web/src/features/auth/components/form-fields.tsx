@@ -2,8 +2,10 @@
 
 import * as React from "react"
 
-import { Button } from "@norge360/ui/components/button"
-import { cn } from "@norge360/ui/lib/utils"
+import { Button } from "@workspace/ui/components/button"
+import { Input } from "@workspace/ui/components/input"
+import { Label } from "@workspace/ui/components/label"
+import { cn } from "@workspace/ui/lib/utils"
 
 import { firstFieldError } from "./form-utils"
 
@@ -46,17 +48,15 @@ export function TextField({
 
   return (
     <div className="grid gap-2">
-      <label className="text-sm font-medium" htmlFor={name}>
+      <Label htmlFor={name}>
         {label}
-      </label>
-      <input
+      </Label>
+      <Input
         aria-describedby={[descriptionId, errorId].filter(Boolean).join(" ")}
         aria-invalid={Boolean(error)}
         autoComplete={autoComplete}
         className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50",
-          error &&
-            "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20"
+          error && "border-destructive focus-visible:border-destructive"
         )}
         defaultValue={defaultValue}
         disabled={disabled}
@@ -124,3 +124,4 @@ export function SubmitButton({
     </Button>
   )
 }
+

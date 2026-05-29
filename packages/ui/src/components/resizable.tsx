@@ -2,7 +2,7 @@
 
 import * as ResizablePrimitive from "react-resizable-panels"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 
 function ResizablePanelGroup({
   className,
@@ -48,3 +48,4 @@ function ResizableHandle({
 }
 
 export { ResizableHandle, ResizablePanel, ResizablePanelGroup }
+

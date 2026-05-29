@@ -1,9 +1,10 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import * as React from "react"
 
-import { ApiProblemError } from "@/src/lib/api/problem"
+import { ApiProblemError, getProblemMessageKey } from "@/src/lib/api/problem"
 import { authRequest } from "@/src/lib/api/auth-client"
 import { AUTH_API_PATHS, APP_ROUTES } from "@/src/lib/routes"
 
@@ -16,31 +17,15 @@ type ConfirmEmailChangePanelProps = {
   userId?: string
 }
 
-export function ConfirmEmailChangePanel({
-  newEmail = "",
-  token = "",
-  userId = "",
-}: ConfirmEmailChangePanelProps) {
-  const parsedRequest = React.useMemo(
-    () =>
-      confirmEmailChangeSchema.safeParse({
-        newEmail,
-        token,
-        userId,
-      }),
-    [newEmail, token, userId]
-  )
-  const [state, setState] = React.useState<{
-    message: string
-    tone: "danger" | "neutral" | "success"
-  }>(() =>
+export function ConfirmEmailChangePanel({ newEmail = "", token = "", userId = "" }: ConfirmEmailChangePanelProps) {
+  const t = useTranslations("auth.confirmEmailChangePanel")
+  const tErrors = useTranslations("auth.errors")
+
+  const parsedRequest = React.useMemo(() => confirmEmailChangeSchema.safeParse({ newEmail, token, userId }), [newEmail, token, userId])
+  const [state, setState] = React.useState<{ message: string; tone: "danger" | "neutral" | "success" }>(() =>
     parsedRequest.success
-      ? { message: "E-posta değişikliği doğrulanıyor...", tone: "neutral" }
-      : {
-          message:
-            "E-posta değişikliği bağlantısı eksik veya geçersiz. E-postadaki bağlantıyı tekrar açın.",
-          tone: "danger",
-        }
+      ? { message: t("verifying"), tone: "neutral" }
+      : { message: t("invalidLink"), tone: "danger" }
   )
 
   React.useEffect(() => {
@@ -52,41 +37,33 @@ export function ConfirmEmailChangePanel({
 
     authRequest(AUTH_API_PATHS.confirmEmailChange, {
       body: parsedRequest.data,
-      method: "POST",
+      method: "POST"
     })
       .then(() => {
         if (!cancelled) {
-          setState({
-            message:
-              "E-posta adresiniz güncellendi. Güvenlik nedeniyle tekrar giriş yapın.",
-            tone: "success",
-          })
+          setState({ message: t("success"), tone: "success" })
         }
       })
       .catch((error: unknown) => {
         if (cancelled) return
-        setState({
-          message:
-            error instanceof ApiProblemError
-              ? error.userMessage
-              : "E-posta değişikliği doğrulanamadı. Lütfen tekrar deneyin.",
-          tone: "danger",
-        })
+
+        if (error instanceof ApiProblemError) {
+          setState({ message: tErrors(getProblemMessageKey(error.problem)), tone: "danger" })
+        } else {
+          setState({ message: t("fallbackError"), tone: "danger" })
+        }
       })
 
     return () => {
       cancelled = true
     }
-  }, [parsedRequest])
+  }, [parsedRequest, t, tErrors])
 
   return (
     <div className="grid gap-4">
       <FieldMessage tone={state.tone}>{state.message}</FieldMessage>
-      <Link
-        className="text-sm font-medium text-primary"
-        href={APP_ROUTES.login}
-      >
-        Giriş sayfasına dön
+      <Link className="text-sm font-medium text-primary" href={APP_ROUTES.login}>
+        {t("backToLogin")}
       </Link>
     </div>
   )

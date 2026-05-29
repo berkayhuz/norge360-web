@@ -11,7 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": dirname,
-      "@norge360/ui": path.resolve(dirname, "../../packages/ui/src"),
+      "@workspace/ui": path.resolve(dirname, "../../packages/ui/src"),
     },
   },
   test: {
@@ -20,3 +20,4 @@ export default defineConfig({
     setupFiles: ["./test/setup.ts"],
   },
 })
+

@@ -3,8 +3,8 @@
 import * as React from "react"
 import { AlertDialog as AlertDialogPrimitive } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
-import { Button } from "@norge360/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
+import { Button } from "@workspace/ui/components/button"
 
 function AlertDialog({
   ...props
@@ -197,3 +197,4 @@ export {
   AlertDialogTitle,
   AlertDialogTrigger,
 }
+

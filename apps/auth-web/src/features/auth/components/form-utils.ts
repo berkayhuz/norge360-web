@@ -16,6 +16,11 @@ export function getFormBoolean(formData: FormData, key: string) {
   return formData.get(key) === "on"
 }
 
+export function getTurnstileToken(formData: FormData) {
+  const value = formData.get("cf-turnstile-response")
+  return typeof value === "string" ? value.trim() : ""
+}
+
 export function zodFieldErrors(error: z.ZodError): ValidationErrors {
   const fieldErrors = error.flatten().fieldErrors as Record<
     string,

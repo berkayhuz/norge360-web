@@ -3,7 +3,8 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./*"],
-      "@norge360/ui/*": ["../../packages/ui/src/*"]
+      "@workspace/ui/globals.css": ["../../packages/ui/src/styles/globals.css"],
+      "@workspace/ui/*": ["../../packages/ui/src/*"]
     },
     "plugins": [
       {
@@ -23,3 +24,4 @@
   ],
   "exclude": ["node_modules"]
 }
+

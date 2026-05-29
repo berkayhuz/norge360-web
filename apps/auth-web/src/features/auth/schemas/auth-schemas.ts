@@ -25,6 +25,7 @@ export const loginSchema = z.object({
   password: z.string().min(1).max(256),
   recoveryCode: z.string().trim().max(128).optional().transform((v) => (v ? v : undefined)),
   rememberMe: z.boolean().default(false),
+  turnstileToken: z.string().trim().min(1),
 })
 
 export const registerSchema = z.object({
@@ -33,11 +34,13 @@ export const registerSchema = z.object({
   firstName: z.string().trim().max(100).optional().transform((v) => (v ? v : undefined)),
   lastName: z.string().trim().max(100).optional().transform((v) => (v ? v : undefined)),
   password: passwordSchema,
+  turnstileToken: z.string().trim().min(1),
   userName: z.string().trim().min(3).max(64),
 })
 
 export const forgotPasswordSchema = z.object({
   email: z.string().trim().email(),
+  turnstileToken: z.string().trim().min(1),
 })
 
 export const resetPasswordSchema = z
@@ -45,6 +48,7 @@ export const resetPasswordSchema = z
     confirmPassword: z.string().min(1),
     newPassword: passwordSchema,
     token: z.string().trim().min(1).max(512),
+    turnstileToken: z.string().trim().min(1),
     userId: guidSchema,
   })
   .refine((v) => v.newPassword === v.confirmPassword, {

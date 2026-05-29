@@ -1,7 +1,7 @@
 import * as React from "react"
 
-import { cn } from "@norge360/ui/lib/utils"
-import { Button } from "@norge360/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
+import { Button } from "@workspace/ui/components/button"
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
@@ -127,3 +127,4 @@ export {
   PaginationNext,
   PaginationPrevious,
 }
+

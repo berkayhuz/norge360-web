@@ -3,7 +3,7 @@
 import * as React from "react"
 import { ContextMenu as ContextMenuPrimitive } from "radix-ui"
 
-import { cn } from "@norge360/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils"
 import { ChevronRightIcon, CheckIcon } from "lucide-react"
 
 function ContextMenu({
@@ -261,3 +261,4 @@ export {
   ContextMenuSubTrigger,
   ContextMenuRadioGroup,
 }
+
