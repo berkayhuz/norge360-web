@@ -208,6 +208,7 @@ async function main() {
   const filePath = path.resolve(process.cwd(), args.file);
   const fileContents = await fs.readFile(filePath, 'utf8');
   const secrets = parseSecretsFile(fileContents);
+  validateProductionSecrets(secrets, args.file);
 
   if (secrets.length === 0) {
     throw new Error(`No secrets found in ${args.file}`);
@@ -229,6 +230,46 @@ async function main() {
       value: secret.value,
       dryRun: args.dryRun,
     });
+  }
+}
+
+function validateProductionSecrets(secrets, fileName) {
+  const restrictedKeys = new Set([
+    'AUTH_API_BASE_URL',
+    'GATEWAY_API_BASE_URL',
+    'INTERNAL_API_BASE_URL',
+  ]);
+
+  const problems = [];
+
+  for (const secret of secrets) {
+    if (!restrictedKeys.has(secret.key)) {
+      continue;
+    }
+
+    const value = secret.value.trim();
+    if (!value) {
+      problems.push(`${secret.key} is empty`);
+      continue;
+    }
+
+    try {
+      const url = new URL(value);
+      if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+        problems.push(`${secret.key} must not point to localhost in ${fileName}`);
+      }
+    } catch {
+      problems.push(`${secret.key} must be a valid URL in ${fileName}`);
+    }
+  }
+
+  if (problems.length > 0) {
+    throw new Error([
+      'Production secret file validation failed:',
+      ...problems.map((problem) => `- ${problem}`),
+      '',
+      'Set the backend/gateway URLs to the real production endpoints before syncing secrets.',
+    ].join('\n'));
   }
 }
 

@@ -110,6 +110,14 @@ jobs:
             fi
           done
 
+          for name in GATEWAY_API_BASE_URL INTERNAL_API_BASE_URL AUTH_API_BASE_URL; do
+            value="${!name}"
+            if [[ "$value" =~ ^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?(/|$) ]]; then
+              echo "::error::${name} must point to a real backend endpoint, not ${value}"
+              exit 1
+            fi
+          done
+
           {
             printf 'NEXT_PUBLIC_SITE_URL=%s\n' "$NEXT_PUBLIC_SITE_URL"
             printf 'PUBLIC_WEB_APP_URL=%s\n' "$PUBLIC_WEB_APP_URL"
