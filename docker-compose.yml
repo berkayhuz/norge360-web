@@ -1,18 +1,49 @@
+x-common-build-args: &common-build-args
+  NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+  PUBLIC_WEB_APP_URL: ${PUBLIC_WEB_APP_URL:-http://localhost:3000}
+  NEXT_PUBLIC_AUTH_WEB_URL: ${NEXT_PUBLIC_AUTH_WEB_URL:-http://localhost:3001}
+  GATEWAY_API_BASE_URL: ${GATEWAY_API_BASE_URL:-http://localhost:5030}
+  INTERNAL_API_BASE_URL: ${INTERNAL_API_BASE_URL:-http://localhost:5030}
+  AUTH_WEB_APP_URL: ${AUTH_WEB_APP_URL:-http://localhost:3001}
+  AUTH_API_BASE_URL: ${AUTH_API_BASE_URL:-http://localhost:5030}
+  POST_LOGIN_REDIRECT_URL: ${POST_LOGIN_REDIRECT_URL:-http://localhost:3000/}
+  ALLOWED_REDIRECT_ORIGINS: ${ALLOWED_REDIRECT_ORIGINS:-http://localhost:3000,http://localhost:3001}
+  AUTH_ACCESS_COOKIE_NAME: ${AUTH_ACCESS_COOKIE_NAME:-Norge360-access}
+  AUTH_REFRESH_COOKIE_NAME: ${AUTH_REFRESH_COOKIE_NAME:-Norge360-refresh}
+  AUTH_SESSION_COOKIE_NAME: ${AUTH_SESSION_COOKIE_NAME:-Norge360-session}
+  AUTH_COOKIE_DOMAIN: ${AUTH_COOKIE_DOMAIN:-}
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-0x4AAAAAADYZs62J8mYwqUhP}
+
+x-common-runtime-env: &common-runtime-env
+  NODE_ENV: production
+  PORT: "3000"
+  HOSTNAME: 0.0.0.0
+  NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+  PUBLIC_WEB_APP_URL: ${PUBLIC_WEB_APP_URL:-http://localhost:3000}
+  NEXT_PUBLIC_AUTH_WEB_URL: ${NEXT_PUBLIC_AUTH_WEB_URL:-http://localhost:3001}
+  GATEWAY_API_BASE_URL: ${GATEWAY_API_BASE_URL:-http://localhost:5030}
+  INTERNAL_API_BASE_URL: ${INTERNAL_API_BASE_URL:-http://localhost:5030}
+  AUTH_WEB_APP_URL: ${AUTH_WEB_APP_URL:-http://localhost:3001}
+  AUTH_API_BASE_URL: ${AUTH_API_BASE_URL:-http://localhost:5030}
+  POST_LOGIN_REDIRECT_URL: ${POST_LOGIN_REDIRECT_URL:-http://localhost:3000/}
+  ALLOWED_REDIRECT_ORIGINS: ${ALLOWED_REDIRECT_ORIGINS:-http://localhost:3000,http://localhost:3001}
+  AUTH_ACCESS_COOKIE_NAME: ${AUTH_ACCESS_COOKIE_NAME:-Norge360-access}
+  AUTH_REFRESH_COOKIE_NAME: ${AUTH_REFRESH_COOKIE_NAME:-Norge360-refresh}
+  AUTH_SESSION_COOKIE_NAME: ${AUTH_SESSION_COOKIE_NAME:-Norge360-session}
+  AUTH_COOKIE_DOMAIN: ${AUTH_COOKIE_DOMAIN:-}
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-0x4AAAAAADYZs62J8mYwqUhP}
+
 services:
   public-web:
     build:
       context: .
       dockerfile: Dockerfile.public-web
+      args: *common-build-args
     container_name: norge360-public-web
     restart: unless-stopped
-    env_file:
-      - ./.env.local
     extra_hosts:
       - host.docker.internal:host-gateway
-    environment:
-      NODE_ENV: production
-      PORT: 3000
-      HOSTNAME: 0.0.0.0
+    environment: *common-runtime-env
     expose:
       - "3000"
     healthcheck:
@@ -26,16 +57,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.auth-web
+      args: *common-build-args
     container_name: norge360-auth-web
     restart: unless-stopped
-    env_file:
-      - ./.env.local
     extra_hosts:
       - host.docker.internal:host-gateway
-    environment:
-      NODE_ENV: production
-      PORT: 3000
-      HOSTNAME: 0.0.0.0
+    environment: *common-runtime-env
     expose:
       - "3000"
     healthcheck:
@@ -58,7 +85,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Caddyfile.local:/etc/caddy/Caddyfile:ro
+      - ./${CADDYFILE_PATH:-Caddyfile.local}:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
 

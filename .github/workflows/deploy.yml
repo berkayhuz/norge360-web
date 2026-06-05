@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+concurrency:
+  group: norge360-web-production
+  cancel-in-progress: true
 
 jobs:
   quality:
@@ -57,7 +62,29 @@ jobs:
     needs:
       - quality
       - secret-scan
-    runs-on: self-hosted
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+      - norge360-frontend-1
+    environment: production
+
+    env:
+      NEXT_PUBLIC_SITE_URL: https://norge360.com
+      PUBLIC_WEB_APP_URL: https://norge360.com
+      NEXT_PUBLIC_AUTH_WEB_URL: https://auth.norge360.com
+      AUTH_WEB_APP_URL: https://auth.norge360.com
+      POST_LOGIN_REDIRECT_URL: https://norge360.com/
+      ALLOWED_REDIRECT_ORIGINS: https://norge360.com,https://www.norge360.com,https://auth.norge360.com
+      AUTH_COOKIE_DOMAIN: .norge360.com
+      AUTH_ACCESS_COOKIE_NAME: Norge360-access
+      AUTH_REFRESH_COOKIE_NAME: Norge360-refresh
+      AUTH_SESSION_COOKIE_NAME: Norge360-session
+      GATEWAY_API_BASE_URL: ${{ secrets.GATEWAY_API_BASE_URL }}
+      INTERNAL_API_BASE_URL: ${{ secrets.INTERNAL_API_BASE_URL }}
+      AUTH_API_BASE_URL: ${{ secrets.AUTH_API_BASE_URL }}
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+      CADDYFILE_PATH: Caddyfile
 
     steps:
       - name: Checkout repository
@@ -65,15 +92,48 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Prepare production env file
+        run: |
+          set -euo pipefail
+
+          required_vars=(
+            GATEWAY_API_BASE_URL
+            INTERNAL_API_BASE_URL
+            AUTH_API_BASE_URL
+            NEXT_PUBLIC_TURNSTILE_SITE_KEY
+          )
+
+          for name in "${required_vars[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error::Missing required environment variable: ${name}"
+              exit 1
+            fi
+          done
+
+          {
+            printf 'NEXT_PUBLIC_SITE_URL=%s\n' "$NEXT_PUBLIC_SITE_URL"
+            printf 'PUBLIC_WEB_APP_URL=%s\n' "$PUBLIC_WEB_APP_URL"
+            printf 'NEXT_PUBLIC_AUTH_WEB_URL=%s\n' "$NEXT_PUBLIC_AUTH_WEB_URL"
+            printf 'GATEWAY_API_BASE_URL=%s\n' "$GATEWAY_API_BASE_URL"
+            printf 'INTERNAL_API_BASE_URL=%s\n' "$INTERNAL_API_BASE_URL"
+            printf 'AUTH_WEB_APP_URL=%s\n' "$AUTH_WEB_APP_URL"
+            printf 'AUTH_API_BASE_URL=%s\n' "$AUTH_API_BASE_URL"
+            printf 'POST_LOGIN_REDIRECT_URL=%s\n' "$POST_LOGIN_REDIRECT_URL"
+            printf 'ALLOWED_REDIRECT_ORIGINS=%s\n' "$ALLOWED_REDIRECT_ORIGINS"
+            printf 'AUTH_COOKIE_DOMAIN=%s\n' "$AUTH_COOKIE_DOMAIN"
+            printf 'AUTH_ACCESS_COOKIE_NAME=%s\n' "$AUTH_ACCESS_COOKIE_NAME"
+            printf 'AUTH_REFRESH_COOKIE_NAME=%s\n' "$AUTH_REFRESH_COOKIE_NAME"
+            printf 'AUTH_SESSION_COOKIE_NAME=%s\n' "$AUTH_SESSION_COOKIE_NAME"
+            printf 'NEXT_PUBLIC_TURNSTILE_SITE_KEY=%s\n' "$NEXT_PUBLIC_TURNSTILE_SITE_KEY"
+            printf 'CADDYFILE_PATH=%s\n' "$CADDYFILE_PATH"
+          } > .env.production
+
+          chmod 600 .env.production
+
       - name: Deploy web stack on frontend server
         run: |
           set -euo pipefail
 
-          cd /opt/norge360-web
-
-          git fetch origin main
-          git reset --hard origin/main
-
-          docker compose up -d --build --remove-orphans
+          docker compose --env-file .env.production -p norge360-web up -d --build --remove-orphans
 
           docker image prune -f

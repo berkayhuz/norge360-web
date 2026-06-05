@@ -12,7 +12,7 @@ Use the repo-root env file:
 Then start the stack:
 
 ```powershell
-docker compose up -d --build
+docker compose --env-file .env.local up -d --build
 ```
 
 ## GitHub Secrets Sync
@@ -30,6 +30,35 @@ For local HTTPS, map these hostnames to `127.0.0.1` in your hosts file:
 - `auth.norge360.com`
 
 The local Caddy config uses internal TLS so the browser can talk to the stack over HTTPS without public DNS.
+
+## Production Deploy
+
+Production on Hetzner uses a GitHub Actions self-hosted runner on `norge360-frontend-1`.
+
+1. Install Docker and register the runner on the server with:
+
+```bash
+sudo bash scripts/ops/setup-hetzner-frontend-runner.sh \
+  --repo berkayhuz/norge360-web \
+  --token YOUR_RUNNER_REGISTRATION_TOKEN
+```
+
+2. Add these repository environment variables or secrets in GitHub Actions `production`:
+
+- `GATEWAY_API_BASE_URL`
+- `INTERNAL_API_BASE_URL`
+- `AUTH_API_BASE_URL`
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+
+3. Push to `main`.
+
+The deploy workflow writes a production env file on the runner, then runs:
+
+```bash
+docker compose --env-file .env.production -p norge360-web up -d --build --remove-orphans
+```
+
+If runner registration fails with `404`, generate a fresh GitHub runner registration token and rerun the bootstrap command. Those tokens expire quickly.
 
 ## Production Kubernetes
 

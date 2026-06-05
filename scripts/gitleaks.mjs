@@ -21,6 +21,15 @@ const forbiddenFilePatterns = [
   /\.tfvars(\.json)?$/i,
 ]
 
+const ignoredEnvFiles = new Set([
+  ".env.local",
+  ".env.local.example",
+  ".env.secrets.production",
+  ".env.production.local",
+  ".env.test.local",
+  ".env.production.example",
+])
+
 async function exists(filePath) {
   try {
     await access(filePath)
@@ -71,10 +80,7 @@ async function main() {
     .filter((relativePath) => /^\.env(\.|$)/i.test(path.basename(relativePath)))
 
   for (const envFile of obviousEnvFiles) {
-    if (
-      envFile.endsWith(".env.example") ||
-      envFile.endsWith(".env.production.example")
-    ) {
+    if (ignoredEnvFiles.has(path.basename(envFile))) {
       continue
     }
 
