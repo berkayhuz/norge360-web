@@ -57,6 +57,7 @@ export function useCommunityFeed() {
       setHasNextPage(response.hasNextPage ?? response.items.length >= response.pageSize);
     } catch (err) {
       setError(err instanceof Error ? err.message : "community_error");
+      setHasNextPage(false);
     } finally {
       setLoading(false);
     }
@@ -247,6 +248,7 @@ export function useCommunityUserPosts(userId: string) {
       setHasNextPage(response.hasNextPage ?? response.items.length >= response.pageSize);
     } catch (err) {
       setError(err instanceof Error ? err.message : "community_user_posts_error");
+      setHasNextPage(false);
     } finally {
       setLoading(false);
     }
