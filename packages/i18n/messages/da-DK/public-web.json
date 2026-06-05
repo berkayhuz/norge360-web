@@ -1,0 +1,283 @@
+{
+  "brand": {
+    "communityBadge": "Norge360 lokalsamfund"
+  },
+  "profile": {
+    "status": {
+      "forbiddenTitle": "Adgang begrænset",
+      "forbiddenDescription": "Denne profil kan ikke vises offentligt.",
+      "loadingTitle": "Profilen kan ikke indlæses lige nu",
+      "loadingDescription": "Prøv igen om et øjeblik."
+    },
+    "hero": {
+      "editProfile": "Rediger profil",
+      "message": "Send besked",
+      "follow": "Følg",
+      "occupationFallback": "Medlem af fællesskabet",
+      "coverAlt": "Forsidebillede til {name}",
+      "avatarAlt": "Profilbillede til {name}"
+    },
+    "stats": {
+      "posts": "Indlæg",
+      "followers": "Følgere",
+      "following": "Følger"
+    },
+    "feed": {
+      "title": "Fællesskabsfeed",
+      "description": "Dette område er reserveret til brugerens indlæg og bidrag til fællesskabet."
+    },
+    "summary": {
+      "title": "Profiloversigt",
+      "role": "Rolle",
+      "company": "Virksomhed",
+      "location": "Sted",
+      "joined": "Tilmeldt",
+      "lastActive": "Sidst aktiv",
+      "website": "Websted",
+      "profileStrengthTitle": "Gør din profil stærkere"
+    },
+    "community": {
+      "title": "Forbind dig med fællesskabet",
+      "description": "Mennesker i nærheden og lokale muligheder for at deltage.",
+      "nearbyPeople": "Personer i nærheden",
+      "sameCity": "Personer fra samme by",
+      "localGuides": "Lokale guider",
+      "activePeople": "Aktive personer i fællesskabet",
+      "nearbyDescription": "Mød aktive medlemmer omkring dig.",
+      "sameCityDescription": "Styrk lokale fællesskabsbånd.",
+      "localGuidesDescription": "Opdag guider, der bidrager i nabolaget.",
+      "activePeopleDescription": "Medlemmer som har postet jævnligt for nylig.",
+      "nearbyMeta": "11 medlemmer inden for 3 km",
+      "sameCityMeta": "26 nye medlemmer denne uge",
+      "localGuidesMeta": "9 aktive guider",
+      "activePeopleMeta": "14 aktive medlemmer de sidste 7 dage",
+      "viewProfiles": "Se profiler",
+      "connect": "Forbind",
+      "reviewContributions": "Gennemgå bidrag",
+      "seeActivity": "Se aktivitet"
+    },
+    "actionsMenu": {
+      "ariaLabel": "Profile actions",
+      "block": "Block user",
+      "unblock": "Unblock user",
+      "report": "Report",
+      "reportSoon": "Reporting will be available soon."
+    }
+  },
+  "onboarding": {
+    "title": "Profilafslutning",
+    "description": "Du kan fuldføre trinene nedenfor, når du vil.",
+    "editProfile": "Rediger profil",
+    "dismiss": "Vis ikke igen",
+    "progress": "{completed}/{total} fuldført",
+    "progressAria": "Procent fuldført profil",
+    "completed": "Fuldført",
+    "suggestion": "Forslag",
+    "bonusTitle": "Forsidebillede (bonus)",
+    "bonusDescription": "Upload af forsidebillede kommer snart.",
+    "bonusAvailable": "Tilgængelig",
+    "bonusSoon": "Snart",
+    "avatar": {
+      "title": "Profilbillede",
+      "doneHint": "Der er et profilbillede.",
+      "missingHint": "Tilføj et profilbillede for at gøre kontoen mere genkendelig."
+    },
+    "bio": {
+      "title": "Bio",
+      "doneHint": "Din korte bio er synlig.",
+      "missingHint": "Præsenter dig selv i et par sætninger."
+    },
+    "company": {
+      "title": "Virksomhed / organisation",
+      "doneHint": "Oplysninger om virksomhed eller organisation er udfyldt.",
+      "missingHint": "Tilføj den virksomhed eller organisation, du er tilknyttet."
+    },
+    "location": {
+      "title": "Sted",
+      "doneHint": "Stedsoplysninger er tilgængelige.",
+      "missingHint": "Tilføj et sted, så folk ved, hvor du er."
+    },
+    "occupation": {
+      "title": "Beskæftigelse",
+      "doneHint": "Oplysninger om beskæftigelse er udfyldt.",
+      "missingHint": "Tilføj, hvad du laver, eller hvad du er specialiseret i."
+    },
+    "website": {
+      "title": "Websted",
+      "doneHint": "Dit webstedlink er tilgængeligt.",
+      "missingHint": "Tilføj dit personlige websted eller portfolio."
+    }
+  },
+  "settings": {
+    "loginRequiredTitle": "Login påkrævet",
+    "loginRequiredDescription": "Log ind for at redigere dine profilindstillinger.",
+    "preparingTitle": "Profilen forberedes",
+    "preparingDescription": "Din profilpost oprettes. Prøv igen om et øjeblik.",
+    "accessRestrictedTitle": "Adgang begrænset",
+    "accessRestrictedDescription": "Du har ikke tilladelse til at se disse profilindstillinger.",
+    "notFoundTitle": "Profil ikke fundet",
+    "notFoundDescription": "Vi kunne ikke finde din profil. Prøv igen senere.",
+    "serviceUnavailableTitle": "Profiltjenesten er utilgængelig",
+    "serviceUnavailableDescription": "Profilindstillingerne kan ikke indlæses lige nu. Prøv igen senere.",
+    "title": "Profilindstillinger",
+    "description": "Disse felter er valgfrie. Opdater dem, når det giver mening.",
+    "avatar": {
+      "title": "Avatar",
+      "description": "JPG, PNG eller WebP. Op til 5 MB.",
+      "hint": "Når du uploader en ny avatar, sendes den først til R2 og knyttes derefter til din profil.",
+      "optional": "Valgfri",
+      "fileLabel": "Avatarfil",
+      "fileSelected": "{fileName} ({fileSize})",
+      "fileDefault": "Du kan kun uploade JPG, PNG eller WebP.",
+      "validImage": "Vælg et gyldigt billede.",
+      "fileTooLarge": "Filstørrelsen må højst være 5 MB.",
+      "uploadStartError": "Avatarupload kunne ikke startes.",
+      "uploadFormatError": "Svaret fra avataruploaden havde ikke det forventede format.",
+      "uploadFailed": "Billedfilen kunne ikke uploades. Prøv igen.",
+      "attachFailed": "Avatar kunne ikke knyttes til profilen.",
+      "profileUnreadable": "Avatar blev opdateret, men profildata kunne ikke læses.",
+      "unexpectedError": "Der opstod en uventet fejl under upload af avatar.",
+      "updating": "Opdaterer...",
+      "updateButton": "Upload avatar"
+    },
+    "alert": {
+      "successTitle": "Succes",
+      "avatarErrorTitle": "Avatar kunne ikke opdateres",
+      "saveErrorTitle": "Profilen kunne ikke opdateres",
+      "successMessage": "Dine profiloplysninger er blevet opdateret.",
+      "validationMessage": "Kontroller venligst felterne.",
+      "unauthorizedMessage": "Din session er ugyldig. Log ind igen.",
+      "forbiddenMessage": "Du har ikke tilladelse til at gøre det.",
+      "notFoundMessage": "Profilposten blev ikke fundet.",
+      "upstreamMessage": "Profiltjenesten er utilgængelig. Prøv igen.",
+      "unexpectedMessage": "Der opstod en uventet fejl."
+    },
+    "fields": {
+      "displayName": "Visningsnavn",
+      "displayNamePlaceholder": "Dit visningsnavn",
+      "bio": "Bio",
+      "bioPlaceholder": "Præsenter dig kort",
+      "bioHint": "Op til 500 tegn.",
+      "country": "Land",
+      "city": "By",
+      "district": "Distrikt",
+      "occupation": "Beskæftigelse",
+      "company": "Virksomhed / organisation",
+      "website": "Websted",
+      "websitePlaceholder": "https://example.com",
+      "websiteHint": "Indtast en URL, der starter med http:// eller https://.",
+      "profileVisibility": "Profilsynlighed",
+      "sectionLocation": "Sted",
+      "sectionProfessional": "Professionel",
+      "sectionLinksVisibility": "Links og synlighed"
+    },
+    "visibility": {
+      "public": "Visible to everyone",
+      "followersOnly": "Visible to followers only",
+      "private": "Visible to signed-in users only"
+    },
+    "actions": {
+      "save": "Gem ændringer",
+      "saving": "Gemmer..."
+    }
+  },
+  "search": {
+    "command": {
+      "title": "Search",
+      "description": "Norge360 search",
+      "placeholder": "User, community, post...",
+      "suggestions": "Suggestions",
+      "empty": {
+        "loading": "Searching...",
+        "typeHint": "Type a user, community or post.",
+        "noResults": "No results found."
+      }
+    }
+  },
+  "community": {
+    "feed": {
+      "title": "Community-feed",
+      "emptyTitle": "Ingen opslag endnu",
+      "emptyDescription": "V?r den f?rste til at dele med communityet.",
+      "loadMore": "Indl?s flere",
+      "loading": "Indl?ser feed...",
+      "error": "Feed kunne ikke indl?ses."
+    },
+    "post": {
+      "createTitle": "Opret opslag",
+      "captionPlaceholder": "Del noget med communityet",
+      "addImages": "Tilf?j billeder",
+      "removeImage": "Fjern billede",
+      "maxImagesError": "Du kan v?lge op til 8 billeder.",
+      "publish": "Udgiv",
+      "publishing": "Udgiver...",
+      "like": "Synes godt om",
+      "unlike": "Fjern like",
+      "save": "Gem",
+      "unsave": "Fjern gemt",
+      "comment": "Kommentar",
+      "report": "Rapport?r",
+      "interested": "Interesseret",
+      "notInterested": "Ikke interesseret",
+      "hiddenBecauseNotInterested": "Skjult fordi ikke interesseret.",
+      "mediaOptimizingNotice": "Billeder over 1 MB kan optimeres automatisk i backend.",
+      "authorFallback": "Communitymedlem",
+      "mediaAlt": "Opslagsbillede",
+      "edit": "Rediger",
+      "editTitle": "Rediger opslag",
+      "saveChanges": "Gem ?ndringer",
+      "savingChanges": "Gemmer ?ndringer...",
+      "delete": "Slet",
+      "deleteTitle": "Slet opslag",
+      "deleteDescription": "Denne handling kan ikke fortrydes.",
+      "deleteConfirm": "Slet",
+      "deleteCancel": "Annuller",
+      "deleted": "Opslag slettet.",
+      "updated": "Opslag opdateret.",
+      "updateError": "Kunne ikke opdatere opslag.",
+      "deleteError": "Kunne ikke slette opslag.",
+      "reports": "Rapporter",
+      "hide": "Skjul",
+      "restore": "Gendan"
+    },
+    "comment": {
+      "title": "Kommentarer",
+      "placeholder": "Skriv en kommentar",
+      "reply": "Svar",
+      "send": "Send",
+      "empty": "Ingen kommentarer endnu.",
+      "loading": "Indl?ser kommentarer...",
+      "error": "Kommentarer kunne ikke indl?ses."
+    },
+    "reaction": {
+      "add": "Tilf?j reaktion",
+      "remove": "Fjern reaktion"
+    },
+    "report": {
+      "title": "Rapport?r",
+      "description": "Beskrivelse (valgfri)",
+      "reason": "?rsag",
+      "submit": "Send rapport",
+      "success": "Rapport sendt.",
+      "reasons": {
+        "spam": "Spam",
+        "harassment": "Chikane",
+        "hateSpeech": "Hadtale",
+        "nudity": "N?genhed",
+        "violence": "Vold",
+        "scam": "Svindel",
+        "other": "Andet"
+      }
+    },
+    "error": {
+      "generic": "Noget gik galt.",
+      "unauthorized": "Log venligst ind.",
+      "validation": "Kontroll?r dine input."
+    },
+    "moderation": {
+      "reports": "Rapporter",
+      "hide": "Skjul",
+      "restore": "Gendan"
+    }
+  }
+}

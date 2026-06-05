@@ -1,0 +1,20 @@
+{
+  "save": "Speichern",
+  "cancel": "Abbrechen",
+  "close": "Schliessen",
+  "confirm": "Bestaetigen",
+  "delete": "Loeschen",
+  "edit": "Bearbeiten",
+  "create": "Erstellen",
+  "update": "Aktualisieren",
+  "search": "Suchen",
+  "clear": "Leeren",
+  "loading": "Laedt",
+  "error": "Etwas ist schiefgelaufen",
+  "success": "Erfolgreich",
+  "empty": "Keine Eintraege",
+  "welcome": "Willkommen, {name}",
+  "itemCount": "{count, plural, =0 {Keine Eintraege} one {# Eintrag} other {# Eintraege}}",
+  "scheduledAt": "Geplant fur {date, date, medium} um {date, time, short}",
+  "balance": "Kontostand: {amount, number, ::currency/EUR}"
+}

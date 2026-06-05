@@ -1,0 +1,283 @@
+{
+  "brand": {
+    "communityBadge": "Norge360 local community"
+  },
+  "profile": {
+    "status": {
+      "forbiddenTitle": "Access restricted",
+      "forbiddenDescription": "This profile cannot be viewed publicly.",
+      "loadingTitle": "Profile can't be loaded right now",
+      "loadingDescription": "Please try again in a moment."
+    },
+    "hero": {
+      "editProfile": "Edit profile",
+      "message": "Send message",
+      "follow": "Follow",
+      "occupationFallback": "Community member",
+      "coverAlt": "{name} cover image",
+      "avatarAlt": "{name} profile picture"
+    },
+    "stats": {
+      "posts": "Posts",
+      "followers": "Followers",
+      "following": "Following"
+    },
+    "feed": {
+      "title": "Community feed",
+      "description": "This area is reserved for the user's posts and community contributions."
+    },
+    "summary": {
+      "title": "Profile summary",
+      "role": "Role",
+      "company": "Company",
+      "location": "Location",
+      "joined": "Joined",
+      "lastActive": "Last active",
+      "website": "Website",
+      "profileStrengthTitle": "Strengthen your profile"
+    },
+    "community": {
+      "title": "Connect with the community",
+      "description": "Nearby people and local participation opportunities.",
+      "nearbyPeople": "Nearby people",
+      "sameCity": "People from the same city",
+      "localGuides": "Local guides",
+      "activePeople": "Active people in the community",
+      "nearbyDescription": "Meet active members around you.",
+      "sameCityDescription": "Strengthen local community ties.",
+      "localGuidesDescription": "Discover guide members contributing to the neighborhood.",
+      "activePeopleDescription": "Members who have been posting regularly lately.",
+      "nearbyMeta": "11 members within 3 km",
+      "sameCityMeta": "26 new members this week",
+      "localGuidesMeta": "9 active guides",
+      "activePeopleMeta": "14 active members in the last 7 days",
+      "viewProfiles": "View profiles",
+      "connect": "Connect",
+      "reviewContributions": "Review contributions",
+      "seeActivity": "See activity"
+    },
+    "actionsMenu": {
+      "ariaLabel": "Profile actions",
+      "block": "Block user",
+      "unblock": "Unblock user",
+      "report": "Report",
+      "reportSoon": "Reporting will be available soon."
+    }
+  },
+  "onboarding": {
+    "title": "Profile completion",
+    "description": "You can complete the steps below whenever you like.",
+    "editProfile": "Edit profile",
+    "dismiss": "Don't show again",
+    "progress": "{completed}/{total} completed",
+    "progressAria": "Profile completion percentage",
+    "completed": "Completed",
+    "suggestion": "Suggestion",
+    "bonusTitle": "Cover photo (bonus)",
+    "bonusDescription": "Cover photo upload will be added soon.",
+    "bonusAvailable": "Available",
+    "bonusSoon": "Soon",
+    "avatar": {
+      "title": "Profile photo",
+      "doneHint": "A profile photo is present.",
+      "missingHint": "Add a profile photo to make your account more recognizable."
+    },
+    "bio": {
+      "title": "Bio",
+      "doneHint": "Your short bio is visible.",
+      "missingHint": "Introduce yourself in a few sentences."
+    },
+    "company": {
+      "title": "Company / organization",
+      "doneHint": "Company or organization information has been filled in.",
+      "missingHint": "Add the company or organization you are connected to."
+    },
+    "location": {
+      "title": "Location",
+      "doneHint": "Location information is available.",
+      "missingHint": "Add a location so people know where you are."
+    },
+    "occupation": {
+      "title": "Occupation",
+      "doneHint": "Occupation information has been filled in.",
+      "missingHint": "Add what you do or what you specialize in."
+    },
+    "website": {
+      "title": "Website",
+      "doneHint": "Your website link is available.",
+      "missingHint": "Add your personal site or portfolio link."
+    }
+  },
+  "settings": {
+    "loginRequiredTitle": "Sign in required",
+    "loginRequiredDescription": "Sign in to edit your profile settings.",
+    "preparingTitle": "Profile is being prepared",
+    "preparingDescription": "Your profile record is being created. Please try again in a moment.",
+    "accessRestrictedTitle": "Access restricted",
+    "accessRestrictedDescription": "You do not have permission to view these profile settings.",
+    "notFoundTitle": "Profile not found",
+    "notFoundDescription": "We couldn't find your profile. Please try again later.",
+    "serviceUnavailableTitle": "Profile service unavailable",
+    "serviceUnavailableDescription": "Profile settings can't be loaded right now. Please try again later.",
+    "title": "Profile settings",
+    "description": "These fields are optional. Update them whenever it makes sense.",
+    "avatar": {
+      "title": "Avatar",
+      "description": "JPG, PNG or WebP. Up to 5 MB.",
+      "hint": "When you upload a new avatar, it is uploaded to R2 first, then attached to your profile.",
+      "optional": "Optional",
+      "fileLabel": "Avatar file",
+      "fileSelected": "{fileName} ({fileSize})",
+      "fileDefault": "You can upload only JPG, PNG or WebP.",
+      "validImage": "Select a valid image.",
+      "fileTooLarge": "The file size can be at most 5 MB.",
+      "uploadStartError": "Avatar upload could not be started.",
+      "uploadFormatError": "Avatar upload response was not in the expected format.",
+      "uploadFailed": "The image file could not be uploaded. Please try again.",
+      "attachFailed": "Avatar could not be attached to the profile.",
+      "profileUnreadable": "Avatar was updated, but the profile data could not be read.",
+      "unexpectedError": "An unexpected error occurred during avatar upload.",
+      "updating": "Updating...",
+      "updateButton": "Upload avatar"
+    },
+    "alert": {
+      "successTitle": "Success",
+      "avatarErrorTitle": "Avatar could not be updated",
+      "saveErrorTitle": "Profile could not be updated",
+      "successMessage": "Your profile information has been updated.",
+      "validationMessage": "Please check the fields.",
+      "unauthorizedMessage": "Your session is invalid. Please sign in again.",
+      "forbiddenMessage": "You don't have permission to do that.",
+      "notFoundMessage": "Profile record not found.",
+      "upstreamMessage": "Profile service unavailable. Please try again.",
+      "unexpectedMessage": "An unexpected error occurred."
+    },
+    "fields": {
+      "displayName": "Display name",
+      "displayNamePlaceholder": "Your display name",
+      "bio": "Bio",
+      "bioPlaceholder": "Introduce yourself briefly",
+      "bioHint": "Up to 500 characters.",
+      "country": "Country",
+      "city": "City",
+      "district": "District",
+      "occupation": "Occupation",
+      "company": "Company / organization",
+      "website": "Website",
+      "websitePlaceholder": "https://example.com",
+      "websiteHint": "Enter a URL starting with http:// or https://.",
+      "profileVisibility": "Profile visibility",
+      "sectionLocation": "Location",
+      "sectionProfessional": "Professional",
+      "sectionLinksVisibility": "Links and visibility"
+    },
+    "visibility": {
+      "public": "Visible to everyone",
+      "followersOnly": "Visible to followers only",
+      "private": "Visible to signed-in users only"
+    },
+    "actions": {
+      "save": "Save changes",
+      "saving": "Saving..."
+    }
+  },
+  "search": {
+    "command": {
+      "title": "Search",
+      "description": "Norge360 search",
+      "placeholder": "User, community, post...",
+      "suggestions": "Suggestions",
+      "empty": {
+        "loading": "Searching...",
+        "typeHint": "Type a user, community or post.",
+        "noResults": "No results found."
+      }
+    }
+  },
+  "community": {
+    "feed": {
+      "title": "Community feed",
+      "emptyTitle": "No posts yet",
+      "emptyDescription": "Be the first to share with the community.",
+      "loadMore": "Load more",
+      "loading": "Loading feed...",
+      "error": "Feed could not be loaded."
+    },
+    "post": {
+      "createTitle": "Create post",
+      "captionPlaceholder": "Share something with your community",
+      "addImages": "Add images",
+      "removeImage": "Remove image",
+      "maxImagesError": "You can select up to 8 images.",
+      "publish": "Publish",
+      "publishing": "Publishing...",
+      "like": "Like",
+      "unlike": "Unlike",
+      "save": "Save",
+      "unsave": "Unsave",
+      "comment": "Comment",
+      "report": "Report",
+      "interested": "Interested",
+      "notInterested": "Not interested",
+      "hiddenBecauseNotInterested": "Hidden because not interested.",
+      "mediaOptimizingNotice": "Images over 1 MB can be optimized automatically by backend.",
+      "authorFallback": "Community member",
+      "mediaAlt": "Post image",
+      "edit": "Edit",
+      "editTitle": "Edit post",
+      "saveChanges": "Save changes",
+      "savingChanges": "Saving changes...",
+      "delete": "Delete",
+      "deleteTitle": "Delete post",
+      "deleteDescription": "This action cannot be undone.",
+      "deleteConfirm": "Delete",
+      "deleteCancel": "Cancel",
+      "deleted": "Post deleted.",
+      "updated": "Post updated.",
+      "updateError": "Could not update post.",
+      "deleteError": "Could not delete post.",
+      "reports": "Reports",
+      "hide": "Hide",
+      "restore": "Restore"
+    },
+    "comment": {
+      "title": "Comments",
+      "placeholder": "Write a comment",
+      "reply": "Reply",
+      "send": "Send",
+      "empty": "No comments yet.",
+      "loading": "Loading comments...",
+      "error": "Comments could not be loaded."
+    },
+    "reaction": {
+      "add": "Add reaction",
+      "remove": "Remove reaction"
+    },
+    "report": {
+      "title": "Report",
+      "description": "Description (optional)",
+      "reason": "Reason",
+      "submit": "Submit report",
+      "success": "Report submitted.",
+      "reasons": {
+        "spam": "Spam",
+        "harassment": "Harassment",
+        "hateSpeech": "Hate speech",
+        "nudity": "Nudity",
+        "violence": "Violence",
+        "scam": "Scam",
+        "other": "Other"
+      }
+    },
+    "error": {
+      "generic": "Something went wrong.",
+      "unauthorized": "Please sign in.",
+      "validation": "Please check your input."
+    },
+    "moderation": {
+      "reports": "Reports",
+      "hide": "Hide",
+      "restore": "Restore"
+    }
+  }
+}

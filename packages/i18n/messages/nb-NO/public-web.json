@@ -1,0 +1,283 @@
+{
+  "brand": {
+    "communityBadge": "Norge360 lokalsamfunn"
+  },
+  "profile": {
+    "status": {
+      "forbiddenTitle": "Tilgang begrenset",
+      "forbiddenDescription": "Denne profilen kan ikke vises offentlig.",
+      "loadingTitle": "Profilen kan ikke lastes inn akkurat nå",
+      "loadingDescription": "Prøv igjen om et øyeblikk."
+    },
+    "hero": {
+      "editProfile": "Rediger profil",
+      "message": "Send melding",
+      "follow": "Følg",
+      "occupationFallback": "Medlem av fellesskapet",
+      "coverAlt": "Coverbilde for {name}",
+      "avatarAlt": "Profilbilde for {name}"
+    },
+    "stats": {
+      "posts": "Innlegg",
+      "followers": "Følgere",
+      "following": "Følger"
+    },
+    "feed": {
+      "title": "Fellesskapsfeed",
+      "description": "Dette området er reservert for brukerens innlegg og bidrag til fellesskapet."
+    },
+    "summary": {
+      "title": "Profiloversikt",
+      "role": "Rolle",
+      "company": "Bedrift",
+      "location": "Sted",
+      "joined": "Ble med",
+      "lastActive": "Sist aktiv",
+      "website": "Nettsted",
+      "profileStrengthTitle": "Styrk profilen din"
+    },
+    "community": {
+      "title": "Koble deg til fellesskapet",
+      "description": "Mennesker i nærheten og lokale muligheter for deltakelse.",
+      "nearbyPeople": "Folk i nærheten",
+      "sameCity": "Folk fra samme by",
+      "localGuides": "Lokale guider",
+      "activePeople": "Aktive personer i fellesskapet",
+      "nearbyDescription": "Møt aktive medlemmer rundt deg.",
+      "sameCityDescription": "Styrk lokale fellesskapsbånd.",
+      "localGuidesDescription": "Oppdag guider som bidrar i nabolaget.",
+      "activePeopleDescription": "Medlemmer som har publisert jevnlig i det siste.",
+      "nearbyMeta": "11 medlemmer innenfor 3 km",
+      "sameCityMeta": "26 nye medlemmer denne uken",
+      "localGuidesMeta": "9 aktive guider",
+      "activePeopleMeta": "14 aktive medlemmer de siste 7 dagene",
+      "viewProfiles": "Se profiler",
+      "connect": "Koble til",
+      "reviewContributions": "Gå gjennom bidrag",
+      "seeActivity": "Se aktivitet"
+    },
+    "actionsMenu": {
+      "ariaLabel": "Profile actions",
+      "block": "Block user",
+      "unblock": "Unblock user",
+      "report": "Report",
+      "reportSoon": "Reporting will be available soon."
+    }
+  },
+  "onboarding": {
+    "title": "Fullføring av profil",
+    "description": "Du kan fullføre trinnene nedenfor når som helst.",
+    "editProfile": "Rediger profil",
+    "dismiss": "Ikke vis igjen",
+    "progress": "{completed}/{total} fullført",
+    "progressAria": "Prosent fullført profil",
+    "completed": "Fullført",
+    "suggestion": "Forslag",
+    "bonusTitle": "Coverbilde (bonus)",
+    "bonusDescription": "Opplasting av coverbilde kommer snart.",
+    "bonusAvailable": "Tilgjengelig",
+    "bonusSoon": "Snart",
+    "avatar": {
+      "title": "Profilbilde",
+      "doneHint": "Det finnes et profilbilde.",
+      "missingHint": "Legg til et profilbilde for å gjøre kontoen din mer gjenkjennelig."
+    },
+    "bio": {
+      "title": "Bio",
+      "doneHint": "Din korte bio er synlig.",
+      "missingHint": "Presenter deg selv i noen setninger."
+    },
+    "company": {
+      "title": "Bedrift / organisasjon",
+      "doneHint": "Informasjon om bedrift eller organisasjon er fylt inn.",
+      "missingHint": "Legg til bedriften eller organisasjonen du er tilknyttet."
+    },
+    "location": {
+      "title": "Sted",
+      "doneHint": "Stedsinformasjon er tilgjengelig.",
+      "missingHint": "Legg til et sted slik at folk vet hvor du er."
+    },
+    "occupation": {
+      "title": "Yrke",
+      "doneHint": "Informasjon om yrke er fylt inn.",
+      "missingHint": "Legg til hva du gjør eller spesialiserer deg i."
+    },
+    "website": {
+      "title": "Nettsted",
+      "doneHint": "Nettstedslenken din er tilgjengelig.",
+      "missingHint": "Legg til din personlige nettside eller portefølje."
+    }
+  },
+  "settings": {
+    "loginRequiredTitle": "Innlogging kreves",
+    "loginRequiredDescription": "Logg inn for å redigere profilinnstillingene dine.",
+    "preparingTitle": "Profilen forberedes",
+    "preparingDescription": "Profilposten din opprettes. Prøv igjen om et øyeblikk.",
+    "accessRestrictedTitle": "Tilgang begrenset",
+    "accessRestrictedDescription": "Du har ikke tillatelse til å se disse profilinnstillingene.",
+    "notFoundTitle": "Profil ikke funnet",
+    "notFoundDescription": "Vi fant ikke profilen din. Prøv igjen senere.",
+    "serviceUnavailableTitle": "Profiltjenesten er utilgjengelig",
+    "serviceUnavailableDescription": "Profilinnstillingene kan ikke lastes inn akkurat nå. Prøv igjen senere.",
+    "title": "Profilinnstillinger",
+    "description": "Disse feltene er valgfrie. Oppdater dem når det passer.",
+    "avatar": {
+      "title": "Profilbilde",
+      "description": "JPG, PNG eller WebP. Opptil 5 MB.",
+      "hint": "Når du laster opp et nytt profilbilde, sendes det først til R2 og kobles deretter til profilen din.",
+      "optional": "Valgfritt",
+      "fileLabel": "Profilbildefil",
+      "fileSelected": "{fileName} ({fileSize})",
+      "fileDefault": "Du kan bare laste opp JPG, PNG eller WebP.",
+      "validImage": "Velg et gyldig bilde.",
+      "fileTooLarge": "Filstørrelsen kan være maks 5 MB.",
+      "uploadStartError": "Opplasting av profilbilde kunne ikke startes.",
+      "uploadFormatError": "Svar fra opplasting av profilbilde hadde ikke forventet format.",
+      "uploadFailed": "Bildefilen kunne ikke lastes opp. Prøv igjen.",
+      "attachFailed": "Profilbildet kunne ikke kobles til profilen.",
+      "profileUnreadable": "Profilbildet ble oppdatert, men profildataene kunne ikke leses.",
+      "unexpectedError": "Det oppstod en uventet feil under opplasting av profilbilde.",
+      "updating": "Oppdaterer...",
+      "updateButton": "Last opp profilbilde"
+    },
+    "alert": {
+      "successTitle": "Vellykket",
+      "avatarErrorTitle": "Profilbildet kunne ikke oppdateres",
+      "saveErrorTitle": "Profilen kunne ikke oppdateres",
+      "successMessage": "Profilinformasjonen din er oppdatert.",
+      "validationMessage": "Vennligst kontroller feltene.",
+      "unauthorizedMessage": "Økten din er ugyldig. Logg inn igjen.",
+      "forbiddenMessage": "Du har ikke tillatelse til å gjøre det.",
+      "notFoundMessage": "Profilposten ble ikke funnet.",
+      "upstreamMessage": "Profiltjenesten er utilgjengelig. Prøv igjen.",
+      "unexpectedMessage": "Det oppstod en uventet feil."
+    },
+    "fields": {
+      "displayName": "Visningsnavn",
+      "displayNamePlaceholder": "Ditt visningsnavn",
+      "bio": "Bio",
+      "bioPlaceholder": "Presenter deg kort",
+      "bioHint": "Opptil 500 tegn.",
+      "country": "Land",
+      "city": "By",
+      "district": "Distrikt",
+      "occupation": "Yrke",
+      "company": "Bedrift / organisasjon",
+      "website": "Nettsted",
+      "websitePlaceholder": "https://example.com",
+      "websiteHint": "Skriv inn en URL som starter med http:// eller https://.",
+      "profileVisibility": "Profilsynlighet",
+      "sectionLocation": "Sted",
+      "sectionProfessional": "Profesjonell",
+      "sectionLinksVisibility": "Lenker og synlighet"
+    },
+    "visibility": {
+      "public": "Visible to everyone",
+      "followersOnly": "Visible to followers only",
+      "private": "Visible to signed-in users only"
+    },
+    "actions": {
+      "save": "Lagre endringer",
+      "saving": "Lagrer..."
+    }
+  },
+  "search": {
+    "command": {
+      "title": "Search",
+      "description": "Norge360 search",
+      "placeholder": "User, community, post...",
+      "suggestions": "Suggestions",
+      "empty": {
+        "loading": "Searching...",
+        "typeHint": "Type a user, community or post.",
+        "noResults": "No results found."
+      }
+    }
+  },
+  "community": {
+    "feed": {
+      "title": "Fellesskapsfeed",
+      "emptyTitle": "Ingen innlegg enn?",
+      "emptyDescription": "Bli den f?rste som deler med fellesskapet.",
+      "loadMore": "Last inn flere",
+      "loading": "Laster feed...",
+      "error": "Kunne ikke laste feed."
+    },
+    "post": {
+      "createTitle": "Opprett innlegg",
+      "captionPlaceholder": "Del noe med fellesskapet",
+      "addImages": "Legg til bilder",
+      "removeImage": "Fjern bilde",
+      "maxImagesError": "Du kan velge opptil 8 bilder.",
+      "publish": "Publiser",
+      "publishing": "Publiserer...",
+      "like": "Lik",
+      "unlike": "Lik ikke",
+      "save": "Lagre",
+      "unsave": "Fjern lagring",
+      "comment": "Kommentar",
+      "report": "Rapporter",
+      "interested": "Interessert",
+      "notInterested": "Ikke interessert",
+      "hiddenBecauseNotInterested": "Skjult fordi ikke interessert.",
+      "mediaOptimizingNotice": "Bilder over 1 MB kan optimaliseres automatisk i backend.",
+      "authorFallback": "Fellesskapsmedlem",
+      "mediaAlt": "Innleggsbilde",
+      "edit": "Rediger",
+      "editTitle": "Rediger innlegg",
+      "saveChanges": "Lagre endringer",
+      "savingChanges": "Lagrer endringer...",
+      "delete": "Slett",
+      "deleteTitle": "Slett innlegg",
+      "deleteDescription": "Denne handlingen kan ikke angres.",
+      "deleteConfirm": "Slett",
+      "deleteCancel": "Avbryt",
+      "deleted": "Innlegg slettet.",
+      "updated": "Innlegg oppdatert.",
+      "updateError": "Kunne ikke oppdatere innlegg.",
+      "deleteError": "Kunne ikke slette innlegg.",
+      "reports": "Rapporter",
+      "hide": "Skjul",
+      "restore": "Gjenopprett"
+    },
+    "comment": {
+      "title": "Kommentarer",
+      "placeholder": "Skriv en kommentar",
+      "reply": "Svar",
+      "send": "Send",
+      "empty": "Ingen kommentarer enn?.",
+      "loading": "Laster kommentarer...",
+      "error": "Kunne ikke laste kommentarer."
+    },
+    "reaction": {
+      "add": "Legg til reaksjon",
+      "remove": "Fjern reaksjon"
+    },
+    "report": {
+      "title": "Rapporter",
+      "description": "Beskrivelse (valgfritt)",
+      "reason": "?rsak",
+      "submit": "Send rapport",
+      "success": "Rapport sendt.",
+      "reasons": {
+        "spam": "Spam",
+        "harassment": "Trakassering",
+        "hateSpeech": "Hatprat",
+        "nudity": "Nakenhet",
+        "violence": "Vold",
+        "scam": "Svindel",
+        "other": "Annet"
+      }
+    },
+    "error": {
+      "generic": "Noe gikk galt.",
+      "unauthorized": "Vennligst logg inn.",
+      "validation": "Kontroller inndataene dine."
+    },
+    "moderation": {
+      "reports": "Rapporter",
+      "hide": "Skjul",
+      "restore": "Gjenopprett"
+    }
+  }
+}

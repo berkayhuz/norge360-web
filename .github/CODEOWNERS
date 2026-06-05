@@ -1,0 +1,14 @@
+# Root governance
+/package.json @berkayhuz
+/pnpm-workspace.yaml @berkayhuz
+/turbo.json @berkayhuz
+/.github/ @berkayhuz
+
+# Frontend apps and platform
+/apps/ @berkayhuz
+/packages/ @berkayhuz
+
+# Deploy and infra
+/infra/ @berkayhuz
+/k8s/ @berkayhuz
+/scripts/ @berkayhuz

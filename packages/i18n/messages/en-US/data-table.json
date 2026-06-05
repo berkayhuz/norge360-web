@@ -1,0 +1,9 @@
+{
+  "search": "Search",
+  "noResults": "No results",
+  "rowsPerPage": "Rows per page",
+  "selectedRows": "{count, plural, =0 {No rows selected} one {# row selected} other {# rows selected}}",
+  "clearSelection": "Clear selection",
+  "previousPage": "Previous page",
+  "nextPage": "Next page"
+}

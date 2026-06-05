@@ -1,0 +1,283 @@
+{
+  "brand": {
+    "communityBadge": "Norge360 lokale Gemeinschaft"
+  },
+  "profile": {
+    "status": {
+      "forbiddenTitle": "Zugriff eingeschränkt",
+      "forbiddenDescription": "Dieses Profil kann nicht öffentlich angezeigt werden.",
+      "loadingTitle": "Das Profil kann gerade nicht geladen werden",
+      "loadingDescription": "Bitte versuche es in einem Moment erneut."
+    },
+    "hero": {
+      "editProfile": "Profil bearbeiten",
+      "message": "Nachricht senden",
+      "follow": "Folgen",
+      "occupationFallback": "Mitglied der Gemeinschaft",
+      "coverAlt": "Titelbild für {name}",
+      "avatarAlt": "Profilbild für {name}"
+    },
+    "stats": {
+      "posts": "Beiträge",
+      "followers": "Follower",
+      "following": "Folgt"
+    },
+    "feed": {
+      "title": "Community-Feed",
+      "description": "Dieser Bereich ist für die Beiträge und Community-Aktivitäten des Nutzers reserviert."
+    },
+    "summary": {
+      "title": "Profilübersicht",
+      "role": "Rolle",
+      "company": "Unternehmen",
+      "location": "Ort",
+      "joined": "Beigetreten",
+      "lastActive": "Zuletzt aktiv",
+      "website": "Webseite",
+      "profileStrengthTitle": "Stärke dein Profil"
+    },
+    "community": {
+      "title": "Verbinde dich mit der Community",
+      "description": "Menschen in der Nähe und lokale Möglichkeiten zur Teilnahme.",
+      "nearbyPeople": "Personen in der Nähe",
+      "sameCity": "Personen aus derselben Stadt",
+      "localGuides": "Lokale Guides",
+      "activePeople": "Aktive Personen in der Community",
+      "nearbyDescription": "Triff aktive Mitglieder in deiner Umgebung.",
+      "sameCityDescription": "Stärke lokale Community-Verbindungen.",
+      "localGuidesDescription": "Entdecke Guide-Mitglieder, die in der Nachbarschaft beitragen.",
+      "activePeopleDescription": "Mitglieder, die in letzter Zeit regelmäßig Beiträge veröffentlicht haben.",
+      "nearbyMeta": "11 Mitglieder im Umkreis von 3 km",
+      "sameCityMeta": "26 neue Mitglieder in dieser Woche",
+      "localGuidesMeta": "9 aktive Guides",
+      "activePeopleMeta": "14 aktive Mitglieder in den letzten 7 Tagen",
+      "viewProfiles": "Profile ansehen",
+      "connect": "Verbinden",
+      "reviewContributions": "Beiträge prüfen",
+      "seeActivity": "Aktivität ansehen"
+    },
+    "actionsMenu": {
+      "ariaLabel": "Profile actions",
+      "block": "Block user",
+      "unblock": "Unblock user",
+      "report": "Report",
+      "reportSoon": "Reporting will be available soon."
+    }
+  },
+  "onboarding": {
+    "title": "Profil vervollständigen",
+    "description": "Du kannst die folgenden Schritte jederzeit abschließen.",
+    "editProfile": "Profil bearbeiten",
+    "dismiss": "Nicht mehr anzeigen",
+    "progress": "{completed}/{total} abgeschlossen",
+    "progressAria": "Prozentual abgeschlossene Profilvervollständigung",
+    "completed": "Abgeschlossen",
+    "suggestion": "Vorschlag",
+    "bonusTitle": "Titelbild (Bonus)",
+    "bonusDescription": "Das Hochladen eines Titelbilds folgt in Kürze.",
+    "bonusAvailable": "Verfügbar",
+    "bonusSoon": "Bald",
+    "avatar": {
+      "title": "Profilfoto",
+      "doneHint": "Ein Profilfoto ist vorhanden.",
+      "missingHint": "Füge ein Profilfoto hinzu, damit dein Konto wiedererkennbarer wird."
+    },
+    "bio": {
+      "title": "Bio",
+      "doneHint": "Deine kurze Bio ist sichtbar.",
+      "missingHint": "Stelle dich in ein paar Sätzen vor."
+    },
+    "company": {
+      "title": "Unternehmen / Organisation",
+      "doneHint": "Informationen zum Unternehmen oder zur Organisation sind ausgefüllt.",
+      "missingHint": "Füge das Unternehmen oder die Organisation hinzu, mit der du verbunden bist."
+    },
+    "location": {
+      "title": "Ort",
+      "doneHint": "Standortinformationen sind vorhanden.",
+      "missingHint": "Füge einen Ort hinzu, damit andere wissen, wo du bist."
+    },
+    "occupation": {
+      "title": "Beruf",
+      "doneHint": "Informationen zum Beruf sind ausgefüllt.",
+      "missingHint": "Füge hinzu, was du machst oder worauf du dich spezialisierst."
+    },
+    "website": {
+      "title": "Webseite",
+      "doneHint": "Dein Webseitenlink ist verfügbar.",
+      "missingHint": "Füge deine persönliche Seite oder dein Portfolio hinzu."
+    }
+  },
+  "settings": {
+    "loginRequiredTitle": "Anmeldung erforderlich",
+    "loginRequiredDescription": "Melde dich an, um deine Profileinstellungen zu bearbeiten.",
+    "preparingTitle": "Profil wird vorbereitet",
+    "preparingDescription": "Dein Profildatensatz wird erstellt. Bitte versuche es in einem Moment erneut.",
+    "accessRestrictedTitle": "Zugriff eingeschränkt",
+    "accessRestrictedDescription": "Du hast keine Berechtigung, diese Profileinstellungen anzuzeigen.",
+    "notFoundTitle": "Profil nicht gefunden",
+    "notFoundDescription": "Wir konnten dein Profil nicht finden. Bitte versuche es später erneut.",
+    "serviceUnavailableTitle": "Profildienst nicht verfügbar",
+    "serviceUnavailableDescription": "Die Profileinstellungen können gerade nicht geladen werden. Bitte versuche es später erneut.",
+    "title": "Profileinstellungen",
+    "description": "Diese Felder sind optional. Aktualisiere sie, wann immer es sinnvoll ist.",
+    "avatar": {
+      "title": "Avatar",
+      "description": "JPG, PNG oder WebP. Bis zu 5 MB.",
+      "hint": "Wenn du einen neuen Avatar hochlädst, wird er zuerst in R2 gespeichert und dann deinem Profil zugeordnet.",
+      "optional": "Optional",
+      "fileLabel": "Avatar-Datei",
+      "fileSelected": "{fileName} ({fileSize})",
+      "fileDefault": "Du kannst nur JPG, PNG oder WebP hochladen.",
+      "validImage": "Bitte wähle ein gültiges Bild aus.",
+      "fileTooLarge": "Die Datei darf höchstens 5 MB groß sein.",
+      "uploadStartError": "Der Avatar-Upload konnte nicht gestartet werden.",
+      "uploadFormatError": "Die Antwort des Avatar-Uploads hatte nicht das erwartete Format.",
+      "uploadFailed": "Die Bilddatei konnte nicht hochgeladen werden. Bitte versuche es erneut.",
+      "attachFailed": "Der Avatar konnte dem Profil nicht zugeordnet werden.",
+      "profileUnreadable": "Der Avatar wurde aktualisiert, aber die Profildaten konnten nicht gelesen werden.",
+      "unexpectedError": "Beim Hochladen des Avatars ist ein unerwarteter Fehler aufgetreten.",
+      "updating": "Wird aktualisiert...",
+      "updateButton": "Avatar hochladen"
+    },
+    "alert": {
+      "successTitle": "Erfolgreich",
+      "avatarErrorTitle": "Der Avatar konnte nicht aktualisiert werden",
+      "saveErrorTitle": "Das Profil konnte nicht aktualisiert werden",
+      "successMessage": "Deine Profilinformationen wurden aktualisiert.",
+      "validationMessage": "Bitte überprüfe die Felder.",
+      "unauthorizedMessage": "Deine Sitzung ist ungültig. Bitte melde dich erneut an.",
+      "forbiddenMessage": "Du hast dafür keine Berechtigung.",
+      "notFoundMessage": "Der Profildatensatz wurde nicht gefunden.",
+      "upstreamMessage": "Der Profildienst ist nicht verfügbar. Bitte versuche es erneut.",
+      "unexpectedMessage": "Ein unerwarteter Fehler ist aufgetreten."
+    },
+    "fields": {
+      "displayName": "Anzeigename",
+      "displayNamePlaceholder": "Dein Anzeigename",
+      "bio": "Bio",
+      "bioPlaceholder": "Stelle dich kurz vor",
+      "bioHint": "Bis zu 500 Zeichen.",
+      "country": "Land",
+      "city": "Stadt",
+      "district": "Bezirk",
+      "occupation": "Beruf",
+      "company": "Unternehmen / Organisation",
+      "website": "Webseite",
+      "websitePlaceholder": "https://example.com",
+      "websiteHint": "Gib eine URL ein, die mit http:// oder https:// beginnt.",
+      "profileVisibility": "Profilsichtbarkeit",
+      "sectionLocation": "Ort",
+      "sectionProfessional": "Beruflich",
+      "sectionLinksVisibility": "Links und Sichtbarkeit"
+    },
+    "visibility": {
+      "public": "Visible to everyone",
+      "followersOnly": "Visible to followers only",
+      "private": "Visible to signed-in users only"
+    },
+    "actions": {
+      "save": "Änderungen speichern",
+      "saving": "Wird gespeichert..."
+    }
+  },
+  "search": {
+    "command": {
+      "title": "Search",
+      "description": "Norge360 search",
+      "placeholder": "User, community, post...",
+      "suggestions": "Suggestions",
+      "empty": {
+        "loading": "Searching...",
+        "typeHint": "Type a user, community or post.",
+        "noResults": "No results found."
+      }
+    }
+  },
+  "community": {
+    "feed": {
+      "title": "Community-Feed",
+      "emptyTitle": "Noch keine Beitr?ge",
+      "emptyDescription": "Teile als Erste:r etwas mit der Community.",
+      "loadMore": "Mehr laden",
+      "loading": "Feed wird geladen...",
+      "error": "Feed konnte nicht geladen werden."
+    },
+    "post": {
+      "createTitle": "Beitrag erstellen",
+      "captionPlaceholder": "Teile etwas mit deiner Community",
+      "addImages": "Bilder hinzuf?gen",
+      "removeImage": "Bild entfernen",
+      "maxImagesError": "Du kannst bis zu 8 Bilder ausw?hlen.",
+      "publish": "Ver?ffentlichen",
+      "publishing": "Wird ver?ffentlicht...",
+      "like": "Gef?llt mir",
+      "unlike": "Gef?llt mir nicht mehr",
+      "save": "Speichern",
+      "unsave": "Gespeichert entfernen",
+      "comment": "Kommentar",
+      "report": "Melden",
+      "interested": "Interessiert",
+      "notInterested": "Nicht interessiert",
+      "hiddenBecauseNotInterested": "Ausgeblendet, weil nicht interessiert.",
+      "mediaOptimizingNotice": "Bilder ?ber 1 MB k?nnen im Backend automatisch optimiert werden.",
+      "authorFallback": "Community-Mitglied",
+      "mediaAlt": "Beitragsbild",
+      "edit": "Bearbeiten",
+      "editTitle": "Beitrag bearbeiten",
+      "saveChanges": "?nderungen speichern",
+      "savingChanges": "Speichert ?nderungen...",
+      "delete": "L?schen",
+      "deleteTitle": "Beitrag l?schen",
+      "deleteDescription": "Diese Aktion kann nicht r?ckg?ngig gemacht werden.",
+      "deleteConfirm": "L?schen",
+      "deleteCancel": "Abbrechen",
+      "deleted": "Beitrag gel?scht.",
+      "updated": "Beitrag aktualisiert.",
+      "updateError": "Beitrag konnte nicht aktualisiert werden.",
+      "deleteError": "Beitrag konnte nicht gel?scht werden.",
+      "reports": "Meldungen",
+      "hide": "Ausblenden",
+      "restore": "Wiederherstellen"
+    },
+    "comment": {
+      "title": "Kommentare",
+      "placeholder": "Kommentar schreiben",
+      "reply": "Antworten",
+      "send": "Senden",
+      "empty": "Noch keine Kommentare.",
+      "loading": "Kommentare werden geladen...",
+      "error": "Kommentare konnten nicht geladen werden."
+    },
+    "reaction": {
+      "add": "Reaktion hinzuf?gen",
+      "remove": "Reaktion entfernen"
+    },
+    "report": {
+      "title": "Melden",
+      "description": "Beschreibung (optional)",
+      "reason": "Grund",
+      "submit": "Meldung senden",
+      "success": "Meldung gesendet.",
+      "reasons": {
+        "spam": "Spam",
+        "harassment": "Bel?stigung",
+        "hateSpeech": "Hassrede",
+        "nudity": "Nacktheit",
+        "violence": "Gewalt",
+        "scam": "Betrug",
+        "other": "Sonstiges"
+      }
+    },
+    "error": {
+      "generic": "Etwas ist schiefgelaufen.",
+      "unauthorized": "Bitte melde dich an.",
+      "validation": "Bitte pr?fe deine Eingaben."
+    },
+    "moderation": {
+      "reports": "Meldungen",
+      "hide": "Ausblenden",
+      "restore": "Wiederherstellen"
+    }
+  }
+}

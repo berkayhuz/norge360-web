@@ -1,0 +1,79 @@
+name: Deploy Norge360 Web
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  quality:
+    name: Quality gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Verify formatting and types
+        run: |
+          pnpm lint
+          pnpm typecheck
+          pnpm preflight:production
+
+  secret-scan:
+    name: Secret scan gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Scan repository for secrets
+        run: pnpm gitleaks -- dir
+
+  deploy:
+    needs:
+      - quality
+      - secret-scan
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Deploy web stack on frontend server
+        run: |
+          set -euo pipefail
+
+          cd /opt/norge360-web
+
+          git fetch origin main
+          git reset --hard origin/main
+
+          docker compose up -d --build --remove-orphans
+
+          docker image prune -f

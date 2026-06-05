@@ -1,0 +1,19 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: norge360-public-web
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: norge360-public-web
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: norge360-auth-web
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: norge360-auth-web

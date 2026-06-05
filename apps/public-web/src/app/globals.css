@@ -1,0 +1,14 @@
+@import "@workspace/ui/globals.css";
+
+@layer base {
+  html,
+  body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+  }
+}

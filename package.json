@@ -1,0 +1,32 @@
+{
+  "name": "norge360-web",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "format": "turbo format",
+    "typecheck": "turbo typecheck",
+    "gitleaks": "node scripts/gitleaks.mjs",
+    "preflight:production": "node scripts/tools/preflight-production.mjs",
+    "preflight:production:strict": "node scripts/tools/preflight-production.mjs --require-runtime-secrets",
+    "secrets:sync": "node scripts/tools/sync-github-secrets.mjs",
+    "install:secrets": "pnpm secrets:sync"
+  },
+  "devDependencies": {
+    "@norge360/eslint-config": "workspace:*",
+    "@norge360/typescript-config": "workspace:*",
+    "husky": "^9.1.7",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "turbo": "^2.9.15",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@10.33.4",
+  "engines": {
+    "node": ">=20"
+  }
+}

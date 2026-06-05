@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: norge360-web
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - norge360.com
+        - www.norge360.com
+        - auth.norge360.com
+      secretName: norge360-web-tls
+  rules:
+    - host: norge360.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: norge360-public-web
+                port:
+                  number: 3000
+    - host: www.norge360.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: norge360-public-web
+                port:
+                  number: 3000
+    - host: auth.norge360.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: norge360-auth-web
+                port:
+                  number: 3000

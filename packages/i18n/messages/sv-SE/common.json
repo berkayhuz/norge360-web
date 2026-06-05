@@ -1,0 +1,20 @@
+{
+  "save": "Spara",
+  "cancel": "Avbryt",
+  "close": "Stang",
+  "confirm": "Bekrafta",
+  "delete": "Ta bort",
+  "edit": "Redigera",
+  "create": "Skapa",
+  "update": "Uppdatera",
+  "search": "Sok",
+  "clear": "Rensa",
+  "loading": "Laddar",
+  "error": "Nagot gick fel",
+  "success": "Klart",
+  "empty": "Inga objekt",
+  "welcome": "Valkommen, {name}",
+  "itemCount": "{count, plural, =0 {Inga objekt} one {# objekt} other {# objekt}}",
+  "scheduledAt": "Schemalagd till {date, date, medium} {date, time, short}",
+  "balance": "Saldo: {amount, number, ::currency/SEK}"
+}

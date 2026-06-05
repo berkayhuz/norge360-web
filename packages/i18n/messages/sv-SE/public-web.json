@@ -1,0 +1,283 @@
+{
+  "brand": {
+    "communityBadge": "Norge360 lokalsamhälle"
+  },
+  "profile": {
+    "status": {
+      "forbiddenTitle": "Åtkomst begränsad",
+      "forbiddenDescription": "Den här profilen kan inte visas offentligt.",
+      "loadingTitle": "Profilen kan inte laddas just nu",
+      "loadingDescription": "Försök igen om en stund."
+    },
+    "hero": {
+      "editProfile": "Redigera profil",
+      "message": "Skicka meddelande",
+      "follow": "Följ",
+      "occupationFallback": "Medlem i gemenskapen",
+      "coverAlt": "Omslagsbild för {name}",
+      "avatarAlt": "Profilbild för {name}"
+    },
+    "stats": {
+      "posts": "Inlägg",
+      "followers": "Följare",
+      "following": "Följer"
+    },
+    "feed": {
+      "title": "Gemenskapsflöde",
+      "description": "Det här området är reserverat för användarens inlägg och bidrag till gemenskapen."
+    },
+    "summary": {
+      "title": "Profilöversikt",
+      "role": "Roll",
+      "company": "Företag",
+      "location": "Plats",
+      "joined": "Gick med",
+      "lastActive": "Senast aktiv",
+      "website": "Webbplats",
+      "profileStrengthTitle": "Stärk din profil"
+    },
+    "community": {
+      "title": "Anslut till gemenskapen",
+      "description": "Människor i närheten och lokala möjligheter att engagera sig.",
+      "nearbyPeople": "Personer i närheten",
+      "sameCity": "Personer från samma stad",
+      "localGuides": "Lokala guider",
+      "activePeople": "Aktiva personer i gemenskapen",
+      "nearbyDescription": "Träffa aktiva medlemmar i din närhet.",
+      "sameCityDescription": "Stärk lokala gemenskapsband.",
+      "localGuidesDescription": "Upptäck guider som bidrar i närområdet.",
+      "activePeopleDescription": "Medlemmar som har publicerat regelbundet på sistone.",
+      "nearbyMeta": "11 medlemmar inom 3 km",
+      "sameCityMeta": "26 nya medlemmar den här veckan",
+      "localGuidesMeta": "9 aktiva guider",
+      "activePeopleMeta": "14 aktiva medlemmar de senaste 7 dagarna",
+      "viewProfiles": "Visa profiler",
+      "connect": "Anslut",
+      "reviewContributions": "Granska bidrag",
+      "seeActivity": "Se aktivitet"
+    },
+    "actionsMenu": {
+      "ariaLabel": "Profile actions",
+      "block": "Block user",
+      "unblock": "Unblock user",
+      "report": "Report",
+      "reportSoon": "Reporting will be available soon."
+    }
+  },
+  "onboarding": {
+    "title": "Profilslutförande",
+    "description": "Du kan slutföra stegen nedan när du vill.",
+    "editProfile": "Redigera profil",
+    "dismiss": "Visa inte igen",
+    "progress": "{completed}/{total} slutförda",
+    "progressAria": "Procent slutförd profil",
+    "completed": "Slutförd",
+    "suggestion": "Förslag",
+    "bonusTitle": "Omslagsbild (bonus)",
+    "bonusDescription": "Uppladdning av omslagsbild kommer snart.",
+    "bonusAvailable": "Tillgänglig",
+    "bonusSoon": "Snart",
+    "avatar": {
+      "title": "Profilbild",
+      "doneHint": "Det finns en profilbild.",
+      "missingHint": "Lägg till en profilbild för att göra kontot mer igenkännbart."
+    },
+    "bio": {
+      "title": "Bio",
+      "doneHint": "Din korta bio är synlig.",
+      "missingHint": "Presentera dig själv med några meningar."
+    },
+    "company": {
+      "title": "Företag / organisation",
+      "doneHint": "Information om företag eller organisation har fyllts i.",
+      "missingHint": "Lägg till företaget eller organisationen du är kopplad till."
+    },
+    "location": {
+      "title": "Plats",
+      "doneHint": "Platsinformation finns tillgänglig.",
+      "missingHint": "Lägg till en plats så att andra vet var du finns."
+    },
+    "occupation": {
+      "title": "Yrke",
+      "doneHint": "Information om yrke har fyllts i.",
+      "missingHint": "Lägg till vad du gör eller vad du är specialiserad på."
+    },
+    "website": {
+      "title": "Webbplats",
+      "doneHint": "Din webbplatslänk finns tillgänglig.",
+      "missingHint": "Lägg till din personliga webbplats eller portfölj."
+    }
+  },
+  "settings": {
+    "loginRequiredTitle": "Inloggning krävs",
+    "loginRequiredDescription": "Logga in för att redigera dina profilinställningar.",
+    "preparingTitle": "Profilen förbereds",
+    "preparingDescription": "Din profilpost skapas. Försök igen om en stund.",
+    "accessRestrictedTitle": "Åtkomst begränsad",
+    "accessRestrictedDescription": "Du har inte behörighet att se de här profilinställningarna.",
+    "notFoundTitle": "Profilen hittades inte",
+    "notFoundDescription": "Vi kunde inte hitta din profil. Försök igen senare.",
+    "serviceUnavailableTitle": "Profiltjänsten är otillgänglig",
+    "serviceUnavailableDescription": "Profilinställningarna kan inte laddas just nu. Försök igen senare.",
+    "title": "Profilinställningar",
+    "description": "De här fälten är valfria. Uppdatera dem när det passar.",
+    "avatar": {
+      "title": "Avatar",
+      "description": "JPG, PNG eller WebP. Upp till 5 MB.",
+      "hint": "När du laddar upp en ny avatar skickas den först till R2 och kopplas sedan till din profil.",
+      "optional": "Valfritt",
+      "fileLabel": "Avatarfil",
+      "fileSelected": "{fileName} ({fileSize})",
+      "fileDefault": "Du kan bara ladda upp JPG, PNG eller WebP.",
+      "validImage": "Välj en giltig bild.",
+      "fileTooLarge": "Filen får vara högst 5 MB.",
+      "uploadStartError": "Uppladdning av avatar kunde inte startas.",
+      "uploadFormatError": "Svaret från avataruppladdningen hade inte förväntat format.",
+      "uploadFailed": "Bildfilen kunde inte laddas upp. Försök igen.",
+      "attachFailed": "Avataren kunde inte kopplas till profilen.",
+      "profileUnreadable": "Avataren uppdaterades, men profildata kunde inte läsas.",
+      "unexpectedError": "Ett oväntat fel uppstod under uppladdningen av avataren.",
+      "updating": "Uppdaterar...",
+      "updateButton": "Ladda upp avatar"
+    },
+    "alert": {
+      "successTitle": "Klart",
+      "avatarErrorTitle": "Avataren kunde inte uppdateras",
+      "saveErrorTitle": "Profilen kunde inte uppdateras",
+      "successMessage": "Din profilinformation har uppdaterats.",
+      "validationMessage": "Kontrollera fälten.",
+      "unauthorizedMessage": "Din session är ogiltig. Logga in igen.",
+      "forbiddenMessage": "Du har inte behörighet att göra det.",
+      "notFoundMessage": "Profilposten hittades inte.",
+      "upstreamMessage": "Profiltjänsten är otillgänglig. Försök igen.",
+      "unexpectedMessage": "Ett oväntat fel uppstod."
+    },
+    "fields": {
+      "displayName": "Visningsnamn",
+      "displayNamePlaceholder": "Ditt visningsnamn",
+      "bio": "Bio",
+      "bioPlaceholder": "Presentera dig kort",
+      "bioHint": "Upp till 500 tecken.",
+      "country": "Land",
+      "city": "Stad",
+      "district": "Område",
+      "occupation": "Yrke",
+      "company": "Företag / organisation",
+      "website": "Webbplats",
+      "websitePlaceholder": "https://example.com",
+      "websiteHint": "Ange en URL som börjar med http:// eller https://.",
+      "profileVisibility": "Profilens synlighet",
+      "sectionLocation": "Plats",
+      "sectionProfessional": "Professionellt",
+      "sectionLinksVisibility": "Länkar och synlighet"
+    },
+    "visibility": {
+      "public": "Visible to everyone",
+      "followersOnly": "Visible to followers only",
+      "private": "Visible to signed-in users only"
+    },
+    "actions": {
+      "save": "Spara ändringar",
+      "saving": "Sparar..."
+    }
+  },
+  "search": {
+    "command": {
+      "title": "Search",
+      "description": "Norge360 search",
+      "placeholder": "User, community, post...",
+      "suggestions": "Suggestions",
+      "empty": {
+        "loading": "Searching...",
+        "typeHint": "Type a user, community or post.",
+        "noResults": "No results found."
+      }
+    }
+  },
+  "community": {
+    "feed": {
+      "title": "Communityfl?de",
+      "emptyTitle": "Inga inl?gg ?nnu",
+      "emptyDescription": "Bli f?rst med att dela med communityn.",
+      "loadMore": "Ladda fler",
+      "loading": "Laddar fl?de...",
+      "error": "Kunde inte ladda fl?det."
+    },
+    "post": {
+      "createTitle": "Skapa inl?gg",
+      "captionPlaceholder": "Dela n?got med communityn",
+      "addImages": "L?gg till bilder",
+      "removeImage": "Ta bort bild",
+      "maxImagesError": "Du kan v?lja upp till 8 bilder.",
+      "publish": "Publicera",
+      "publishing": "Publicerar...",
+      "like": "Gilla",
+      "unlike": "Ogilla",
+      "save": "Spara",
+      "unsave": "Ta bort sparad",
+      "comment": "Kommentar",
+      "report": "Rapportera",
+      "interested": "Intresserad",
+      "notInterested": "Inte intresserad",
+      "hiddenBecauseNotInterested": "Dolt eftersom inte intresserad.",
+      "mediaOptimizingNotice": "Bilder ?ver 1 MB kan optimeras automatiskt i backend.",
+      "authorFallback": "Communitymedlem",
+      "mediaAlt": "Inl?ggsbild",
+      "edit": "Redigera",
+      "editTitle": "Redigera inl?gg",
+      "saveChanges": "Spara ?ndringar",
+      "savingChanges": "Sparar ?ndringar...",
+      "delete": "Ta bort",
+      "deleteTitle": "Ta bort inl?gg",
+      "deleteDescription": "Den h?r ?tg?rden kan inte ?ngras.",
+      "deleteConfirm": "Ta bort",
+      "deleteCancel": "Avbryt",
+      "deleted": "Inl?gg borttaget.",
+      "updated": "Inl?gg uppdaterat.",
+      "updateError": "Kunde inte uppdatera inl?gg.",
+      "deleteError": "Kunde inte ta bort inl?gg.",
+      "reports": "Rapporter",
+      "hide": "D?lj",
+      "restore": "?terst?ll"
+    },
+    "comment": {
+      "title": "Kommentarer",
+      "placeholder": "Skriv en kommentar",
+      "reply": "Svara",
+      "send": "Skicka",
+      "empty": "Inga kommentarer ?nnu.",
+      "loading": "Laddar kommentarer...",
+      "error": "Kunde inte ladda kommentarer."
+    },
+    "reaction": {
+      "add": "L?gg till reaktion",
+      "remove": "Ta bort reaktion"
+    },
+    "report": {
+      "title": "Rapportera",
+      "description": "Beskrivning (valfritt)",
+      "reason": "Orsak",
+      "submit": "Skicka rapport",
+      "success": "Rapport skickad.",
+      "reasons": {
+        "spam": "Spam",
+        "harassment": "Trakasserier",
+        "hateSpeech": "Hatretorik",
+        "nudity": "Nakenhet",
+        "violence": "V?ld",
+        "scam": "Bedr?geri",
+        "other": "Annat"
+      }
+    },
+    "error": {
+      "generic": "N?got gick fel.",
+      "unauthorized": "Logga in f?rst.",
+      "validation": "Kontrollera dina uppgifter."
+    },
+    "moderation": {
+      "reports": "Rapporter",
+      "hide": "D?lj",
+      "restore": "?terst?ll"
+    }
+  }
+}
