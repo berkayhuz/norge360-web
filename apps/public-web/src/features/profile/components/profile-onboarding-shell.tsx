@@ -7,7 +7,7 @@ import { Progress } from "@workspace/ui/components/feedback/progress";
 import { Separator } from "@workspace/ui/components/layout/separator";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   buildProfileOnboardingStorageKey,
@@ -34,20 +34,13 @@ export function ProfileOnboardingShell({
     [authUserId, username],
   );
 
-  const [ready, setReady] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
-
-  useEffect(() => {
-    if (!storageKey) {
-      setDismissed(true);
-      setReady(true);
-      return;
+  const [dismissed, setDismissed] = useState(() => {
+    if (!storageKey || typeof window === "undefined") {
+      return false;
     }
 
-    const current = readProfileOnboardingState(storageKey);
-    setDismissed(current?.dismissed === true);
-    setReady(true);
-  }, [storageKey]);
+    return readProfileOnboardingState(storageKey)?.dismissed === true;
+  });
 
   const checklistMeta = useMemo(
     () => ({
@@ -85,7 +78,7 @@ export function ProfileOnboardingShell({
     [t],
   );
 
-  if (!ready || dismissed || !storageKey || !completion) {
+  if (!storageKey || dismissed || !completion) {
     return null;
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
@@ -46,21 +46,19 @@ export function CommunityEditPostDialog({
   const existingMedia = useMemo(() => item.media.filter((media) => !removeMediaIds.includes(media.id ?? "")), [item.media, removeMediaIds]);
   const districtOptions = useMemo(() => getCommunityDistrictOptions(city), [city]);
 
-  useEffect(() => {
-    if (!districtOptions.some((option) => option.value === district)) {
-      setDistrict(districtOptions[0]?.value ?? DEFAULT_COMMUNITY_LOCATION.district);
-    }
-  }, [district, districtOptions]);
+  const resolvedDistrict = districtOptions.some((option) => option.value === district)
+    ? district
+    : districtOptions[0]?.value ?? DEFAULT_COMMUNITY_LOCATION.district;
 
   async function onSave() {
     const mediaOrder = existingMedia.map((x) => x.id ?? "").filter(Boolean);
-    await actions.updatePost(item.id, {
-      caption,
-      city,
-      district,
-      existingMediaIds: mediaOrder,
-      mediaFiles: newFiles,
-      mediaOrder,
+      await actions.updatePost(item.id, {
+        caption,
+        city,
+        district: resolvedDistrict,
+        existingMediaIds: mediaOrder,
+        mediaFiles: newFiles,
+        mediaOrder,
       removeMediaIds,
     });
     onOpenChange?.(false);
@@ -83,7 +81,7 @@ export function CommunityEditPostDialog({
                 </NativeSelectOption>
               ))}
             </NativeSelect>
-            <NativeSelect value={district} onChange={(event) => setDistrict(event.target.value)}>
+            <NativeSelect value={resolvedDistrict} onChange={(event) => setDistrict(event.target.value)}>
               {districtOptions.map((option) => (
                 <NativeSelectOption key={option.value} value={option.value}>
                   {option.label}

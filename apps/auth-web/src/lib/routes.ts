@@ -71,7 +71,8 @@ export function isAuthPagePath(pathname: string) {
   return AUTH_PAGE_PATHS.has(pathname)
 }
 
-export function isProtectedPath(pathname: string) {
+export function isProtectedPath(_pathname: string) {
+  void _pathname
   return false
 }
 

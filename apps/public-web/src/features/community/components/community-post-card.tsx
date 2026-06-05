@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
@@ -12,8 +12,6 @@ import { CommunityPostActions } from "@/features/community/components/community-
 import { CommunityPostCardUserHeaders } from "@/features/community/components/community-post-card-user-headers";
 import type { CommunityFeedActions } from "@/features/community/lib/hooks";
 import type { CommunityFeedItem } from "@/features/community/lib/types";
-import { getClientAuthSessionStatus } from "@/lib/auth/session-status-client";
-import { getAuthWebLoginUrl } from "@/lib/auth-web-url";
 
 const CAPTION_PREVIEW_LENGTH = 260;
 
@@ -29,28 +27,6 @@ export function CommunityPostCard({
   postHref?: string;
 }) {
   const t = useTranslations("public-web");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    if (readOnly) {
-      setIsAuthenticated(true);
-      return;
-    }
-
-    let cancelled = false;
-    void (async () => {
-      try {
-        const response = await getClientAuthSessionStatus();
-        if (!cancelled) setIsAuthenticated(response.authenticated);
-      } catch {
-        if (!cancelled) setIsAuthenticated(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [readOnly]);
 
   const captionPreview = useMemo(() => {
     const caption = item.caption?.trim();
@@ -65,18 +41,7 @@ export function CommunityPostCard({
     return { isTruncated: true, text: `${caption.slice(0, CAPTION_PREVIEW_LENGTH).trimEnd()}...` };
   }, [item.caption]);
 
-  const createdAtLabel = useMemo(() => {
-    const date = new Date(item.createdAt);
-    return Number.isNaN(date.getTime())
-      ? ""
-      : new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
-  }, [item.createdAt]);
-
   const onProtectedAction = async (callback: () => Promise<void>) => {
-    if (!isAuthenticated) {
-      window.location.href = getAuthWebLoginUrl();
-      return;
-    }
     await callback();
   };
 
@@ -90,7 +55,7 @@ export function CommunityPostCard({
           actions={actions}
           onProtectedAction={onProtectedAction}
           postHref={postHref}
-          showMenu={isAuthenticated}
+          showMenu={Boolean(actions) || readOnly}
         />
       }
       body={

@@ -27,17 +27,17 @@ export function HeaderSearch() {
 
   const active = desktopOpen || mobileOpen;
   const trimmedQuery = query.trim();
-  const visibleItems = useMemo(() => items.slice(0, MAX_RESULTS), [items]);
-
-  useEffect(() => {
-    if (!active) {
-      setItems([]);
-      setIsLoading(false);
-      return;
+  const visibleItems = useMemo(() => {
+    if (!active || trimmedQuery.length === 0) {
+      return [];
     }
 
-    if (trimmedQuery.length === 0) {
-      setItems([]);
+    return items.slice(0, MAX_RESULTS);
+  }, [active, items, trimmedQuery.length]);
+  const displayLoading = active && isLoading;
+
+  useEffect(() => {
+    if (!active || trimmedQuery.length === 0) {
       return;
     }
 
@@ -97,10 +97,10 @@ export function HeaderSearch() {
   }
 
   const emptyState = useMemo(() => {
-    if (isLoading) return "Searching...";
+    if (displayLoading) return "Searching...";
     if (trimmedQuery.length === 0) return "Start typing to search";
     return "No results";
-  }, [isLoading, trimmedQuery.length]);
+  }, [displayLoading, trimmedQuery.length]);
 
   const desktopSearchField = (
     <div className="relative w-full" ref={desktopRootRef}>
@@ -146,10 +146,10 @@ export function HeaderSearch() {
           <div className="max-h-[32rem] overflow-y-auto p-2">
             <div className="flex items-center justify-between px-3 pb-2 pt-1">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">{t("search")}</p>
-              {isLoading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : null}
+              {displayLoading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : null}
             </div>
 
-            {!isLoading && visibleItems.length === 0 ? (
+            {!displayLoading && visibleItems.length === 0 ? (
               <div className="px-3 py-10 text-center text-sm text-muted-foreground">
                 {emptyState}
               </div>
@@ -248,10 +248,10 @@ export function HeaderSearch() {
               <div className="rounded-[28px] border border-border/70 bg-popover p-2">
                 <div className="flex items-center justify-between px-3 pb-2 pt-1">
                   <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">{t("search")}</p>
-                  {isLoading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : null}
+                  {displayLoading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : null}
                 </div>
 
-                {!isLoading && visibleItems.length === 0 ? (
+                {!displayLoading && visibleItems.length === 0 ? (
                   <div className="px-3 py-10 text-center text-sm text-muted-foreground">
                     {emptyState}
                   </div>

@@ -94,7 +94,6 @@ export function ProfileSettingsForm({
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const [avatarSuccess, setAvatarSuccess] = useState<string | null>(null);
-  const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(avatarUrl);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrl = useMemo(
     () => (selectedFile ? URL.createObjectURL(selectedFile) : null),
@@ -107,10 +106,6 @@ export function ProfileSettingsForm({
       router.refresh();
     }
   }, [router, state.successMessage]);
-
-  useEffect(() => {
-    setCurrentAvatarUrl(avatarUrl);
-  }, [avatarUrl]);
 
   useEffect(() => {
     return () => {
@@ -260,7 +255,6 @@ export function ProfileSettingsForm({
         return;
       }
 
-      setCurrentAvatarUrl(normalizedProfile.avatarUrl);
       setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -290,7 +284,7 @@ export function ProfileSettingsForm({
             <CardContent className="space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Avatar className="size-20">
-                  <AvatarImage alt={username} src={previewUrl ?? currentAvatarUrl ?? undefined} />
+                  <AvatarImage alt={username} src={previewUrl ?? avatarUrl ?? undefined} />
                   <AvatarFallback>{toInitials(username)}</AvatarFallback>
                 </Avatar>
                 <div className="space-y-2 text-sm">

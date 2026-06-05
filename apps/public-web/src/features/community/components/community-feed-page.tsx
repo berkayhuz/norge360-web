@@ -53,11 +53,9 @@ export function CommunityFeedPage() {
     };
   }, [loadInitial]);
 
-  useEffect(() => {
-    if (!districtOptions.some((option) => option.value === district)) {
-      setDistrict(districtOptions[0]?.value ?? DEFAULT_COMMUNITY_LOCATION.district);
-    }
-  }, [district, districtOptions]);
+  const resolvedDistrict = districtOptions.some((option) => option.value === district)
+    ? district
+    : districtOptions[0]?.value ?? DEFAULT_COMMUNITY_LOCATION.district;
 
   useEffect(() => {
     const sentinel = loadMoreSentinelRef.current;
@@ -86,7 +84,7 @@ export function CommunityFeedPage() {
 
     setSubmitting(true);
     try {
-      await actions.createPost(caption.trim(), city, district, images);
+      await actions.createPost(caption.trim(), city, resolvedDistrict, images);
       setCaption("");
       setCity(DEFAULT_COMMUNITY_LOCATION.city);
       setDistrict(DEFAULT_COMMUNITY_LOCATION.district);
@@ -130,7 +128,7 @@ export function CommunityFeedPage() {
                       </NativeSelectOption>
                     ))}
                   </NativeSelect>
-                  <NativeSelect value={district} onChange={(event) => setDistrict(event.target.value)}>
+                  <NativeSelect value={resolvedDistrict} onChange={(event) => setDistrict(event.target.value)}>
                     {districtOptions.map((option) => (
                       <NativeSelectOption key={option.value} value={option.value}>
                         {option.label}

@@ -17,29 +17,25 @@ const ThemeContext = React.createContext<ThemeContextValue | null>(null);
 const THEME_STORAGE_KEY = "norge360.theme";
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [mounted, setMounted] = React.useState(false);
-  const [theme, setThemeState] = React.useState<Theme>("light");
+  const [theme, setThemeState] = React.useState<Theme>(() => {
+    if (typeof window === "undefined") {
+      return "light";
+    }
 
-  React.useEffect(() => {
     const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
     const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const nextTheme: Theme = saved === "dark" || saved === "light"
+    return saved === "dark" || saved === "light"
       ? saved
       : systemPrefersDark
         ? "dark"
         : "light";
-
-    setThemeState(nextTheme);
-    setMounted(true);
-  }, []);
+  });
 
   React.useEffect(() => {
-    if (!mounted) return;
-
     const root = document.documentElement;
     root.classList.toggle("dark", theme === "dark");
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-  }, [mounted, theme]);
+  }, [theme]);
 
   const setTheme = React.useCallback((nextTheme: Theme) => {
     setThemeState(nextTheme);

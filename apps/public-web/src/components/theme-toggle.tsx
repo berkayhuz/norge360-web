@@ -26,17 +26,19 @@ export function ThemeToggle({ darkLabel, lightLabel }: ThemeToggleProps) {
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
+  const label = isDark ? lightLabel : darkLabel;
 
   return (
     <Button
-      aria-label={isDark ? lightLabel : darkLabel}
+      aria-label={label}
       onClick={() => setTheme(isDark ? "light" : "dark")}
       type="button"
       rounded="2xl"
       variant="outline"
-      className="w-full justify-center"
+      className="w-full justify-center gap-2"
     >
-      Görüntüleme modunu değiştir
+      {!mounted ? null : isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      <span>{label}</span>
     </Button>
   );
 }

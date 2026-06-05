@@ -59,7 +59,7 @@ export const TurnstileWidget = React.forwardRef<TurnstileWidgetHandle, Turnstile
       size: "flexible",
       sitekey: siteKey,
     }) ?? null
-  }, [scriptReady])
+  }, [scriptReady, siteKey])
 
   const reset = React.useCallback(() => {
     setToken("")

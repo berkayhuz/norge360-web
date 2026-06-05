@@ -30,7 +30,7 @@ import { calculateProfileCompletion } from "@/lib/api/profile-completion";
 import { getAuthWebLoginUrl } from "@/lib/auth-web-url";
 import { resolveRequestLocale } from "../../../lib/i18n/request";
 
-type TranslationFn = any;
+type TranslationFn = (key: string, values?: Record<string, string | number | Date>) => string;
 
 type PublicProfilePageProps = {
   params: Promise<{ username: string }>;
@@ -39,6 +39,7 @@ type PublicProfilePageProps = {
 export default async function PublicProfilePage({ params }: PublicProfilePageProps) {
   const { username } = await params;
   const t = await getTranslations("public-web");
+  const translate = t as unknown as TranslationFn;
   const locale = await resolveRequestLocale();
   const result = await getPublicProfileByUsername(username);
 
@@ -103,18 +104,18 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
       <ProfileViewTracker enabled={isAuthenticatedSession && !isOwnProfile} username={profile.username} />
       <section className="w-full space-y-5">
         <ProfileHero
-            displayName={displayName}
-            followersCount={followersCount}
-            followingCount={followingCount}
-            isAuthenticated={isAuthenticatedSession}
-            isOwnProfile={isOwnProfile}
-            loginHref={getAuthWebLoginUrl()}
-            location={location}
-            postsCount={postsCount}
+          displayName={displayName}
+          followersCount={followersCount}
+          followingCount={followingCount}
+          isAuthenticated={isAuthenticatedSession}
+          isOwnProfile={isOwnProfile}
+          loginHref={getAuthWebLoginUrl()}
+          location={location}
+          postsCount={postsCount}
           profile={profile}
           safeAvatarUrl={safeAvatarUrl}
           safeCoverUrl={safeCoverUrl}
-          t={t}
+          t={translate}
         />
 
         <div className="grid gap-6 lg:grid-cols-3">
@@ -132,11 +133,11 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
               occupation={profile.occupation}
               onboardingIdentity={onboardingIdentity}
               visible={isAuthenticatedSession || isOwnProfile}
-              t={t}
+              t={translate}
               website={profile.website}
             />
 
-            <CommunitySuggestionsCard t={t} />
+            <CommunitySuggestionsCard t={translate} />
           </aside>
         </div>
       </section>
@@ -288,26 +289,6 @@ function CompactStatItem({ label, value }: { label: string; value: string }) {
       <p className="text-base font-semibold leading-none text-foreground">{value}</p>
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
-  );
-}
-
-function PostsPlaceholder({ t }: { t: TranslationFn }) {
-  return (
-    <Card className="border-border/70">
-      <CardHeader>
-        <CardTitle className="text-lg">{t("profile.feed.title")}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="rounded-xl border border-border/70 bg-card p-5">
-          <p className="text-sm text-muted-foreground">{t("profile.feed.description")}</p>
-        </div>
-        <div className="space-y-2 rounded-xl border border-dashed border-border/70 bg-muted/20 p-5">
-          <div className="h-3 rounded bg-muted" />
-          <div className="h-3 w-5/6 rounded bg-muted" />
-          <div className="h-3 w-4/6 rounded bg-muted" />
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 
