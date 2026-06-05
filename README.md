@@ -49,7 +49,7 @@ sudo bash scripts/ops/setup-hetzner-frontend-runner.sh \
 - `INTERNAL_API_BASE_URL`
 - `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
 
-For this Hetzner setup, those backend URLs should point at the backend server's private address, for example `http://10.0.0.2:5030`, not `localhost`.
+For this Hetzner setup, those backend URLs should point at the backend server's private address, for example `http://10.0.0.2`, not `localhost` or a local port like `5030`.
 `AUTH_API_BASE_URL` is derived from `GATEWAY_API_BASE_URL` so the auth UI always talks to the trusted gateway instead of the auth API directly.
 
 3. Push to `main`.

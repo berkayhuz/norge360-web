@@ -54,7 +54,7 @@ export async function authRequest<TResponse>(
     return (await response.json()) as TResponse
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
-      throw new Error("İstek zaman aşımına uğradı. Lütfen tekrar deneyin.")
+      throw new Error("The request timed out. Please try again.")
     }
 
     throw error

@@ -17,7 +17,7 @@ Set:
 - `AUTH_ACCESS_COOKIE_NAME`
 - `AUTH_SESSION_COOKIE_NAME`
 
-For production on Hetzner, the backend URLs should target the backend server's private IP on port `5030`, for example `http://10.0.0.2:5030`.
+For production on Hetzner, the backend URLs should target the backend server's private IP on the gateway's HTTP port, for example `http://10.0.0.2`.
 
 ## Notes
 
