@@ -50,6 +50,8 @@ sudo bash scripts/ops/setup-hetzner-frontend-runner.sh \
 - `AUTH_API_BASE_URL`
 - `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
 
+For this Hetzner setup, those backend URLs should point at the backend server's private address, for example `http://10.0.0.2:5030`, not `localhost`.
+
 3. Push to `main`.
 
 The deploy workflow writes a production env file on the runner, then runs:
