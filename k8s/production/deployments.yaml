@@ -48,9 +48,9 @@ spec:
             - name: NEXT_PUBLIC_AUTH_WEB_URL
               value: https://auth.norge360.com
             - name: GATEWAY_API_BASE_URL
-              value: http://norge360-gateway:8080
+              value: http://norge360-gateway.norge360-production:8080
             - name: INTERNAL_API_BASE_URL
-              value: http://norge360-gateway:8080
+              value: http://norge360-gateway.norge360-production:8080
             - name: AUTH_ACCESS_COOKIE_NAME
               value: Norge360-access
             - name: AUTH_SESSION_COOKIE_NAME
@@ -122,7 +122,7 @@ spec:
             - name: NEXT_TELEMETRY_DISABLED
               value: "1"
             - name: AUTH_API_BASE_URL
-              value: http://norge360-auth-api:8080
+              value: http://norge360-gateway.norge360-production:8080
             - name: AUTH_WEB_APP_URL
               value: https://auth.norge360.com
             - name: POST_LOGIN_REDIRECT_URL
