@@ -24,7 +24,6 @@ import {
 } from "@/features/community/lib/client";
 import { useCommunityComments, useCommunityPostBySlug } from "@/features/community/lib/hooks";
 import { getAuthWebLoginUrl } from "@/lib/auth-web-url";
-import { formatRelativeTimeLabel } from "@/lib/date-format";
 import { ChevronLeftIcon, Loader2 } from "lucide-react";
 
 export function CommunityPostDetailPage({ username, postSlug, isAuthenticated }: { username: string; postSlug: string; isAuthenticated: boolean }) {
@@ -56,8 +55,6 @@ export function CommunityPostDetailPage({ username, postSlug, isAuthenticated }:
 
     void loadComments();
   }, [item?.id, loadComments]);
-
-  const createdAtLabel = useMemo(() => formatRelativeTimeLabel(item?.createdAt) ?? "", [item?.createdAt]);
 
   const actions = useMemo(
     () => ({

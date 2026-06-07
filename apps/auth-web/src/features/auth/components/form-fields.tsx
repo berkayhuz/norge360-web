@@ -24,6 +24,7 @@ type FieldProps = {
   name: string
   placeholder?: string
   required?: boolean
+  showStrengthMeter?: boolean
   translateError?: (message: any) => string
   type?: React.HTMLInputTypeAttribute
 }
@@ -41,6 +42,7 @@ export function TextField({
   name,
   placeholder,
   required,
+  showStrengthMeter,
   translateError,
   type = "text",
 }: FieldProps) {
@@ -48,6 +50,11 @@ export function TextField({
   const translatedError = error ? translateError?.(error) ?? error : undefined
   const errorId = translatedError ? `${name}-error` : undefined
   const descriptionId = description ? `${name}-description` : undefined
+  const [value, setValue] = React.useState(defaultValue ?? "")
+  React.useEffect(() => {
+    setValue(defaultValue ?? "")
+  }, [defaultValue])
+  const strength = showStrengthMeter ? evaluatePasswordStrength(value) : null
 
   return (
     <div className="grid gap-2">
@@ -68,6 +75,7 @@ export function TextField({
         name={name}
         placeholder={placeholder}
         required={required}
+        onChange={showStrengthMeter ? (event) => setValue(event.currentTarget.value) : undefined}
         type={type}
       />
       {description ? (
@@ -75,6 +83,7 @@ export function TextField({
           {description}
         </p>
       ) : null}
+      {strength ? <PasswordStrengthMeter strength={strength} /> : null}
       {translatedError ? (
         <p className="text-xs text-destructive" id={errorId} role="alert">
           {translatedError}
@@ -110,6 +119,51 @@ export function FieldMessage({
       {children}
     </div>
   )
+}
+
+function PasswordStrengthMeter({ strength }: { strength: PasswordStrength }) {
+  const width = `${(strength.score / 4) * 100}%`
+
+  return (
+    <div className="space-y-1" aria-live="polite">
+      <div className="h-2 rounded-full bg-muted">
+        <div
+          className={cn(
+            "h-2 rounded-full transition-all",
+            strength.tone === "weak" && "bg-rose-500",
+            strength.tone === "fair" && "bg-amber-500",
+            strength.tone === "good" && "bg-sky-500",
+            strength.tone === "strong" && "bg-emerald-500",
+          )}
+          style={{ width }}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">Password strength: {strength.label}</p>
+    </div>
+  )
+}
+
+type PasswordStrength = {
+  label: "Weak" | "Fair" | "Good" | "Strong"
+  score: number
+  tone: "weak" | "fair" | "good" | "strong"
+}
+
+function evaluatePasswordStrength(value: string): PasswordStrength | null {
+  if (!value) {
+    return null
+  }
+
+  let score = 0
+  if (value.length >= 12) score += 1
+  if (/[a-z]/.test(value) && /[A-Z]/.test(value)) score += 1
+  if (/\d/.test(value)) score += 1
+  if (/[^A-Za-z0-9]/.test(value)) score += 1
+
+  if (score <= 1) return { label: "Weak", score: 1, tone: "weak" }
+  if (score === 2) return { label: "Fair", score: 2, tone: "fair" }
+  if (score === 3) return { label: "Good", score: 3, tone: "good" }
+  return { label: "Strong", score: 4, tone: "strong" }
 }
 
 export function SubmitButton({

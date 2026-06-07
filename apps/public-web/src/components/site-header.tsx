@@ -12,7 +12,6 @@ import {
   LifeBuoy,
   LogIn,
   LogOut,
-  Menu,
   Monitor,
   Moon,
   Settings2,
@@ -28,23 +27,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/overlay/dropdown-menu";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@workspace/ui/components/overlay/sheet";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { LocaleSelect } from "@/components/locale-select";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { useTheme, type ThemePreference } from "@/components/theme-provider";
 import { NotificationsDropdown } from "@/features/notifications/components/notifications-dropdown";
 import { HeaderSearch } from "@/features/search/components/header-search";
@@ -54,31 +41,8 @@ import {
 } from "@/lib/auth/session-status-client";
 import { getAuthWebLoginUrl, getAuthWebRegisterUrl } from "@/lib/auth-web-url";
 
-const communities = [
-  { href: "/communities", labelKey: "communitiesOverview" },
-  { href: "/communities/trending", labelKey: "communitiesTrending" },
-  { href: "/communities/new", labelKey: "communitiesCreate" },
-] as const;
-
-const cities = [
-  { href: "/cities", labelKey: "citiesOverview" },
-  { href: "/cities/guides", labelKey: "citiesGuides" },
-  { href: "/cities/map", labelKey: "citiesMap" },
-] as const;
-
-const primaryLinks = [
-  { href: "/", labelKey: "home" },
-  { href: "/forum", labelKey: "forum" },
-] as const;
-
 const iconTriggerClass =
   "inline-flex size-9 shrink-0 items-center justify-center rounded-full border-0 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30";
-
-const mobileLinkClass =
-  "inline-flex h-10 w-full items-center rounded-2xl px-3 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30";
-
-const mobileAuthLinkClass =
-  "inline-flex h-10 w-full items-center justify-center rounded-2xl border border-border bg-background px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/30";
 
 const LOCALE_COOKIE_NAME = "n360_locale";
 const supportedLocales = getSupportedLocales();
@@ -276,7 +240,7 @@ export function SiteHeader() {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild className="rounded-none">
-                        <Link href="/settings/profile" className="flex w-full items-center gap-2">
+                        <Link href="/settings" className="flex w-full items-center gap-2">
                           <Settings2 className="size-4" />
                           <span>{t("settings")}</span>
                         </Link>

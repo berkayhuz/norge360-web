@@ -16,6 +16,7 @@ import {
   getCommentRepliesBySlug,
   getCommentRepliesFromPost,
   getCommunityFeed,
+  getCommunitySavedPosts,
   getCommunityPost,
   getCommunityPostBySlug,
   getCommunityUserPosts,
@@ -155,6 +156,10 @@ export function useCommunityFeed() {
 }
 
 export type CommunityFeedActions = ReturnType<typeof useCommunityFeed>["actions"];
+
+export function useCommunitySavedPosts() {
+  return useCommunityFeedSource(getCommunitySavedPosts, "community_saved_posts_error");
+}
 
 export function useCommunityActions() {
   const { actions } = useCommunityFeed();
@@ -313,7 +318,7 @@ export function useCommunityCommentReplies(
     } finally {
       setLoading(false);
     }
-  }, [commentId, postId, slugContext?.commentSlug, slugContext?.postSlug, slugContext?.username]);
+  }, [commentId, postId, slugContext]);
 
   const load = useCallback(async () => {
     await loadPage(1, false);
@@ -442,14 +447,15 @@ export function useCommunityCommentBySlug(username: string, postSlug: string, co
     }
   }, [commentSlug, postSlug, username]);
 
+  const itemId = item?.id;
   const toggleLike = useCallback(async (isLiked: boolean) => {
-    if (!item?.id) {
+    if (!itemId) {
       return;
     }
 
-    await toggleCommentLike(item.id, !isLiked);
+    await toggleCommentLike(itemId, !isLiked);
     await load();
-  }, [item?.id, load]);
+  }, [itemId, load]);
 
   return { error, item, load, loading, toggleLike };
 }
@@ -572,4 +578,116 @@ export function useCommunityUserPosts(userId: string) {
     loadMore,
     loading,
   };
+}
+
+function useCommunityFeedSource(
+  loader: (page: number, pageSize: number) => Promise<{ items: CommunityFeedItem[]; page: number; pageSize: number; hasNextPage?: boolean }>,
+  fallbackError: string,
+) {
+  const [items, setItems] = useState<CommunityFeedItem[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasNextPage, setHasNextPage] = useState(true);
+
+  const loadPage = useCallback(async (targetPage: number, append: boolean) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await loader(targetPage, PAGE_SIZE);
+      setItems((prev) => {
+        const merged = append ? [...prev, ...response.items] : response.items;
+        return dedupeById(merged);
+      });
+      setPage(response.page);
+      setHasNextPage(response.hasNextPage ?? response.items.length >= response.pageSize);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : fallbackError);
+      setHasNextPage(false);
+    } finally {
+      setLoading(false);
+    }
+  }, [fallbackError, loader]);
+
+  const loadInitial = useCallback(async () => {
+    await loadPage(1, false);
+  }, [loadPage]);
+
+  const loadMore = useCallback(async () => {
+    if (loading || !hasNextPage) return;
+    await loadPage(page + 1, true);
+  }, [hasNextPage, loadPage, loading, page]);
+
+  const refresh = useCallback(async () => {
+    await loadPage(1, false);
+  }, [loadPage]);
+
+  const optimisticPatch = useCallback((postId: string, updater: (item: CommunityFeedItem) => CommunityFeedItem) => {
+    setItems((prev) => prev.map((item) => (item.id === postId ? updater(item) : item)));
+  }, []);
+
+  const actions = useMemo(() => ({
+    async createPost(caption: string, city: string, district: string, images: File[]) {
+      await createCommunityPost({ caption, city, district, images });
+      await refresh();
+    },
+    async updatePost(
+      postId: string,
+      payload: { caption: string; city: string; district: string; existingMediaIds: string[]; removeMediaIds: string[]; mediaOrder: string[]; mediaFiles: File[] },
+    ) {
+      await updateCommunityPost(postId, payload);
+      await refresh();
+    },
+    async deletePost(postId: string) {
+      await deleteCommunityPost(postId);
+      setItems((prev) => prev.filter((item) => item.id !== postId));
+    },
+    async setCommentsEnabled(postId: string, enabled: boolean) {
+      await setPostCommentsEnabled(postId, enabled);
+      await refresh();
+    },
+    async setHideLikeCount(postId: string, hideLikeCount: boolean) {
+      await setPostHideLikeCount(postId, hideLikeCount);
+      await refresh();
+    },
+    async toggleLike(postId: string, isLiked: boolean) {
+      optimisticPatch(postId, (item) => ({ ...item, isLikedByCurrentUser: !isLiked, likesCount: Math.max(0, (item.likesCount ?? 0) + (isLiked ? -1 : 1)) }));
+      try { await togglePostLike(postId, !isLiked); } catch { await refresh(); }
+    },
+    async toggleSave(postId: string, isSaved: boolean) {
+      optimisticPatch(postId, (item) => ({ ...item, isSavedByCurrentUser: !isSaved, savesCount: Math.max(0, (item.savesCount ?? 0) + (isSaved ? -1 : 1)) }));
+      try { await togglePostSave(postId, !isSaved); } catch { await refresh(); return; }
+      if (isSaved) {
+        setItems((prev) => prev.filter((item) => item.id !== postId));
+      } else {
+        void refresh();
+      }
+    },
+    async setInterest(postId: string, interest: CommunityPostInterestType) {
+      const previous = items;
+      if (interest === "NotInterested") {
+        setItems((prev) => prev.filter((item) => item.id !== postId));
+      } else {
+        optimisticPatch(postId, (item) => ({ ...item, currentUserInterest: interest }));
+      }
+      try { await setPostInterest(postId, interest); } catch { setItems(previous); }
+    },
+    async clearInterest(postId: string) {
+      optimisticPatch(postId, (item) => ({ ...item, currentUserInterest: null }));
+      try { await clearPostInterest(postId); } catch { await refresh(); }
+    },
+    async setReaction(postId: string, emoji: string) {
+      optimisticPatch(postId, (item) => ({ ...item, currentUserReaction: emoji }));
+      try { await setPostReaction(postId, emoji); } catch { await refresh(); }
+    },
+    async removeReaction(postId: string) {
+      optimisticPatch(postId, (item) => ({ ...item, currentUserReaction: null }));
+      try { await removePostReaction(postId); } catch { await refresh(); }
+    },
+    async reportPost(postId: string, reason: CommunityReportReason, description: string) {
+      await reportPost(postId, reason, description);
+    },
+  }), [items, optimisticPatch, refresh]);
+
+  return { actions, error, hasNextPage, items, loadInitial, loadMore, loading, refresh };
 }

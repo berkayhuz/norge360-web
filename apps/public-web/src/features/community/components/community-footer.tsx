@@ -25,7 +25,7 @@ export function CommunityFooter() {
           {t("communityFooter.settings")}
         </Link>
       </div>
-      <Link href="https://norge360.com" className="flex w-full items-center justify-center space-x-1 text-center text-xs text-muted-foreground">
+      <Link href="/" className="flex w-full items-center justify-center space-x-1 text-center text-xs text-muted-foreground">
         <span className="hover:underline">{t("communityFooter.copyright", { year: new Date().getFullYear() })}</span>
       </Link>
     </div>

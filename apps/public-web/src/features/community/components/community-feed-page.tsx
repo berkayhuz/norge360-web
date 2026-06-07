@@ -10,9 +10,12 @@ import { Textarea } from "@workspace/ui/components/forms/textarea";
 import { Image } from "@workspace/ui/components/primitives/image";
 import { Button } from "@workspace/ui/components/primitives/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@workspace/ui/components/overlay/dialog";
-import { Separator } from "@workspace/ui/components/layout/separator";
 
 import { CommunityPageScaffold } from "@/features/community/components/community-page-scaffold";
+import {
+  CommentImageEditorDialog,
+  type CommentAttachment,
+} from "@/features/community/components/community-comment-image-editor-dialog";
 import { CommunityPostCard } from "@/features/community/components/community-post-card";
 import { useCommunityFeed } from "@/features/community/lib/hooks";
 import {
@@ -21,8 +24,12 @@ import {
   getCommunityDistrictOptions,
 } from "@/features/community/lib/location-options";
 import { getClientAuthSessionStatus } from "@/lib/auth/session-status-client";
+import { optimizeImageFile } from "@/lib/image-optimize";
 
-const MAX_IMAGES = 8;
+const MAX_IMAGES = 10;
+const MAX_IMAGE_BYTES = 1 * 1024 * 1024;
+const MAX_IMAGE_DIMENSION = 1920;
+const ALLOWED_POST_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 type FeedSortOption = "best" | "new" | "liked" | "commented" | "trending";
 const ALL_CITIES_VALUE = "__all_cities__";
@@ -59,16 +66,35 @@ export function CommunityFeedPage() {
   const [caption, setCaption] = useState("");
   const [postCity, setPostCity] = useState(DEFAULT_COMMUNITY_LOCATION.city);
   const [postDistrict, setPostDistrict] = useState(DEFAULT_COMMUNITY_LOCATION.district);
-  const [images, setImages] = useState<File[]>([]);
+  const [imageAttachments, setImageAttachments] = useState<CommentAttachment[]>([]);
+  const imageAttachmentsRef = useRef<CommentAttachment[]>([]);
+  const [activeImageAttachmentId, setActiveImageAttachmentId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [createPostOpen, setCreatePostOpen] = useState(false);
   const [sortBy, setSortBy] = useState<FeedSortOption>("best");
+  const [sortReferenceTime] = useState(() => Date.now());
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
 
-  const selectedCityOptions = selectedCity ? getCommunityDistrictOptions(selectedCity) : [];
+  const selectedCityOptions = useMemo(() => (selectedCity ? getCommunityDistrictOptions(selectedCity) : []), [selectedCity]);
   const postDistrictOptions = getCommunityDistrictOptions(postCity);
+  const activeImageAttachment = useMemo(
+    () => imageAttachments.find((attachment) => attachment.id === activeImageAttachmentId) ?? null,
+    [activeImageAttachmentId, imageAttachments],
+  );
+
+  useEffect(() => {
+    imageAttachmentsRef.current = imageAttachments;
+  }, [imageAttachments]);
+
+  useEffect(() => {
+    return () => {
+      for (const attachment of imageAttachmentsRef.current) {
+        URL.revokeObjectURL(attachment.previewUrl);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (initialLoadStartedRef.current) {
@@ -98,13 +124,13 @@ export function CommunityFeedPage() {
 
   useEffect(() => {
     if (!selectedCity) {
-      setSelectedDistrict("");
+      queueMicrotask(() => setSelectedDistrict(""));
       return;
     }
 
     const districtExists = selectedCityOptions.some((option) => option.value === selectedDistrict);
     if (!districtExists) {
-      setSelectedDistrict("");
+      queueMicrotask(() => setSelectedDistrict(""));
     }
   }, [selectedCity, selectedCityOptions, selectedDistrict]);
 
@@ -126,8 +152,8 @@ export function CommunityFeedPage() {
         case "commented":
           return rightComments - leftComments || rightCreatedAt - leftCreatedAt;
         case "trending": {
-          const leftScore = leftLikes * 2 + leftComments * 3 + Math.max(0, 1000 - Math.floor((Date.now() - leftCreatedAt) / 3600000));
-          const rightScore = rightLikes * 2 + rightComments * 3 + Math.max(0, 1000 - Math.floor((Date.now() - rightCreatedAt) / 3600000));
+          const leftScore = leftLikes * 2 + leftComments * 3 + Math.max(0, 1000 - Math.floor((sortReferenceTime - leftCreatedAt) / 3600000));
+          const rightScore = rightLikes * 2 + rightComments * 3 + Math.max(0, 1000 - Math.floor((sortReferenceTime - rightCreatedAt) / 3600000));
           return rightScore - leftScore;
         }
         case "best":
@@ -140,7 +166,7 @@ export function CommunityFeedPage() {
     });
 
     return sorted;
-  }, [items, sortBy]);
+  }, [items, sortBy, sortReferenceTime]);
 
   const filteredFeed = useMemo<FilteredFeedResult>(() => {
     const matchesCity = (item: (typeof feedItems)[number]) =>
@@ -212,7 +238,7 @@ export function CommunityFeedPage() {
 
   async function onCreatePost() {
     setLocalError(null);
-    if (!caption.trim() && images.length === 0) return;
+    if (!caption.trim() && imageAttachments.length === 0) return;
 
     setSubmitting(true);
     try {
@@ -220,11 +246,11 @@ export function CommunityFeedPage() {
         ? postDistrict
         : postDistrictOptions[0]?.value ?? DEFAULT_COMMUNITY_LOCATION.district;
 
-      await actions.createPost(caption.trim(), postCity, resolvedPostDistrict, images);
+      await actions.createPost(caption.trim(), postCity, resolvedPostDistrict, imageAttachments.map((attachment) => attachment.file));
       setCaption("");
       setPostCity(DEFAULT_COMMUNITY_LOCATION.city);
       setPostDistrict(DEFAULT_COMMUNITY_LOCATION.district);
-      setImages([]);
+      clearPostImageAttachments();
       setCreatePostOpen(false);
     } catch {
       setLocalError(t("community.error.generic"));
@@ -233,14 +259,55 @@ export function CommunityFeedPage() {
     }
   }
 
-  function onFilesChanged(fileList: FileList | null) {
+  async function onFilesChanged(fileList: FileList | null) {
     if (!fileList) return;
     const selected = Array.from(fileList);
-    if (images.length + selected.length > MAX_IMAGES) {
+    if (imageAttachments.length + selected.length > MAX_IMAGES) {
       setLocalError(t("community.post.maxImagesError"));
       return;
     }
-    setImages((prev) => [...prev, ...selected]);
+    const optimized = await Promise.all(
+      selected.map(async (file) => {
+        let nextFile = file;
+        if (ALLOWED_POST_MIME_TYPES.has(file.type)) {
+          try {
+            nextFile = await optimizeImageFile(file, { maxBytes: MAX_IMAGE_BYTES, maxDimension: MAX_IMAGE_DIMENSION });
+          } catch {
+            nextFile = file;
+          }
+        }
+        return {
+          file: nextFile,
+          id: crypto.randomUUID(),
+          kind: nextFile.type === "image/gif" ? "gif" : "image",
+          previewUrl: URL.createObjectURL(nextFile),
+        } satisfies CommentAttachment;
+      }),
+    );
+
+    setImageAttachments((prev) => [...prev, ...optimized]);
+  }
+
+  function removePostImageAttachment(id: string) {
+    const target = imageAttachments.find((attachment) => attachment.id === id);
+    if (target) {
+      URL.revokeObjectURL(target.previewUrl);
+    }
+
+    if (activeImageAttachmentId === id) {
+      setActiveImageAttachmentId(null);
+    }
+
+    setImageAttachments((prev) => prev.filter((attachment) => attachment.id !== id));
+  }
+
+  function clearPostImageAttachments() {
+    for (const attachment of imageAttachments) {
+      URL.revokeObjectURL(attachment.previewUrl);
+    }
+
+    setActiveImageAttachmentId(null);
+    setImageAttachments([]);
   }
 
   return (
@@ -252,6 +319,7 @@ export function CommunityFeedPage() {
             setCreatePostOpen(open);
             if (!open) {
               setLocalError(null);
+              clearPostImageAttachments();
             }
           }}
         >
@@ -291,19 +359,25 @@ export function CommunityFeedPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Input type="file" multiple accept="image/*" onChange={(event) => onFilesChanged(event.target.files)} />
+              <Input type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={(event) => void onFilesChanged(event.target.files)} />
               <p className="text-xs text-muted-foreground">{t("community.post.mediaOptimizingNotice")}</p>
-              {images.length > 0 ? (
+              {imageAttachments.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {images.map((file, index) => (
-                    <div key={`${file.name}-${index}`} className="space-y-1">
-                      <Image src={URL.createObjectURL(file)} alt={file.name} aspect="square" radius="md" />
+                  {imageAttachments.map((attachment) => (
+                    <div key={attachment.id} className="space-y-1">
+                      <button
+                        type="button"
+                        className="block w-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        onClick={() => setActiveImageAttachmentId(attachment.id)}
+                      >
+                        <Image src={attachment.previewUrl} alt={attachment.file.name} aspect="square" radius="md" />
+                      </button>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         className="w-full"
-                        onClick={() => setImages((prev) => prev.filter((_, i) => i !== index))}
+                        onClick={() => removePostImageAttachment(attachment.id)}
                       >
                         {t("community.post.removeImage")}
                       </Button>
@@ -316,11 +390,32 @@ export function CommunityFeedPage() {
                 <Button type="button" variant="outline" onClick={() => setCreatePostOpen(false)} disabled={submitting}>
                   {tCommon("cancel")}
                 </Button>
-                <Button type="button" onClick={onCreatePost} disabled={submitting || (!caption.trim() && images.length === 0)}>
+                <Button type="button" onClick={onCreatePost} disabled={submitting || (!caption.trim() && imageAttachments.length === 0)}>
                   {submitting ? t("community.post.publishing") : t("community.post.publish")}
                 </Button>
               </div>
             </div>
+            <CommentImageEditorDialog
+              attachment={activeImageAttachment}
+              initialPreset="square"
+              onOpenChange={(open) => {
+                if (!open) {
+                  setActiveImageAttachmentId(null);
+                }
+              }}
+              onSave={(nextAttachment, previousPreviewUrl) => {
+                if (!activeImageAttachment) {
+                  return;
+                }
+
+                setImageAttachments((current) =>
+                  current.map((attachment) => (attachment.id === activeImageAttachment.id ? nextAttachment : attachment)),
+                );
+                URL.revokeObjectURL(previousPreviewUrl);
+                setActiveImageAttachmentId(nextAttachment.id);
+              }}
+              open={Boolean(activeImageAttachment)}
+            />
           </DialogContent>
         </Dialog>
 

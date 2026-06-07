@@ -51,6 +51,7 @@ export const NotificationType = {
   CommentLike: "community.comment_like",
   PostComment: "community.post_comment",
   CommentReply: "community.comment_reply",
+  SuspiciousLogin: "security.suspicious_login",
 } as const;
 
 export function normalizeNotificationsPage(input: unknown): NotificationsPage {

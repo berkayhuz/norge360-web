@@ -8,7 +8,6 @@ import { Loader2 } from "lucide-react";
 import { Avatar, AvatarImage, DefaultAvatar } from "@workspace/ui/components/data-display/avatar";
 import { Button } from "@workspace/ui/components/primitives/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/layout/card";
-import { Separator } from "@workspace/ui/components/layout/separator";
 import { cn } from "@workspace/ui/lib/utils";
 import { getPopularUsers } from "@/features/discovery/lib/client";
 import type { DiscoverUser } from "@/features/discovery/lib/types";
@@ -49,7 +48,7 @@ export function CommunityPopularUsersWidget() {
           </div>
         ) : null}
         {!loading && error ? <div className="px-4 py-6"><p className="text-sm text-center text-destructive">{t("discovery.errors.loadFailed")}</p></div> : null}
-        {items.slice(0, 5).map((item, index) => (
+        {items.slice(0, 5).map((item) => (
           <div key={item.profileId}>
             <Link href={`/${item.username}`} className="block">
               <div className="px-4 py-3 flex items-start gap-3 transition-colors hover:bg-muted/60 dark:hover:bg-muted/25">
@@ -68,7 +67,6 @@ export function CommunityPopularUsersWidget() {
                 </Button>
               </div>
             </Link>
-            {index < Math.min(items.length, 5) - 1}
           </div>
         ))}
       </CardContent>

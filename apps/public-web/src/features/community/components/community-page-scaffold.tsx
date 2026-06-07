@@ -22,6 +22,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { CommunityFooter } from "@/features/community/components/community-footer";
 import { CommunityPopularUsersWidget } from "@/features/discovery/components/community-popular-users-widget";
 import { getClientAuthSessionStatus } from "@/lib/auth/session-status-client";
+import { getAuthWebLoginUrl } from "@/lib/auth-web-url";
 
 const sidebarButtonClassName = "flex h-10 text-[15px] w-full items-center justify-start gap-2 border-none px-4 hover:bg-muted";
 const sidebarIconToneClasses = [
@@ -47,11 +48,11 @@ export function CommunityPageScaffold({ children, onPublishClick, publishHref = 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [myUsername, setMyUsername] = useState<string | null>(null);
 
-  const authHref = isAuthenticated ? null : "https://auth.norge360.com/login";
+  const authHref = isAuthenticated ? null : getAuthWebLoginUrl();
   const profileHref = isAuthenticated && myUsername ? `/${encodeURIComponent(myUsername)}` : authHref ?? "/";
   const navigationItems = [
     { href: "/", icon: Home, label: t("community.scaffold.home") },
-    { href: "/discover-hub", icon: Compass, label: t("community.scaffold.discover") },
+    { href: "/explore-feed", icon: Compass, label: t("community.scaffold.discover") },
     { href: authHref ?? "/notifications", icon: Bell, label: t("community.scaffold.notifications") },
     {
       href: isAuthenticated ? publishHref : authHref ?? "",
@@ -60,8 +61,8 @@ export function CommunityPageScaffold({ children, onPublishClick, publishHref = 
       onClick: isAuthenticated ? onPublishClick : undefined,
     },
     { href: profileHref, icon: User, label: t("community.scaffold.profile") },
-    { href: authHref ?? "", icon: Bookmark, label: t("community.scaffold.bookmarks") },
-    { href: authHref ?? "/settings/profile", icon: Settings, label: t("community.scaffold.settings") },
+    { href: authHref ?? "/bookmarks", icon: Bookmark, label: t("community.scaffold.bookmarks") },
+    { href: authHref ?? "/settings", icon: Settings, label: t("community.scaffold.settings") },
     { href: "/privacy-policy", icon: ShieldCheck, label: t("community.scaffold.privacyPolicy") },
     { href: "/terms-of-service", icon: FileText, label: t("community.scaffold.termsOfService") },
   ] as const;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -25,6 +25,7 @@ export function NotificationSettingsForm({ initialPreferences }: NotificationSet
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
   const [saved, setSaved] = useState(false);
+  const saveRequestIdRef = useRef(0);
 
   const grouped = useMemo(() => groupPreferences(items), [items]);
 
@@ -42,25 +43,32 @@ export function NotificationSettingsForm({ initialPreferences }: NotificationSet
     }
   }, []);
 
-  function togglePreference(type: string, checked: boolean) {
-    setSaved(false);
-    setItems((current) =>
-      current.map((item) => item.type === type ? { ...item, inAppEnabled: checked } : item),
-    );
-  }
+  async function togglePreference(type: string, checked: boolean) {
+    const previousItems = items;
+    const nextItems = items.map((item) => item.type === type ? { ...item, inAppEnabled: checked } : item);
+    const requestId = saveRequestIdRef.current + 1;
+    saveRequestIdRef.current = requestId;
 
-  async function onSave() {
-    setSaving(true);
-    setError(false);
     setSaved(false);
+    setError(false);
+    setItems(nextItems);
+    setSaving(true);
+
     try {
-      const preferences = await updateNotificationPreferences({ items });
-      setItems(preferences.items);
-      setSaved(true);
+      const preferences = await updateNotificationPreferences({ items: nextItems });
+      if (saveRequestIdRef.current === requestId) {
+        setItems(preferences.items);
+        setSaved(true);
+      }
     } catch {
-      setError(true);
+      if (saveRequestIdRef.current === requestId) {
+        setItems(previousItems);
+        setError(true);
+      }
     } finally {
-      setSaving(false);
+      if (saveRequestIdRef.current === requestId) {
+        setSaving(false);
+      }
     }
   }
 
@@ -100,7 +108,7 @@ export function NotificationSettingsForm({ initialPreferences }: NotificationSet
                 <Switch
                   aria-label={t(typeLabelKey(item.type))}
                   checked={item.inAppEnabled}
-                  onCheckedChange={(checked) => togglePreference(item.type, checked)}
+                  onCheckedChange={(checked) => void togglePreference(item.type, checked)}
                 />
               </div>
             ))}
@@ -108,13 +116,8 @@ export function NotificationSettingsForm({ initialPreferences }: NotificationSet
         </Card>
       ))}
 
-      <div className="flex items-center justify-end gap-3">
-        {saved ? <p className="text-sm text-muted-foreground">{t("settings.notifications.saved")}</p> : null}
+      <div className="flex items-center justify-center gap-3">
         {error ? <p className="text-sm text-destructive">{t("settings.notifications.saveError")}</p> : null}
-        <Button disabled={saving} onClick={onSave} type="button">
-          {saving ? <Loader2 className="size-4 animate-spin" /> : null}
-          {t("settings.notifications.save")}
-        </Button>
       </div>
     </div>
   );
@@ -165,6 +168,8 @@ function typeLabelKey(type: string) {
       return "settings.notifications.types.postComment.label";
     case NotificationType.CommentReply:
       return "settings.notifications.types.commentReply.label";
+    case NotificationType.SuspiciousLogin:
+      return "settings.notifications.types.suspiciousLogin.label";
     default:
       return "settings.notifications.types.generic.label";
   }
@@ -192,6 +197,8 @@ function typeDescriptionKey(type: string) {
       return "settings.notifications.types.postComment.description";
     case NotificationType.CommentReply:
       return "settings.notifications.types.commentReply.description";
+    case NotificationType.SuspiciousLogin:
+      return "settings.notifications.types.suspiciousLogin.description";
     default:
       return "settings.notifications.types.generic.description";
   }

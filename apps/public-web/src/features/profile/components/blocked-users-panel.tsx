@@ -60,7 +60,7 @@ export function BlockedUsersPanel() {
   }, []);
 
   useEffect(() => {
-    void loadPage(1, false);
+    queueMicrotask(() => void loadPage(1, false));
   }, [loadPage]);
 
   async function onUnblock(username: string) {
@@ -76,12 +76,12 @@ export function BlockedUsersPanel() {
   }
 
   return (
-    <Card className="border-border/70">
-      <CardHeader className="space-y-2">
+    <Card className="border-none bg-transparent rounded-none shadow-none ring-0">
+      <CardHeader className="sr-only">
         <CardTitle className="text-lg">{t("profile.blocked.title")}</CardTitle>
         <p className="text-sm text-muted-foreground">{t("profile.blocked.description")}</p>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 px-0">
         {loading ? (
           <div className="flex min-h-24 items-center justify-center">
             <Loader2 aria-hidden="true" className="size-5 animate-spin text-muted-foreground" />

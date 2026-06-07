@@ -18,7 +18,6 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
-import { BlockedUsersPanel } from "@/features/profile/components/blocked-users-panel";
 import { ProfileOnboardingShell } from "@/features/profile/components/profile-onboarding-shell";
 import { ProfileSocialPanel } from "@/features/profile/components/profile-social-panel";
 import { ProfileViewTracker } from "@/features/profile/components/profile-view-tracker";
@@ -151,8 +150,6 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
               t={translate}
               website={profile.website}
             />
-
-            {isOwnProfile && isAuthenticatedSession ? <BlockedUsersPanel /> : null}
 
             <CommunitySuggestionsCard t={translate} />
           </aside>

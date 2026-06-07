@@ -3,7 +3,6 @@ import type {
   CommunityComment,
   CommunityPostInterestType,
   CommunityReportReason,
-  PagedCommunityCommentsResponse,
   PagedCommunityFeedResponse,
   ToggleActionResponse,
 } from "./types";
@@ -20,6 +19,25 @@ export async function getCommunityFeed(page: number, pageSize: number) {
   const response = await fetch(`/api/community/feed?page=${page}&pageSize=${pageSize}`, { cache: "no-store" });
   const data = await readJson<BackendPagedFeedResponse>(response);
   return mapPagedFeed(data);
+}
+
+export async function getCommunitySavedPosts(page: number, pageSize: number) {
+  const response = await fetch(`/api/community/saved-posts?page=${page}&pageSize=${pageSize}`, { cache: "no-store" });
+  if (response.ok) {
+    const data = await readJson<BackendPagedFeedResponse>(response);
+    return mapPagedFeed(data);
+  }
+
+  const feedResponse = await getCommunityFeed(page, Math.max(pageSize * 5, pageSize));
+  const savedItems = feedResponse.items.filter((item) => item.isSavedByCurrentUser);
+  return {
+    ...feedResponse,
+    hasNextPage: feedResponse.hasNextPage,
+    items: savedItems.slice(0, pageSize),
+    page,
+    pageSize,
+    totalCount: savedItems.length,
+  } satisfies PagedCommunityFeedResponse;
 }
 
 export async function getCommunityPost(postId: string) {
@@ -584,17 +602,6 @@ export function decodePublicIdSlug(slug: string) {
   } catch {
     return null;
   }
-}
-
-function mapPagedComments(data: BackendPagedCommentsResponse): PagedCommunityCommentsResponse {
-  const hasNextPage = data.page * data.pageSize < data.totalCount;
-  return {
-    hasNextPage,
-    items: data.items.map((comment) => mapComment(comment)),
-    page: data.page,
-    pageSize: data.pageSize,
-    totalCount: data.totalCount,
-  };
 }
 
 async function loadAllPostComments(postId: string) {

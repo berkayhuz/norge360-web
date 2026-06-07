@@ -1,19 +1,17 @@
-const DEFAULT_LOGIN_PATH = "https://auth.norge360.com/login";
-const DEFAULT_REGISTER_PATH = "https://auth.norge360.com/register";
+const DEFAULT_AUTH_WEB_URL = "https://auth.norge360.com";
+const LOGIN_PATH = "/login";
+const REGISTER_PATH = "/register";
 
 export function getAuthWebLoginUrl() {
-  return buildAuthWebUrl(DEFAULT_LOGIN_PATH);
+  return buildAuthWebUrl(LOGIN_PATH);
 }
 
 export function getAuthWebRegisterUrl() {
-  return buildAuthWebUrl(DEFAULT_REGISTER_PATH);
+  return buildAuthWebUrl(REGISTER_PATH);
 }
 
 function buildAuthWebUrl(path: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_AUTH_WEB_URL?.trim();
-  if (!baseUrl) {
-    return path;
-  }
+  const baseUrl = process.env.NEXT_PUBLIC_AUTH_WEB_URL?.trim() || DEFAULT_AUTH_WEB_URL;
 
   try {
     return new URL(path, baseUrl).toString();

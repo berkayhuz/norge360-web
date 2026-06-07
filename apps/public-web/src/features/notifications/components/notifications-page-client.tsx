@@ -58,11 +58,6 @@ export function NotificationsPageClient({ initialPage }: NotificationsPageClient
 
   useEffect(() => {
     if (initialPage) {
-      setItems(initialPage.items);
-      setPage(initialPage.page);
-      setTotal(initialPage.total);
-      setLoading(false);
-      setError(false);
       return undefined;
     }
 

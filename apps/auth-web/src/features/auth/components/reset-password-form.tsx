@@ -84,7 +84,7 @@ export function ResetPasswordForm({ token = "", userId = "" }: ResetPasswordForm
       {message ? <FieldMessage tone={message.tone}>{message.text}</FieldMessage> : null}
       <input name="userId" type="hidden" value={userId} />
       <input name="token" type="hidden" value={token} />
-      <PasswordField autoComplete="new-password" disabled={pending} fieldErrors={fieldErrors} label={t("newPasswordLabel")} maxLength={128} minLength={12} name="newPassword" required translateError={tValidation} />
+      <PasswordField autoComplete="new-password" disabled={pending} fieldErrors={fieldErrors} label={t("newPasswordLabel")} maxLength={128} minLength={12} name="newPassword" required showStrengthMeter translateError={tValidation} />
       <PasswordField autoComplete="new-password" disabled={pending} fieldErrors={fieldErrors} label={t("confirmPasswordLabel")} maxLength={128} minLength={12} name="confirmPassword" required translateError={tValidation} />
       <TurnstileWidget ref={turnstileRef} disabled={pending} />
       <SubmitButton disabled={pending}>{pending ? t("submitting") : t("submit")}</SubmitButton>

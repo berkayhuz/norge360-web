@@ -4,6 +4,9 @@ import { tryGetServerEnv } from "@/lib/env/server";
 
 const COMMUNITY_ALLOWED_ROUTES: Array<{ method: string; pattern: RegExp }> = [
   { method: "GET", pattern: /^\/feed$/ },
+  { method: "GET", pattern: /^\/saved-posts$/ },
+  { method: "GET", pattern: /^\/posts\/saved$/ },
+  { method: "GET", pattern: /^\/bookmarks$/ },
   { method: "GET", pattern: /^\/users\/[A-Za-z0-9-]{1,64}\/posts$/ },
   { method: "GET", pattern: /^\/[A-Za-z0-9-]{1,64}\/feed\/[A-Za-z0-9-]{1,64}$/ },
   { method: "GET", pattern: /^\/[A-Za-z0-9-]{1,64}\/feed\/[A-Za-z0-9-]{1,64}\/comments$/ },

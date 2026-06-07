@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Loader2, UserPlus } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { Avatar, AvatarImage, DefaultAvatar } from "@workspace/ui/components/data-display/avatar";
 import { Button } from "@workspace/ui/components/primitives/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/layout/card";
+import { Card, CardContent } from "@workspace/ui/components/layout/card";
 import { CommunityPageScaffold } from "@/features/community/components/community-page-scaffold";
 import { getDiscoveryHub } from "@/features/discovery/lib/client";
 import type { DiscoverUser, DiscoveryHub } from "@/features/discovery/lib/types";

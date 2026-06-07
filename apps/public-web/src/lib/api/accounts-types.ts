@@ -138,10 +138,81 @@ export type AuthSessionStatus = {
   userId: string;
 };
 
+export type SecurityOverview = {
+  email: string;
+  emailConfirmed: boolean;
+  hasAuthenticator: boolean;
+  lastLoginAt: string | null;
+  lastSecurityEventAt: string | null;
+  passwordChangedAt: string | null;
+  recoveryCodesRemaining: number;
+  trustedDevicesCount: number;
+  isMfaEnabled: boolean;
+};
+
+export type AuthSessionSummary = {
+  createdAt: string;
+  ipAddress: string | null;
+  isCurrent: boolean;
+  isRevoked: boolean;
+  lastSeenAt: string | null;
+  refreshTokenExpiresAt: string;
+  revokedAt: string | null;
+  revokedReason: string | null;
+  sessionId: string;
+  userAgent: string | null;
+};
+
 export type GetAuthSessionResult =
   | { kind: "authenticated"; session: AuthSessionStatus }
   | { kind: "unauthenticated"; status: 401 | 403 }
   | { kind: "upstreamError"; status?: number };
+
+export type GetSecurityOverviewResult =
+  | { kind: "success"; overview: SecurityOverview }
+  | { kind: "unauthorized"; problem?: AccountsProblemDetails }
+  | { kind: "upstreamError"; problem?: AccountsProblemDetails; status?: number };
+
+export type GetMySessionsResult =
+  | { kind: "success"; sessions: AuthSessionSummary[] }
+  | { kind: "unauthorized"; problem?: AccountsProblemDetails }
+  | { kind: "upstreamError"; problem?: AccountsProblemDetails; status?: number };
+
+export type ChangePasswordInput = {
+  currentPassword: string;
+  newPassword: string;
+};
+
+export type ChangePasswordResult =
+  | { kind: "success" }
+  | {
+      kind: "validationError";
+      errors: FieldErrors;
+      message?: string;
+      problem?: AccountsProblemDetails;
+    }
+  | { kind: "unauthorized"; problem?: AccountsProblemDetails }
+  | { kind: "forbidden"; problem?: AccountsProblemDetails }
+  | { kind: "upstreamError"; message?: string; problem?: AccountsProblemDetails; status?: number }
+  | { kind: "unknownError"; message?: string; problem?: AccountsProblemDetails; status?: number };
+
+export type ChangeEmailInput = {
+  currentPassword: string;
+  newEmail: string;
+};
+
+export type ChangeEmailResult =
+  | { kind: "accepted" }
+  | {
+      kind: "validationError";
+      errors: FieldErrors;
+      message?: string;
+      problem?: AccountsProblemDetails;
+    }
+  | { kind: "unauthorized"; problem?: AccountsProblemDetails }
+  | { kind: "forbidden"; problem?: AccountsProblemDetails }
+  | { kind: "upstreamError"; message?: string; problem?: AccountsProblemDetails; status?: number }
+  | { kind: "unknownError"; message?: string; problem?: AccountsProblemDetails; status?: number };
 
 export type CheckUsernameAvailabilityResult =
   | { kind: "available"; response: UsernameAvailability }
@@ -350,6 +421,69 @@ export function normalizeUsernameAvailability(input: unknown): UsernameAvailabil
     reason: readNullableString(source, "reason", "Reason"),
     suggestedUsername: readNullableString(source, "suggestedUsername", "SuggestedUsername"),
     username,
+  };
+}
+
+export function normalizeAuthSessionSummary(input: unknown): AuthSessionSummary | null {
+  const source = asRecord(input);
+  if (!source) return null;
+
+  const sessionId = readString(source, "sessionId", "SessionId");
+  const createdAt = readString(source, "createdAt", "CreatedAt");
+  const refreshTokenExpiresAt = readString(source, "refreshTokenExpiresAt", "RefreshTokenExpiresAt");
+  const isCurrent = readBoolean(source, "isCurrent", "IsCurrent");
+  const isRevoked = readBoolean(source, "isRevoked", "IsRevoked");
+
+  if (!sessionId || !createdAt || !refreshTokenExpiresAt || isCurrent === null || isRevoked === null) {
+    return null;
+  }
+
+  return {
+    createdAt,
+    ipAddress: readNullableString(source, "ipAddress", "IpAddress"),
+    isCurrent,
+    isRevoked,
+    lastSeenAt: readNullableString(source, "lastSeenAt", "LastSeenAt"),
+    refreshTokenExpiresAt,
+    revokedAt: readNullableString(source, "revokedAt", "RevokedAt"),
+    revokedReason: readNullableString(source, "revokedReason", "RevokedReason"),
+    sessionId,
+    userAgent: readNullableString(source, "userAgent", "UserAgent"),
+  };
+}
+
+export function normalizeSecurityOverview(input: unknown): SecurityOverview | null {
+  const source = asRecord(input);
+  if (!source) return null;
+
+  const email = readString(source, "email", "Email");
+  const emailConfirmed = readBoolean(source, "emailConfirmed", "EmailConfirmed");
+  const hasAuthenticator = readBoolean(source, "hasAuthenticator", "HasAuthenticator");
+  const isMfaEnabled = readBoolean(source, "isMfaEnabled", "IsMfaEnabled");
+  const recoveryCodesRemaining = readNumber(source, "recoveryCodesRemaining", "RecoveryCodesRemaining");
+  const trustedDevicesCount = readNumber(source, "trustedDevicesCount", "TrustedDevicesCount");
+
+  if (
+    !email ||
+    emailConfirmed === null ||
+    hasAuthenticator === null ||
+    isMfaEnabled === null ||
+    recoveryCodesRemaining === null ||
+    trustedDevicesCount === null
+  ) {
+    return null;
+  }
+
+  return {
+    email,
+    emailConfirmed,
+    hasAuthenticator,
+    isMfaEnabled,
+    lastLoginAt: readNullableString(source, "lastLoginAt", "LastLoginAt"),
+    lastSecurityEventAt: readNullableString(source, "lastSecurityEventAt", "LastSecurityEventAt"),
+    passwordChangedAt: readNullableString(source, "passwordChangedAt", "PasswordChangedAt"),
+    recoveryCodesRemaining,
+    trustedDevicesCount,
   };
 }
 

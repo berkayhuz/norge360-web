@@ -1,10 +1,11 @@
-import { Alert, AlertDescription, AlertTitle } from "@workspace/ui/components/feedback/alert";
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 import { NotificationsPageClient } from "@/features/notifications/components/notifications-page-client";
 import { CommunityPageScaffold } from "@/features/community/components/community-page-scaffold";
 import { getAuthSessionStatus } from "@/lib/api/accounts-server";
 import { getNotificationsPage } from "@/lib/api/notifications-server";
+import { getAuthWebLoginUrl } from "@/lib/auth-web-url";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -14,16 +15,7 @@ export default async function NotificationsPage() {
   const authSession = await getAuthSessionStatus();
 
   if (authSession.kind !== "authenticated") {
-    return (
-      <CommunityPageScaffold>
-        <main className="mx-auto flex w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
-          <Alert>
-            <AlertTitle>{t("notifications.loginRequiredTitle")}</AlertTitle>
-            <AlertDescription>{t("notifications.loginRequiredDescription")}</AlertDescription>
-          </Alert>
-        </main>
-      </CommunityPageScaffold>
-    );
+    redirect(getAuthWebLoginUrl());
   }
 
   const notificationsResult = await getNotificationsPage({

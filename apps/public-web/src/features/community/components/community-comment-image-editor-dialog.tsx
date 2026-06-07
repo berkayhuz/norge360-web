@@ -3,12 +3,13 @@
 import type { CSSProperties, Dispatch, PointerEvent, SetStateAction } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Check, Crop, Maximize2, Move, PencilLine, Search, Trash2 } from "lucide-react";
+import { Check, Crop, Maximize2, Move, PencilLine, Search } from "lucide-react";
 
 import { Button } from "@workspace/ui/components/primitives/button";
 import { Slider } from "@workspace/ui/components/primitives/slider";
-import { Dialog, DialogContent } from "@workspace/ui/components/overlay/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@workspace/ui/components/overlay/dialog";
 import { cn } from "@workspace/ui/lib/utils";
+import { optimizeImageFile } from "@/lib/image-optimize";
 
 export type CommentAttachmentKind = "image" | "gif";
 export type CommentAttachment = {
@@ -18,18 +19,18 @@ export type CommentAttachment = {
   kind: CommentAttachmentKind;
 };
 
-type CropPreset = "circle" | "square" | "portrait" | "landscape";
+export type CropPreset = "circle" | "square" | "portrait" | "landscape";
 
 const CROP_PRESETS: Array<{
   key: CropPreset;
-  label: string;
+  labelKey: "community.imageEditor.presets.circle" | "community.imageEditor.presets.square" | "community.imageEditor.presets.portrait" | "community.imageEditor.presets.landscape";
   aspect: number;
   circular: boolean;
 }> = [
-    { key: "circle", label: "Circle", aspect: 1, circular: true },
-    { key: "square", label: "Square", aspect: 1, circular: false },
-    { key: "portrait", label: "Portrait", aspect: 4 / 5, circular: false },
-    { key: "landscape", label: "Landscape", aspect: 16 / 9, circular: false },
+    { key: "circle", labelKey: "community.imageEditor.presets.circle", aspect: 1, circular: true },
+    { key: "square", labelKey: "community.imageEditor.presets.square", aspect: 1, circular: false },
+    { key: "portrait", labelKey: "community.imageEditor.presets.portrait", aspect: 4 / 5, circular: false },
+    { key: "landscape", labelKey: "community.imageEditor.presets.landscape", aspect: 16 / 9, circular: false },
   ];
 
 export function CommentImageEditorDialog({
@@ -37,22 +38,15 @@ export function CommentImageEditorDialog({
   open,
   onOpenChange,
   onSave,
-  onRemove,
+  initialPreset = "circle",
 }: {
   attachment: CommentAttachment | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (nextAttachment: CommentAttachment, previousPreviewUrl: string) => void | Promise<void>;
-  onRemove: () => void;
+  initialPreset?: CropPreset;
 }) {
-  const t = useTranslations("public-web");
   const [mode, setMode] = useState<"view" | "edit">("view");
-
-  useEffect(() => {
-    if (!open) {
-      setMode("view");
-    }
-  }, [open]);
 
   if (!attachment) {
     return null;
@@ -61,14 +55,29 @@ export function CommentImageEditorDialog({
   const canEdit = attachment.kind !== "gif" && attachment.file.type !== "image/gif";
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          setMode("view");
+        }
+
+        onOpenChange(nextOpen);
+      }}
+    >
       <DialogContent className="max-h-[92vh] overflow-hidden p-0 sm:max-w-[56rem]">
+        <DialogTitle className="sr-only">Image editor</DialogTitle>
+        <DialogDescription className="sr-only">
+          Preview, crop and save the selected image.
+        </DialogDescription>
 
         {mode === "view" ? (
           <MediaPreview attachment={attachment} canEdit={canEdit} onEdit={() => setMode("edit")} />
         ) : (
           <ImageCropEditor
+            key={`${attachment.id}-${initialPreset}`}
             attachment={attachment}
+            initialPreset={initialPreset}
             onCancel={() => setMode("view")}
             onSave={async (nextAttachment, previousPreviewUrl) => {
               await onSave(nextAttachment, previousPreviewUrl);
@@ -90,12 +99,15 @@ function MediaPreview({
   canEdit: boolean;
   onEdit: () => void;
 }) {
+  const t = useTranslations("public-web");
+
   return (
     <div className="group relative overflow-hidden rounded-[28px] border border-border/60 bg-black/5">
+      {/* eslint-disable-next-line @next/next/no-img-element -- The editor needs direct access to the selected object URL. */}
       <img src={attachment.previewUrl} alt={attachment.file.name} className="max-h-[70vh] w-full object-contain" />
       <Button type="button" variant="secondary" onClick={onEdit} disabled={!canEdit} className="group-hover:opacity-100 lg:opacity-0 absolute bottom-2 right-2">
         <PencilLine className="size-4" />
-        Edit
+        {t("community.imageEditor.edit")}
       </Button>
     </div>
   );
@@ -103,10 +115,12 @@ function MediaPreview({
 
 function ImageCropEditor({
   attachment,
+  initialPreset,
   onCancel,
   onSave,
 }: {
   attachment: CommentAttachment;
+  initialPreset: CropPreset;
   onCancel: () => void;
   onSave: (nextAttachment: CommentAttachment, previousPreviewUrl: string) => void | Promise<void>;
 }) {
@@ -115,19 +129,13 @@ function ImageCropEditor({
   const dragStateRef = useRef<{ startX: number; startY: number; offsetX: number; offsetY: number } | null>(null);
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
   const [frameSize, setFrameSize] = useState<{ width: number; height: number } | null>(null);
-  const [presetKey, setPresetKey] = useState<CropPreset>("circle");
+  const [presetKey, setPresetKey] = useState<CropPreset>(attachment.kind === "gif" ? "square" : initialPreset);
   const [zoom, setZoom] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isSaving, setIsSaving] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
   const preset = useMemo(() => CROP_PRESETS.find((item) => item.key === presetKey) ?? CROP_PRESETS[0], [presetKey]);
-
-  useEffect(() => {
-    setPresetKey(attachment.kind === "gif" ? "square" : "circle");
-    setZoom(1);
-    setOffset({ x: 0, y: 0 });
-  }, [attachment.id]);
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -147,9 +155,37 @@ function ImageCropEditor({
     return () => observer.disconnect();
   }, []);
 
+  function clampOffset(nextOffset: { x: number; y: number }) {
+    if (!frameSize || !imageSize) {
+      return nextOffset;
+    }
+
+    const displayScale = getDisplayScale(frameSize.width, frameSize.height, imageSize.width, imageSize.height, zoom);
+    const displayWidth = imageSize.width * displayScale;
+    const displayHeight = imageSize.height * displayScale;
+    const limitX = Math.max(0, (displayWidth - frameSize.width) / 2);
+    const limitY = Math.max(0, (displayHeight - frameSize.height) / 2);
+
+    return {
+      x: clamp(nextOffset.x, -limitX, limitX),
+      y: clamp(nextOffset.y, -limitY, limitY),
+    };
+  }
+
   useEffect(() => {
-    clampOffset();
-  }, [presetKey, zoom, imageSize, frameSize]);
+    setOffset({ x: 0, y: 0 });
+  }, [presetKey]);
+
+  useEffect(() => {
+    setOffset((current) => {
+      const nextOffset = clampOffset(current);
+      if (nextOffset.x === current.x && nextOffset.y === current.y) {
+        return current;
+      }
+
+      return nextOffset;
+    });
+  }, [frameSize, imageSize, zoom]);
 
   const frameShapeClass = preset.circular ? "rounded-full" : "rounded-[28px]";
 
@@ -165,23 +201,6 @@ function ImageCropEditor({
     } finally {
       setIsSaving(false);
     }
-  }
-
-  function clampOffset(nextOffset = offset) {
-    if (!frameSize || !imageSize) {
-      return;
-    }
-
-    const displayScale = getDisplayScale(frameSize.width, frameSize.height, imageSize.width, imageSize.height, zoom);
-    const displayWidth = imageSize.width * displayScale;
-    const displayHeight = imageSize.height * displayScale;
-    const limitX = Math.max(0, (displayWidth - frameSize.width) / 2);
-    const limitY = Math.max(0, (displayHeight - frameSize.height) / 2);
-
-    setOffset({
-      x: clamp(nextOffset.x, -limitX, limitX),
-      y: clamp(nextOffset.y, -limitY, limitY),
-    });
   }
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
@@ -259,13 +278,13 @@ function ImageCropEditor({
 
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Move className="size-3.5" />
-          Drag to reposition the image
+          {t("community.imageEditor.dragHint")}
         </div>
       </div>
 
       <div className="space-y-5 border-t border-border/60 px-5 py-5 lg:border-l lg:border-t-0">
         <div className="space-y-3">
-          <p className="text-sm font-medium text-foreground">Crop shape</p>
+          <p className="text-sm font-medium text-foreground">{t("community.imageEditor.cropShape")}</p>
           <div className="grid grid-cols-2 gap-2">
             {CROP_PRESETS.map((item) => (
               <Button
@@ -275,11 +294,10 @@ function ImageCropEditor({
                 className="justify-start"
                 onClick={() => {
                   setPresetKey(item.key);
-                  setOffset({ x: 0, y: 0 });
                 }}
               >
                 {presetKey === item.key ? <Check className="size-4" /> : <Maximize2 className="size-4" />}
-                {item.label}
+                {t(item.labelKey)}
               </Button>
             ))}
           </div>
@@ -287,7 +305,7 @@ function ImageCropEditor({
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-foreground">Zoom</p>
+            <p className="text-sm font-medium text-foreground">{t("community.imageEditor.zoom")}</p>
             <span className="text-xs text-muted-foreground">{Math.round(zoom * 100)}%</span>
           </div>
           <div className="flex items-center gap-3">
@@ -304,17 +322,17 @@ function ImageCropEditor({
 
         {attachment.kind === "gif" ? (
           <p className="rounded-2xl border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-            GIF editing is disabled to preserve animation.
+            {t("community.imageEditor.gifDisabled")}
           </p>
         ) : null}
 
         <div className="flex justify-end gap-2 border-t border-border/60 pt-4">
           <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
-            Cancel
+            {t("community.imageEditor.cancel")}
           </Button>
           <Button type="button" onClick={() => void handleSave()} disabled={isSaving}>
             <Crop className="size-4" />
-            {isSaving ? "Saving..." : "Apply"}
+            {isSaving ? t("community.imageEditor.saving") : t("community.imageEditor.apply")}
           </Button>
         </div>
       </div>
@@ -340,6 +358,7 @@ function CropImage({
   const style = useMemo<CSSProperties | undefined>(() => getImageStyle(imageSize, frameSize, zoom, offset), [imageSize, frameSize, zoom, offset]);
 
   return (
+    // eslint-disable-next-line @next/next/no-img-element -- The cropper needs natural dimensions and precise transforms.
     <img
       src={attachment.previewUrl}
       alt={attachment.file.name}
@@ -457,11 +476,20 @@ async function cropAttachment(
   const nextFile = new File([blob], `${attachment.file.name.replace(/\.[^.]+$/, "")}-cropped.${safeExtension}`, {
     type: blob.type,
   });
-  const previewUrl = URL.createObjectURL(blob);
+  let optimizedFile = nextFile;
+  try {
+    optimizedFile = await optimizeImageFile(nextFile, {
+      maxBytes: 1 * 1024 * 1024,
+      maxDimension: 1920,
+    });
+  } catch {
+    optimizedFile = nextFile;
+  }
+  const previewUrl = URL.createObjectURL(optimizedFile);
 
   return {
     ...attachment,
-    file: nextFile,
+    file: optimizedFile,
     previewUrl,
   };
 }
@@ -473,18 +501,6 @@ function loadImage(src: string) {
     image.onerror = () => reject(new Error("Unable to load image"));
     image.src = src;
   });
-}
-
-function formatFileSize(bytes: number) {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-
-  if (bytes < 1024 * 1024) {
-    return `${Math.round(bytes / 1024)} KB`;
-  }
-
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function clamp(value: number, min: number, max: number) {

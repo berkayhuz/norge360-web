@@ -1,15 +1,17 @@
 import { Alert, AlertDescription, AlertTitle } from "@workspace/ui/components/feedback/alert";
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 import {
   ProfileSettingsForm,
   type ProfileSettingsFormState,
   type ProfileSettingsValues,
 } from "@/features/profile/components/profile-settings-form";
-import { ProfileSettingsSidebar } from "@/features/profile/components/profile-settings-sidebar";
 import { buildProfileSettingsSidebarItems } from "@/features/profile/components/profile-settings-sidebar-data";
 import type { MyProfile } from "@/lib/api/accounts-types";
 import { getMyProfile, updateMyProfile } from "@/lib/api/accounts-server";
+import { getAuthWebLoginUrl } from "@/lib/auth-web-url";
+import { SettingsPageLayout } from "@/features/settings/components/settings-page-layout";
 
 export default async function ProfileSettingsPage() {
   const t = await getTranslations("public-web");
@@ -27,8 +29,6 @@ export default async function ProfileSettingsPage() {
     status: {
       accessRestrictedDescription: t("settings.accessRestrictedDescription"),
       accessRestrictedTitle: t("settings.accessRestrictedTitle"),
-      loginRequiredDescription: t("settings.loginRequiredDescription"),
-      loginRequiredTitle: t("settings.loginRequiredTitle"),
       notFoundDescription: t("settings.notFoundDescription"),
       notFoundTitle: t("settings.notFoundTitle"),
       preparingDescription: t("settings.preparingDescription"),
@@ -39,10 +39,7 @@ export default async function ProfileSettingsPage() {
   } as const;
 
   if (myProfileResult.kind === "unauthorized") {
-    return renderAlert(
-      settingsMessages.status.loginRequiredTitle,
-      settingsMessages.status.loginRequiredDescription,
-    );
+    redirect(getAuthWebLoginUrl());
   }
 
   if (myProfileResult.kind === "pending") {
@@ -78,12 +75,13 @@ export default async function ProfileSettingsPage() {
   const profile = myProfileResult.profile;
   const initialValues = toProfileSettingsValues(profile);
   const sidebarItems = buildProfileSettingsSidebarItems({
-    accountPrivacy: "Hesap gizliliği",
-    blockedUsers: "Engellenenler",
-    commentPermissions: "Yorum izinleri",
+    accountPrivacy: t("settings.sidebar.accountPrivacy"),
+    blockedUsers: t("settings.sidebar.blockedUsers"),
+    commentPermissions: t("settings.sidebar.commentPermissions"),
     editProfile: t("profile.hero.editProfile"),
-    hideLikeCounts: "Beğeni sayıları",
+    hideLikeCounts: t("settings.sidebar.hideLikeCounts"),
     notifications: t("settings.notifications.sidebarLabel"),
+    security: t("settings.sidebar.security"),
   });
 
   async function updateProfileAction(
@@ -162,23 +160,21 @@ export default async function ProfileSettingsPage() {
   }
 
   return (
-    <main className="mx-auto grid w-full max-w-6xl flex-1 gap-4 px-4 py-8 sm:px-6 lg:grid-cols-4 lg:px-2">
-      <ProfileSettingsSidebar
-        description={t("settings.description")}
-        items={sidebarItems}
-        title={t("settings.title")}
+    <SettingsPageLayout
+      description={t("settings.description")}
+      items={sidebarItems}
+      title={t("settings.title")}
+      headingDescription={t("settings.description")}
+      headingTitle={t("settings.title")}
+    >
+      <ProfileSettingsForm
+        action={updateProfileAction}
+        avatarUrl={profile.avatarUrl}
+        coverPhotoUrl={profile.coverPhotoUrl}
+        initialValues={initialValues}
+        username={profile.username}
       />
-
-      <div className="relative col-span-4 block w-full lg:col-span-3">
-        <ProfileSettingsForm
-          action={updateProfileAction}
-          avatarUrl={profile.avatarUrl}
-          coverPhotoUrl={profile.coverPhotoUrl}
-          initialValues={initialValues}
-          username={profile.username}
-        />
-      </div>
-    </main>
+    </SettingsPageLayout>
   );
 }
 

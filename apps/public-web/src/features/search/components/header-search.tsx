@@ -41,7 +41,7 @@ export function HeaderSearch() {
 
   useEffect(() => {
     if (!active || trimmedQuery.length === 0) {
-      setHasError(false);
+      queueMicrotask(() => setHasError(false));
       return;
     }
 
@@ -163,7 +163,7 @@ export function HeaderSearch() {
             size="icon-xs"
             rounded="full"
             border="none"
-            className="text-muted-foreground hover:bg-transparent hover:text-foreground"
+            className="text-muted-foreground hover:bg-transparent hover:text-foreground shrink-0 w-7 h-7"
             aria-label={t("clearSearch")}
             onClick={() => {
               setQuery("");

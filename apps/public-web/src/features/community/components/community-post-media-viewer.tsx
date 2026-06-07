@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { Button } from "@workspace/ui/components/primitives/button";
 import { Image } from "@workspace/ui/components/primitives/image";
 
 import type { CommunityPostMedia } from "@/features/community/lib/types";
-import { cn } from "@workspace/ui/lib/utils";
 
 export function CommunityPostMediaViewer({
   media,
@@ -16,6 +15,7 @@ export function CommunityPostMediaViewer({
   media: CommunityPostMedia[];
   alt: string;
 }) {
+  const t = useTranslations("public-web");
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -40,17 +40,17 @@ export function CommunityPostMediaViewer({
     dragged: false,
   });
 
-  if (media.length === 0) {
-    return null;
-  }
-
   const showControls = media.length > 1;
 
   useEffect(() => {
     if (activeIndex > media.length - 1) {
-      setActiveIndex(0);
+      queueMicrotask(() => setActiveIndex(0));
     }
   }, [activeIndex, media.length]);
+
+  if (media.length === 0) {
+    return null;
+  }
 
   function syncActiveIndex() {
     const track = trackRef.current;
@@ -266,7 +266,7 @@ export function CommunityPostMediaViewer({
           <>
             <button
               type="button"
-              aria-label="Previous image"
+              aria-label={t("community.post.previousImage")}
               className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/80 p-1 text-foreground shadow-md backdrop-blur transition hover:bg-background"
               onClick={() => scrollByStep(-1)}
               disabled={activeIndex === 0}
@@ -275,7 +275,7 @@ export function CommunityPostMediaViewer({
             </button>
             <button
               type="button"
-              aria-label="Next image"
+              aria-label={t("community.post.nextImage")}
               className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/80 p-1 text-foreground shadow-md backdrop-blur transition hover:bg-background"
               onClick={() => scrollByStep(1)}
               disabled={activeIndex >= media.length - 1}

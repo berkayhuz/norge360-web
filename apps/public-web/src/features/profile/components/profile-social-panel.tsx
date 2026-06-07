@@ -38,6 +38,8 @@ type FollowUser = {
   avatarUrl: string | null;
   displayName: string | null;
   followedAtUtc: string | null;
+  isFollowRequestPending: boolean | null;
+  isFollowing: boolean | null;
   profileId: string;
   username: string;
 };
@@ -326,6 +328,7 @@ function FollowListDialog({
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(false);
+  const [currentUsername, setCurrentUsername] = useState<string | null>(null);
   const open = kind !== null;
   const title = kind === "following" ? t("profile.social.followingTitle") : t("profile.social.followersTitle");
   const description =
@@ -380,8 +383,41 @@ function FollowListDialog({
       return;
     }
 
-    void loadPage(1, false);
+    queueMicrotask(() => void loadPage(1, false));
   }, [kind, loadPage, open]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const response = await fetch("/api/accounts/profiles/me", {
+          cache: "no-store",
+          credentials: "include",
+        });
+        if (!response.ok) {
+          return;
+        }
+
+        const profile = (await response.json().catch(() => null)) as { username?: string | null; normalizedUsername?: string | null } | null;
+        const nextUsername = profile?.normalizedUsername ?? profile?.username ?? null;
+        if (!cancelled) {
+          setCurrentUsername(typeof nextUsername === "string" ? nextUsername : null);
+        }
+      } catch {
+        if (!cancelled) {
+          setCurrentUsername(null);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -409,7 +445,7 @@ function FollowListDialog({
           {!loading && !error ? (
             <div className="space-y-1.5">
               {items.map((item) => (
-                <FollowUserRow item={item} key={item.profileId} />
+                <FollowUserRow currentUsername={currentUsername} item={item} key={item.profileId} />
               ))}
             </div>
           ) : null}
@@ -434,26 +470,114 @@ function FollowListDialog({
   );
 }
 
-function FollowUserRow({ item }: { item: FollowUser }) {
+function FollowUserRow({ currentUsername, item }: { currentUsername: string | null; item: FollowUser }) {
   const t = useTranslations("public-web");
   const displayName = item.displayName?.trim() || item.username;
+  const [isFollowing, setIsFollowing] = useState(item.isFollowing ?? false);
+  const [isFollowRequestPending, setIsFollowRequestPending] = useState(item.isFollowRequestPending ?? false);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState(false);
+  const isOwnProfile = currentUsername?.trim().toLowerCase() === item.username.trim().toLowerCase();
+
+  useEffect(() => {
+    if (isOwnProfile) {
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const response = await fetch(`/api/accounts/follows/${encodeURIComponent(item.username)}/status`, {
+          cache: "no-store",
+          credentials: "include",
+        });
+        if (!response.ok) {
+          return;
+        }
+
+        const status = normalizeFollowStatus(await response.json().catch(() => null));
+        if (!cancelled) {
+          setIsFollowing(status.isFollowing ?? item.isFollowing ?? false);
+          setIsFollowRequestPending(status.isFollowRequestPending ?? item.isFollowRequestPending ?? false);
+        }
+      } catch {
+        if (!cancelled) {
+          setIsFollowing(item.isFollowing ?? false);
+          setIsFollowRequestPending(item.isFollowRequestPending ?? false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOwnProfile, item.isFollowRequestPending, item.isFollowing, item.username]);
+
+  async function onToggleFollow() {
+    if (pending || isOwnProfile) {
+      return;
+    }
+
+    setPending(true);
+    setError(false);
+    const method = isFollowing || isFollowRequestPending ? "DELETE" : "POST";
+
+    try {
+      const response = await fetch(`/api/accounts/follows/${encodeURIComponent(item.username)}`, {
+        credentials: "include",
+        method,
+      });
+
+      if (!response.ok && response.status !== 204) {
+        throw new Error("follow_request_failed");
+      }
+
+      const status = response.status === 204 ? null : normalizeFollowStatus(await response.json().catch(() => null));
+      setIsFollowing(status?.isFollowing ?? false);
+      setIsFollowRequestPending(status?.isFollowRequestPending ?? false);
+    } catch {
+      setError(true);
+    } finally {
+      setPending(false);
+    }
+  }
+
+  const buttonLabel = isFollowRequestPending
+    ? t("profile.hero.cancelRequest")
+    : isFollowing
+      ? t("profile.hero.unfollow")
+      : t("profile.hero.follow");
 
   return (
     <div className="flex items-center justify-between gap-3 rounded-3xl px-3 py-2.5 transition hover:bg-muted/70">
-      <div className="flex min-w-0 items-center gap-3">
-        <Avatar className="size-10">
-          {item.avatarUrl ? <AvatarImage alt={`${displayName} avatar`} src={item.avatarUrl} /> : null}
-          {item.displayName ? <AvatarFallback>{getInitials(displayName)}</AvatarFallback> : <DefaultAvatar />}
-        </Avatar>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-foreground">{displayName}</p>
-          <p className="truncate text-xs text-muted-foreground">@{item.username}</p>
+      <Link href={`/${encodeURIComponent(item.username)}`} className="min-w-0 flex-1">
+        <div className="flex min-w-0 items-center gap-3">
+          <Avatar className="size-10">
+            {item.avatarUrl ? <AvatarImage alt={`${displayName} avatar`} src={item.avatarUrl} /> : null}
+            {item.displayName ? <AvatarFallback>{getInitials(displayName)}</AvatarFallback> : <DefaultAvatar />}
+          </Avatar>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-foreground">{displayName}</p>
+            <p className="truncate text-xs text-muted-foreground">@{item.username}</p>
+          </div>
         </div>
-      </div>
+      </Link>
 
-      <Button asChild size="sm" variant="outline">
-        <Link href={`/${encodeURIComponent(item.username)}`}>{t("profile.social.viewProfile")}</Link>
-      </Button>
+      {isOwnProfile ? null : (
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <Button
+            disabled={pending}
+            onClick={() => void onToggleFollow()}
+            size="sm"
+            type="button"
+            variant={isFollowing || isFollowRequestPending ? "outline" : "default"}
+          >
+            {pending ? <Loader2 aria-hidden="true" className="size-4 animate-spin" /> : null}
+            {buttonLabel}
+          </Button>
+          {error ? <span className="text-[11px] text-destructive">{t("profile.social.actionError")}</span> : null}
+        </div>
+      )}
     </div>
   );
 }
@@ -484,6 +608,8 @@ function normalizeFollowUser(value: unknown): FollowUser | null {
     avatarUrl: readNullableString(source, "avatarUrl", "AvatarUrl"),
     displayName: readNullableString(source, "displayName", "DisplayName"),
     followedAtUtc: readNullableString(source, "followedAtUtc", "FollowedAtUtc"),
+    isFollowRequestPending: readBoolean(source, "isFollowRequestPending", "IsFollowRequestPending"),
+    isFollowing: readBoolean(source, "isFollowing", "IsFollowing", "viewerFollowsThisUser", "ViewerFollowsThisUser"),
     profileId,
     username,
   };
@@ -557,5 +683,13 @@ async function readFollowMutationResponse(response: Response) {
     followersCount: readNumber(source, "followersCount", "FollowersCount"),
     isFollowRequestPending: readBoolean(source, "isFollowRequestPending", "IsFollowRequestPending"),
     isFollowing: readBoolean(source, "isFollowing", "IsFollowing"),
+  };
+}
+
+function normalizeFollowStatus(value: unknown) {
+  const source = asRecord(value);
+  return {
+    isFollowRequestPending: readBoolean(source, "isFollowRequestPending", "IsFollowRequestPending"),
+    isFollowing: readBoolean(source, "isFollowing", "IsFollowing", "viewerFollowsThisUser", "ViewerFollowsThisUser"),
   };
 }

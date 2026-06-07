@@ -1,9 +1,8 @@
-import { Ban, Bell, Heart, Shield, MessageCircle, User, type LucideIcon } from "lucide-react";
-
 export type ProfileSettingsSidebarItem = Readonly<{
   href: string;
-  icon: LucideIcon;
+  iconKey: "user" | "shield" | "lock" | "messageCircle" | "heart" | "ban" | "bell";
   label: string;
+  searchTerms: readonly string[];
 }>;
 
 export function buildProfileSettingsSidebarItems(text: {
@@ -13,13 +12,50 @@ export function buildProfileSettingsSidebarItems(text: {
   commentPermissions: string;
   hideLikeCounts: string;
   notifications: string;
+  security: string;
 }): readonly ProfileSettingsSidebarItem[] {
   return [
-    { href: "/settings/profile", icon: User, label: text.editProfile },
-    { href: "/settings/account-privacy", icon: Shield, label: text.accountPrivacy },
-    { href: "/settings/comment-permissions", icon: MessageCircle, label: text.commentPermissions },
-    { href: "/settings/like-count-visibility", icon: Heart, label: text.hideLikeCounts },
-    { href: "/settings/blocked-users", icon: Ban, label: text.blockedUsers },
-    { href: "/settings/notifications", icon: Bell, label: text.notifications },
+    {
+      href: "/settings/profile",
+      iconKey: "user",
+      label: text.editProfile,
+      searchTerms: ["profile", "edit profile", "avatar", "cover photo", "bio", "name"],
+    },
+    {
+      href: "/settings/account-privacy",
+      iconKey: "shield",
+      label: text.accountPrivacy,
+      searchTerms: ["privacy", "account", "visibility", "profile visibility", "public", "private", "followers"],
+    },
+    {
+      href: "/settings/comment-permissions",
+      iconKey: "messageCircle",
+      label: text.commentPermissions,
+      searchTerms: ["comments", "comment", "reply", "replies", "who can comment", "permissions"],
+    },
+    {
+      href: "/settings/like-count-visibility",
+      iconKey: "heart",
+      label: text.hideLikeCounts,
+      searchTerms: ["likes", "like counts", "hide likes", "likes visibility", "hearts"],
+    },
+    {
+      href: "/settings/blocked-users",
+      iconKey: "ban",
+      label: text.blockedUsers,
+      searchTerms: ["blocked", "blocked users", "ban", "mute", "restrictions"],
+    },
+    {
+      href: "/settings/notifications",
+      iconKey: "bell",
+      label: text.notifications,
+      searchTerms: ["notifications", "notification settings", "follow requests", "follows", "requests", "alerts"],
+    },
+    {
+      href: "/settings/password-security",
+      iconKey: "lock",
+      label: text.security,
+      searchTerms: ["security", "password", "email", "sessions", "sign in", "login"],
+    },
   ] as const;
 }

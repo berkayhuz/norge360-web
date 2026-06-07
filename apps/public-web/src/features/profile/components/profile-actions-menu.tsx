@@ -67,11 +67,9 @@ export function ProfileActionsMenu({ username, profileId, onBlockChange }: Props
         method,
       });
       if (response.ok || response.status === 204) {
-        setBlockedByMe((value) => {
-          const nextValue = !value;
-          onBlockChange?.(nextValue);
-          return nextValue;
-        });
+        const nextValue = !blockedByMe;
+        setBlockedByMe(nextValue);
+        onBlockChange?.(nextValue);
       }
     } finally {
       setLoading(false);

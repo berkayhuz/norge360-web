@@ -153,14 +153,22 @@
     "description": "Disse felter er valgfrie. Opdater dem, når det giver mening.",
     "avatar": {
       "title": "Avatar",
-      "description": "JPG, PNG eller WebP. Op til 5 MB.",
+      "description": "JPG, PNG eller WebP. Op til 1 MB.",
       "hint": "Når du uploader en ny avatar, sendes den først til R2 og knyttes derefter til din profil.",
       "optional": "Valgfri",
+      "dialogTitle": "Avatar image",
+      "dialogDescription": "Choose a new image and save it.",
+      "currentPreviewLabel": "Current avatar",
+      "newPreviewLabel": "New image",
+      "chooseImageButton": "Choose a new image",
+      "cancelButton": "Cancel",
+      "saveButton": "Save",
       "fileLabel": "Avatarfil",
       "fileSelected": "{fileName} ({fileSize})",
       "fileDefault": "Du kan kun uploade JPG, PNG eller WebP.",
       "validImage": "Vælg et gyldigt billede.",
-      "fileTooLarge": "Filstørrelsen må højst være 5 MB.",
+      "fileTooLarge": "Filstørrelsen må højst være 1 MB.",
+      "optimizing": "Optimerer billede...",
       "uploadStartError": "Avatarupload kunne ikke startes.",
       "uploadFormatError": "Svaret fra avataruploaden havde ikke det forventede format.",
       "uploadFailed": "Billedfilen kunne ikke uploades. Prøv igen.",
@@ -172,22 +180,30 @@
     },
     "coverPhoto": {
       "title": "Cover photo",
-      "description": "JPG, PNG or WebP. Up to 10 MB.",
-      "hint": "Use a wide image for the best profile header result.",
+      "description": "JPG, PNG or WebP. Up to 2 MB.",
+      "hint": "Brug et bredt billede for det bedste resultat i profilheaderen.",
       "optional": "Optional",
+      "dialogTitle": "Cover photo",
+      "dialogDescription": "Choose a new wide image and save it.",
+      "currentPreviewLabel": "Current cover photo",
+      "newPreviewLabel": "New image",
+      "chooseImageButton": "Choose a new image",
+      "cancelButton": "Cancel",
+      "saveButton": "Save",
       "fileLabel": "Cover photo file",
       "fileSelected": "{fileName} ({fileSize})",
-      "fileDefault": "You can upload only JPG, PNG or WebP.",
-      "validImage": "Select a valid image.",
-      "fileTooLarge": "The file size can be at most 10 MB.",
+      "fileDefault": "Du kan kun uploade JPG, PNG eller WebP.",
+      "validImage": "Vælg et gyldigt billede.",
+      "fileTooLarge": "Filstørrelsen må højst være 2 MB.",
+      "optimizing": "Optimerer billede...",
       "uploadStartError": "Cover photo upload could not be started.",
-      "uploadFormatError": "Cover photo upload response was not in the expected format.",
-      "uploadFailed": "The image file could not be uploaded. Please try again.",
-      "attachFailed": "Cover photo could not be attached to the profile.",
-      "profileUnreadable": "Cover photo was updated, but the profile data could not be read.",
-      "unexpectedError": "An unexpected error occurred during cover photo upload.",
-      "updating": "Updating...",
-      "updateButton": "Upload cover photo"
+      "uploadFormatError": "Svaret fra coverfotouploaden havde ikke det forventede format.",
+      "uploadFailed": "Billedfilen kunne ikke uploades. Prøv igen.",
+      "attachFailed": "Coverfoto kunne ikke knyttes til profilen.",
+      "profileUnreadable": "Coverfoto blev opdateret, men profildata kunne ikke læses.",
+      "unexpectedError": "Der opstod en uventet fejl under upload af coverfoto.",
+      "updating": "Opdaterer...",
+      "updateButton": "Upload coverfoto"
     },
     "alert": {
       "successTitle": "Succes",
@@ -219,7 +235,8 @@
       "profileVisibility": "Profilsynlighed",
       "sectionLocation": "Sted",
       "sectionProfessional": "Professionel",
-      "sectionLinksVisibility": "Links og synlighed"
+      "sectionLinksVisibility": "Links og synlighed",
+      "sectionLinks": "Links"
     },
     "visibility": {
       "public": "Visible to everyone",
@@ -286,10 +303,208 @@
           "label": "Comment replies",
           "description": "When someone replies to your comment."
         },
+        "suspiciousLogin": {
+          "label": "Suspicious login alerts",
+          "description": "Email alerts for new devices and failed login attempts."
+        },
         "generic": {
           "label": "Other notifications",
           "description": "Other relevant account or community updates."
         }
+      }
+    },
+    "security": {
+      "pageTitle": "Password & Security",
+      "pageDescription": "Update your password, request an email change, and review active sessions.",
+      "actions": {
+        "saving": "Saving..."
+      },
+      "alert": {
+        "successTitle": "Success",
+        "errorTitle": "Unable to save changes",
+        "validationError": "Please check the highlighted fields.",
+        "unauthorized": "Your session is invalid. Please sign in again.",
+        "forbidden": "You do not have permission to do that.",
+        "unavailable": "Security settings are unavailable right now. Please try again later.",
+        "unexpected": "An unexpected error occurred."
+      },
+      "currentEmail": "Current email",
+      "currentEmailLabel": "Current email",
+      "currentSession": "Current session",
+      "currentDevice": "Current device",
+      "password": {
+        "statusLabel": "Password",
+        "lastChanged": "Last changed {days} days ago",
+        "never": "No password change has been recorded yet.",
+        "title": "Change password",
+        "description": "Use your current password to set a new one.",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "note": "Changing your password will revoke your sessions on the next request.",
+        "save": "Update password",
+        "mismatch": "Passwords do not match.",
+        "success": "Your password has been updated."
+      },
+      "twoFactor": {
+        "statusLabel": "Two-Factor Authentication",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "title": "Two-Factor Authentication",
+        "description": "Authenticator apps and recovery codes help protect your account.",
+        "manage": "Manage 2FA",
+        "startSetup": "Set up 2FA",
+        "authenticatorLabel": "Authenticator",
+        "configured": "Configured",
+        "notConfigured": "Not configured",
+        "recoveryCodesLabel": "Recovery codes",
+        "setupTitle": "Authenticator setup",
+        "setupDescription": "Enter the shared key into your authenticator app, then confirm with a 6-digit code.",
+        "sharedKey": "Shared key",
+        "authenticatorUri": "Authenticator URI",
+        "codePlaceholder": "Enter 6-digit code",
+        "confirm": "Confirm setup",
+        "recoveryCodesTitle": "Recovery codes",
+        "recoveryCodesDescription": "Regenerate recovery codes after confirming your authenticator app.",
+        "regenerateCodes": "Generate recovery codes",
+        "recoveryCodesSaved": "Recovery codes have been generated.",
+        "disable": "Disable 2FA"
+      },
+      "recovery": {
+        "title": "Account recovery",
+        "description": "Recovery email, security key, and passkey options.",
+        "recoveryEmail": "Recovery email",
+        "recoveryCodes": "Recovery codes",
+        "passkeys": "Trusted devices",
+        "passkeyTitle": "Passkeys and security keys",
+        "passkeyDescription": "Windows Hello, Face ID, Touch ID, and YubiKey are supported recovery methods.",
+        "trustedDevices": "Trusted devices",
+        "trustedDevicesDescription": "Review or remove devices you previously trusted.",
+        "manageRecoveryCodes": "Manage recovery codes",
+        "deviceFallback": "Trusted device",
+        "removeDevice": "Remove device",
+        "noTrustedDevices": "No trusted devices were found.",
+        "deviceRevoked": "Trusted device removed."
+      },
+      "securityScore": {
+        "label": "Security score",
+        "title": "Security score details",
+        "description": "Here is what affects your score and what still needs attention.",
+        "progressTitle": "Current protection level",
+        "progressDescription": "Complete the items below to reach 100/100.",
+        "missingTitle": "Missing protections",
+        "missingBadge": "Missing",
+        "complete": "Everything required is already enabled."
+      },
+      "actions": {
+        "saving": "Saving...",
+        "manage": "Manage"
+      },
+      "notifications": {
+        "title": "Suspicious login notifications",
+        "description": "Get email alerts for new devices and failed login attempts.",
+        "emailAlerts": "Email alerts",
+        "emailAlertsDescription": "Send me an email when your account is accessed from a new device or when login attempts fail.",
+        "inAppHint": "This preference controls email delivery only.",
+        "saved": "Notification preference updated.",
+        "loadError": "Notification preferences could not be loaded.",
+        "saveError": "Notification preferences could not be saved."
+      },
+      "email": {
+        "statusLabel": "Email",
+        "title": "Change email",
+        "description": "Request an email change and confirm it from the new inbox.",
+        "currentPassword": "Current password",
+        "newEmail": "New email",
+        "note": "A confirmation email will be sent to the new address.",
+        "save": "Request email change",
+        "success": "A confirmation email has been sent to the new address.",
+        "notVerified": "Email not verified",
+        "verifyNow": "Verify now"
+      },
+      "sessions": {
+        "open": "View sessions",
+        "summaryTitle": "Account overview",
+        "summaryDescription": "Your current account and session details.",
+        "currentTitle": "Current device",
+        "currentDescription": "The device you are currently using.",
+        "pageTitle": "Sessions",
+        "pageDescription": "Review active sessions and sign out if something looks unfamiliar.",
+        "back": "Back to security",
+        "listTitle": "Active sessions",
+        "listDescription": "All sessions issued for this account.",
+        "currentSessionTitle": "Current session",
+        "currentSessionDescription": "The session you are signed in with right now.",
+        "createdAtLabel": "Created at",
+        "loadError": "Sessions could not be loaded right now.",
+        "actionsError": "Could not update the selected session.",
+        "revokeOthers": "Log out other sessions",
+        "terminateCurrent": "End current session",
+        "lastLogin": "Last login",
+        "lastLoginTitle": "Last login details",
+        "lastLoginDescription": "Review the most recent login for this account.",
+        "location": "Location",
+        "locationUnavailable": "Location lookup is not available yet.",
+        "ipAddressLabel": "IP address",
+        "osLabel": "Operating system",
+        "browserLabel": "Browser",
+        "os": "Operating system",
+        "browser": "Browser",
+        "activeBadge": "{count} devices connected",
+        "connected": "Connected",
+        "noOtherSessions": "No other active sessions were found.",
+        "terminate": "End this session",
+        "viewSessions": "View sessions",
+        "viewDetails": "View details",
+        "currentBadge": "Current",
+        "revokedBadge": "Revoked",
+        "sessionLabel": "Session {sessionId}",
+        "createdAt": "Created {date}",
+        "lastSeenAt": "Last seen {date}",
+        "expiresAt": "Expires {date}",
+        "ipAddress": "IP address",
+        "userAgent": "User agent: {value}",
+        "revokedReason": "Revoked reason: {value}",
+        "revokedAt": "Revoked {date}",
+        "empty": "No sessions were found.",
+        "unknown": "Unknown"
+      }
+    },
+    "sidebar": {
+      "accountPrivacy": "Account privacy",
+      "blockedUsers": "Blocked users",
+      "commentPermissions": "Comment permissions",
+      "hideLikeCounts": "Like counts",
+      "security": "Password & Security"
+    },
+    "accountPrivacy": {
+      "loadErrorTitle": "Account privacy could not be loaded",
+      "loadErrorDescription": "Please try again later.",
+      "title": "Account privacy",
+      "description": "Manage who can see your profile.",
+      "fieldLabel": "Account privacy"
+    },
+    "commentPermissions": {
+      "loadErrorTitle": "Comment permissions could not be loaded",
+      "loadErrorDescription": "Please try again later.",
+      "title": "Comment permissions",
+      "description": "Choose who can comment on your posts.",
+      "fieldLabel": "Who can comment",
+      "options": {
+        "followers": "Followers",
+        "mutualFollowers": "Mutual followers",
+        "closed": "Closed"
+      }
+    },
+    "likeCountVisibility": {
+      "loadErrorTitle": "Like counts could not be loaded",
+      "loadErrorDescription": "Please try again later.",
+      "title": "Like counts",
+      "description": "Hide or show like counts across the platform.",
+      "fieldLabel": "Visibility",
+      "options": {
+        "show": "Show like counts",
+        "hide": "Hide like counts"
       }
     }
   },
@@ -350,7 +565,7 @@
       "captionPlaceholder": "Del noget med communityet",
       "addImages": "Tilf?j billeder",
       "removeImage": "Fjern billede",
-      "maxImagesError": "Du kan v?lge op til 8 billeder.",
+      "maxImagesError": "Du kan v?lge op til 10 billeder.",
       "publish": "Udgiv",
       "publishing": "Udgiver...",
       "like": "Synes godt om",
@@ -362,7 +577,7 @@
       "interested": "Interesseret",
       "notInterested": "Ikke interesseret",
       "hiddenBecauseNotInterested": "Skjult fordi ikke interesseret.",
-      "mediaOptimizingNotice": "Billeder over 1 MB kan optimeres automatisk i backend.",
+      "mediaOptimizingNotice": "Billeder over 1 MB optimeres automatisk før upload.",
       "authorFallback": "Communitymedlem",
       "mediaAlt": "Opslagsbillede",
       "edit": "Rediger",
@@ -382,7 +597,13 @@
       "hide": "Skjul",
       "restore": "Gendan",
       "backToFeed": "Back to feed",
-      "moreActions": "More"
+      "moreActions": "More",
+      "disableComments": "Turn comments off",
+      "enableComments": "Turn comments on",
+      "showLikeCounts": "Show like counts",
+      "hideLikeCounts": "Hide like counts",
+      "previousImage": "Previous image",
+      "nextImage": "Next image"
     },
     "comment": {
       "title": "Kommentarer",
@@ -399,7 +620,14 @@
       "send": "Send",
       "empty": "Ingen kommentarer endnu.",
       "loading": "Indl?ser kommentarer...",
-      "error": "Kommentarer kunne ikke indl?ses."
+      "error": "Kommentarer kunne ikke indl?ses.",
+      "closed": "Comments are closed for this post.",
+      "loadingMore": "Loading more comments...",
+      "loadMore": "Load more",
+      "addGif": "GIF",
+      "addEmoji": "Emoji",
+      "emojiPickerTitle": "Emoji picker",
+      "mediaAlt": "Comment media"
     },
     "reaction": {
       "add": "Tilf?j reaktion",
@@ -444,6 +672,22 @@
       "settings": "Settings",
       "privacyPolicy": "Privacy Policy",
       "termsOfService": "Terms of Service"
+    },
+    "imageEditor": {
+      "edit": "Edit",
+      "dragHint": "Drag to reposition the image",
+      "cropShape": "Crop shape",
+      "zoom": "Zoom",
+      "gifDisabled": "GIF editing is disabled to preserve animation.",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "apply": "Apply",
+      "presets": {
+        "circle": "Circle",
+        "square": "Square",
+        "portrait": "Portrait",
+        "landscape": "Landscape"
+      }
     }
   },
   "communityFooter": {
@@ -468,6 +712,32 @@
       "accept": "Accept",
       "done": "Done",
       "followBack": "Follow back"
+    }
+  },
+  "bookmarks": {
+    "page": {
+      "title": "Bookmarks",
+      "description": "Posts you saved are collected here."
+    },
+    "empty": {
+      "title": "No saved posts yet",
+      "description": "Save posts to find them here later."
+    },
+    "errors": {
+      "loadFailed": "Bookmarks could not be loaded."
+    }
+  },
+  "exploreFeed": {
+    "page": {
+      "title": "Explore feed",
+      "description": "Browse popular community posts from across Norge360."
+    },
+    "empty": {
+      "title": "No posts to explore yet",
+      "description": "Popular posts will appear here as the community grows."
+    },
+    "errors": {
+      "loadFailed": "Explore feed could not be loaded."
     }
   }
 }

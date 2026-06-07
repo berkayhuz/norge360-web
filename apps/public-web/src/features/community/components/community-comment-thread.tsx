@@ -31,9 +31,13 @@ import { useTheme } from "@/components/theme-provider";
 import type { CommunityAuthor, CommunityComment, CommunityReportReason } from "@/features/community/lib/types";
 import { getAuthWebLoginUrl } from "@/lib/auth-web-url";
 import { formatRelativeTimeLabel } from "@/lib/date-format";
+import { optimizeImageFile } from "@/lib/image-optimize";
 import { cn } from "@workspace/ui/lib/utils";
 
 const COMMENT_MAX_LENGTH = 1000;
+const MAX_COMMENT_ATTACHMENTS = 1;
+const MAX_COMMENT_ATTACHMENT_BYTES = 1 * 1024 * 1024;
+const MAX_COMMENT_ATTACHMENT_DIMENSION = 1280;
 
 type CommunityCommentThreadProps = {
   comments: CommunityComment[];
@@ -158,7 +162,7 @@ export function CommunityCommentThread({
           </div>
         ) : (
           <p className="rounded-2xl border border-border/60 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
-            Yorumlar bu gönderide kapalı.
+            {t("community.comment.closed")}
           </p>
         )}
       </div>
@@ -175,7 +179,6 @@ export function CommunityCommentThread({
             key={comment.id}
             comment={comment}
             depth={0}
-            isAuthenticated={isAuthenticated}
             onReply={onReply}
             onDeleteComment={onDeleteComment}
             onToggleLike={onToggleLike}
@@ -189,10 +192,10 @@ export function CommunityCommentThread({
         ))}
       </div>
 
-      {loadingMore ? <p className="text-xs text-muted-foreground">Loading more comments...</p> : null}
+      {loadingMore ? <p className="text-xs text-muted-foreground">{t("community.comment.loadingMore")}</p> : null}
       {loadMoreError ? (
         <Button type="button" variant="outline" onClick={() => void loadMore?.()}>
-          Load more
+          {t("community.comment.loadMore")}
         </Button>
       ) : null}
       {hasNextPage && loadMore && !loadMoreError ? <div ref={loadMoreSentinelRef} id="community-comments-sentinel" className="h-1 w-full" /> : null}
@@ -203,7 +206,6 @@ export function CommunityCommentThread({
 function CommentCard({
   comment,
   depth,
-  isAuthenticated,
   onReply,
   onDeleteComment,
   onToggleLike,
@@ -216,7 +218,6 @@ function CommentCard({
 }: {
   comment: CommentNode;
   depth: number;
-  isAuthenticated: boolean;
   onReply: (commentId: string, content: string) => Promise<void>;
   onDeleteComment?: (commentId: string) => Promise<void>;
   onToggleLike: (commentId: string, isLiked: boolean) => Promise<void>;
@@ -592,12 +593,6 @@ function CommentComposer({
   }, [attachments]);
 
   useEffect(() => {
-    if (activeAttachmentId && !activeAttachment) {
-      setActiveAttachmentId(null);
-    }
-  }, [activeAttachment, activeAttachmentId]);
-
-  useEffect(() => {
     return () => {
       for (const attachment of attachmentsRef.current) {
         URL.revokeObjectURL(attachment.previewUrl);
@@ -618,21 +613,49 @@ function CommentComposer({
     imageFileInputRef.current?.click();
   }
 
-  function handleFileSelection(kind: CommentAttachmentKind, event: ChangeEvent<HTMLInputElement>) {
+  async function handleFileSelection(kind: CommentAttachmentKind, event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
     if (files.length === 0) {
       return;
     }
 
-    const nextAttachments = files.map((file) => ({
-      id: crypto.randomUUID(),
-      file,
-      previewUrl: URL.createObjectURL(file),
-      kind,
-    }));
+    try {
+      const remainingSlots = MAX_COMMENT_ATTACHMENTS - attachments.length;
+      if (remainingSlots <= 0) {
+        event.target.value = "";
+        return;
+      }
 
-    onAttachmentsChange([...attachments, ...nextAttachments]);
-    event.target.value = "";
+      const selectedFiles = files.slice(0, remainingSlots);
+      const optimizedFiles = await Promise.all(
+        selectedFiles.map(async (file) => {
+          let nextFile = file;
+          if (kind === "image" && file.type !== "image/gif") {
+            try {
+              nextFile = await optimizeImageFile(file, {
+                maxBytes: MAX_COMMENT_ATTACHMENT_BYTES,
+                maxDimension: MAX_COMMENT_ATTACHMENT_DIMENSION,
+              });
+            } catch {
+              nextFile = file;
+            }
+          }
+
+          return {
+            id: crypto.randomUUID(),
+            file: nextFile,
+            previewUrl: URL.createObjectURL(nextFile),
+            kind,
+          } satisfies CommentAttachment;
+        }),
+      );
+
+      onAttachmentsChange([...attachments, ...optimizedFiles]);
+    } catch {
+      // Ignore selection failures silently to avoid blocking comment flow.
+    } finally {
+      event.target.value = "";
+    }
   }
 
   function removeAttachment(id: string) {
@@ -692,8 +715,8 @@ function CommentComposer({
         className={cn(compact && "min-h-24")}
       />
 
-      <input ref={imageFileInputRef} type="file" className="hidden" accept="image/*" multiple onChange={(event) => handleFileSelection("image", event)} />
-      <input ref={gifFileInputRef} type="file" className="hidden" accept="image/gif" multiple onChange={(event) => handleFileSelection("gif", event)} />
+      <input ref={imageFileInputRef} type="file" className="hidden" accept="image/jpeg,image/png,image/webp" multiple onChange={(event) => void handleFileSelection("image", event)} />
+      <input ref={gifFileInputRef} type="file" className="hidden" accept="image/gif" multiple onChange={(event) => void handleFileSelection("gif", event)} />
 
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap items-center gap-2">
@@ -703,7 +726,7 @@ function CommentComposer({
           </Button>
           <Button type="button" size="sm" variant="outline" disabled={disabled} onClick={() => openFilePicker("gif")}>
             <Film className="size-4" />
-            GIF
+            {t("community.comment.addGif")}
           </Button>
           <EmojiPickerButton disabled={disabled} onPick={onInsertEmoji} />
         </div>
@@ -752,13 +775,6 @@ function CommentComposer({
             setActiveAttachmentId(null);
           }
         }}
-        onRemove={() => {
-          if (!activeAttachment) {
-            return;
-          }
-
-          removeAttachment(activeAttachment.id);
-        }}
         onSave={(nextAttachment, previousPreviewUrl) => {
           if (!activeAttachment) {
             return;
@@ -782,6 +798,7 @@ function EmojiPickerButton({
   onPick: (emoji: string) => void;
   disabled?: boolean;
 }) {
+  const t = useTranslations("public-web");
   const [open, setOpen] = useState(false);
   const { resolvedTheme } = useTheme();
   const pickerTheme = resolvedTheme === "dark" ? EmojiPickerTheme.DARK : EmojiPickerTheme.LIGHT;
@@ -790,13 +807,13 @@ function EmojiPickerButton({
     <>
       <Button type="button" size="sm" variant="outline" disabled={disabled} onClick={() => setOpen(true)}>
         <SmilePlus className="size-4" />
-        Emoji
+        {t("community.comment.addEmoji")}
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent showCloseButton={false} className="max-h-[92vh] overflow-hidden sm:max-w-[32rem] shadow-none bg-transparent ring-0">
           <DialogHeader className="sr-only">
-            <DialogTitle>Emoji picker</DialogTitle>
+            <DialogTitle>{t("community.comment.emojiPickerTitle")}</DialogTitle>
           </DialogHeader>
           <div>
             <EmojiPicker
@@ -813,7 +830,7 @@ function EmojiPickerButton({
                 setOpen(false);
               }}
             />
-            <style jsx global>{`
+            <style>{`
               .EmojiPickerReact .epr-search-container input {
                 border-radius: 1.5rem !important;
               }
@@ -826,6 +843,7 @@ function EmojiPickerButton({
 }
 
 function CommentContent({ body }: { body: string }) {
+  const t = useTranslations("public-web");
   const parts = splitCommentContent(body);
 
   if (parts.length === 1 && parts[0].type === "text") {
@@ -843,7 +861,7 @@ function CommentContent({ body }: { body: string }) {
           );
         }
 
-        return <Image key={`${index}-${part.url}`} src={part.url} alt={part.alt || "Comment media"} aspect="video" radius="xl" />;
+        return <Image key={`${index}-${part.url}`} src={part.url} alt={part.alt || t("community.comment.mediaAlt")} aspect="video" radius="xl" />;
       })}
     </div>
   );
@@ -860,7 +878,10 @@ function splitCommentContent(content: string): Array<{ type: "text"; value: stri
       result.push({ type: "text", value: content.slice(lastIndex, match.index) });
     }
 
-    result.push({ type: "image", alt: match[1] || "Comment media", url: match[2] });
+    const mediaUrl = normalizeCommentMediaUrl(match[2]);
+    if (mediaUrl) {
+      result.push({ type: "image", alt: match[1] || "", url: mediaUrl });
+    }
     lastIndex = pattern.lastIndex;
   }
 
@@ -869,6 +890,24 @@ function splitCommentContent(content: string): Array<{ type: "text"; value: stri
   }
 
   return result.length > 0 ? result : [{ type: "text", value: content }];
+}
+
+function normalizeCommentMediaUrl(value: string) {
+  const trimmed = value.trim();
+  if (!/^(https?:\/\/|blob:)/i.test(trimmed)) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:" || parsed.protocol === "blob:") {
+      return parsed.toString();
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
 }
 
 function buildCommentTree(comments: CommunityComment[]) {

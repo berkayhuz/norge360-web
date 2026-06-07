@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
+import Script from "next/script";
 
 import "./globals.css";
 
@@ -41,6 +42,15 @@ export default async function RootLayout({
       className={`${inter.variable} ${geistMono.variable} h-full font-sans antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <Script
+          id="theme-bootstrap"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: THEME_BOOTSTRAP_SCRIPT,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground pt-14 md:pt-16">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider>
@@ -54,3 +64,5 @@ export default async function RootLayout({
     </html>
   );
 }
+
+const THEME_BOOTSTRAP_SCRIPT = `try{var key="norge360.theme";var saved=localStorage.getItem(key);var theme=saved==="light"||saved==="dark"||saved==="system"?saved:"system";var dark=theme==="dark"||theme==="system"&&matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",dark);document.documentElement.style.colorScheme=dark?"dark":"light";}catch{}`;

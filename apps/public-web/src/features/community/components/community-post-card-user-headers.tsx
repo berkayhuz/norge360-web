@@ -30,8 +30,6 @@ export function CommunityPostCardUserHeaders({
   item,
   actions,
   onProtectedAction,
-  postHref = item.author?.username && item.slug ? `/${item.author.username}/feed/${item.slug}` : "#",
-  isAuthenticated = false,
   showMenu = true,
 }: {
   item: CommunityFeedItem;
@@ -79,7 +77,7 @@ export function CommunityPostCardUserHeaders({
   }
 
   const menu =
-    showMenu && isAuthenticated && actions ? (
+    showMenu && actions ? (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -105,12 +103,12 @@ export function CommunityPostCardUserHeaders({
               {item.canEdit && item.canDelete ? <DropdownMenuSeparator /> : null}
               {item.canEdit && actions ? (
                 <DropdownMenuItem onSelect={() => void protectedAction(() => actions.setCommentsEnabled(item.id, !commentsEnabled))}>
-                  {commentsEnabled ? "Yorumları kapat" : "Yorumları aç"}
+                  {commentsEnabled ? t("community.post.disableComments") : t("community.post.enableComments")}
                 </DropdownMenuItem>
               ) : null}
               {item.canEdit && actions ? (
                 <DropdownMenuItem onSelect={() => void protectedAction(() => actions.setHideLikeCount(item.id, !hideLikeCounts))}>
-                  {hideLikeCounts ? "Beğeni sayılarını göster" : "Beğeni sayılarını gizle"}
+                  {hideLikeCounts ? t("community.post.showLikeCounts") : t("community.post.hideLikeCounts")}
                 </DropdownMenuItem>
               ) : null}
               {item.canEdit && actions ? <DropdownMenuSeparator /> : null}

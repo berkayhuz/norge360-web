@@ -5,22 +5,30 @@ import { cookies, headers } from "next/headers";
 import { tryGetServerEnv } from "@/lib/env/server";
 
 import {
+  normalizeAuthSessionSummary,
   normalizeAuthSessionStatus,
   normalizeAvatarUploadIntent,
   normalizeMyProfile,
   normalizePublicProfile,
   normalizeUsernameAvailability,
+  normalizeSecurityOverview,
+  type ChangeEmailInput,
+  type ChangeEmailResult,
+  type ChangePasswordInput,
+  type ChangePasswordResult,
   type CompleteAvatarUploadInput,
   type CompleteAvatarUploadResult,
   type CreateAvatarUploadIntentInput,
   type CreateAvatarUploadIntentResult,
   type UpdateMyProfileInput,
   type UpdateMyProfileResult,
+  type GetMySessionsResult,
   type CheckUsernameAvailabilityResult,
   type AccountsProblemDetails,
   type GetAuthSessionResult,
   type GetMyProfileResult,
   type GetPublicProfileResult,
+  type GetSecurityOverviewResult,
 } from "./accounts-types";
 
 export async function getMyProfile(): Promise<GetMyProfileResult> {
@@ -74,6 +82,172 @@ export async function getAuthSessionStatus(): Promise<GetAuthSessionResult> {
   }
 
   return { kind: "upstreamError", status };
+}
+
+export async function getMySessions(): Promise<GetMySessionsResult> {
+  const response = await requestGateway("/api/auth/sessions");
+
+  if ("error" in response) {
+    return { kind: "upstreamError", problem: response.error.problem, status: response.error.status };
+  }
+
+  const { data, status } = response;
+  if (status === 200 && Array.isArray(data)) {
+    const sessions = data
+      .map((item) => normalizeAuthSessionSummary(item))
+      .filter((item): item is NonNullable<ReturnType<typeof normalizeAuthSessionSummary>> => item !== null);
+
+    return { kind: "success", sessions };
+  }
+
+  if (status === 401 || status === 403) {
+    return { kind: "unauthorized", problem: parseProblemDetails(data, status) };
+  }
+
+  return { kind: "upstreamError", problem: parseProblemDetails(data, status), status };
+}
+
+export async function getSecurityOverview(): Promise<GetSecurityOverviewResult> {
+  const response = await requestGateway("/api/auth/security/overview");
+
+  if ("error" in response) {
+    return { kind: "upstreamError", problem: response.error.problem, status: response.error.status };
+  }
+
+  const { data, status } = response;
+  if (status === 200) {
+    const normalized = normalizeSecurityOverview(data);
+    if (!normalized) {
+      return { kind: "upstreamError", status };
+    }
+
+    return { kind: "success", overview: normalized };
+  }
+
+  if (status === 401 || status === 403) {
+    return { kind: "unauthorized", problem: parseProblemDetails(data, status) };
+  }
+
+  return { kind: "upstreamError", problem: parseProblemDetails(data, status), status };
+}
+
+export async function getTrustedDevices(): Promise<unknown[]> {
+  const response = await requestGateway("/api/auth/security/trusted-devices");
+
+  if ("error" in response) {
+    return [];
+  }
+
+  const { data, status } = response;
+  if (status !== 200 || !Array.isArray(data)) {
+    return [];
+  }
+
+  return data;
+}
+
+export async function changeMyPassword(
+  input: ChangePasswordInput,
+): Promise<ChangePasswordResult> {
+  const response = await requestGateway("/api/auth/change-password", {
+    body: input,
+    method: "POST",
+  });
+
+  if ("error" in response) {
+    return {
+      kind: "upstreamError",
+      message: "public_web_password_change_service_unavailable",
+      problem: response.error.problem,
+      status: response.error.status,
+    };
+  }
+
+  const { data, status } = response;
+  if (status === 204 || status === 200) {
+    return { kind: "success" };
+  }
+
+  const problem = parseProblemDetails(data, status);
+  if (status === 400) {
+    return {
+      kind: "validationError",
+      errors: problem.errors ?? {},
+      message: getProblemMessageCode(problem, "public_web_password_change_validation_error"),
+      problem,
+    };
+  }
+
+  if (status === 401) return { kind: "unauthorized", problem };
+  if (status === 403) return { kind: "forbidden", problem };
+
+  if (status >= 500) {
+    return {
+      kind: "upstreamError",
+      message: "public_web_password_change_service_unavailable",
+      problem,
+      status,
+    };
+  }
+
+  return {
+    kind: "unknownError",
+    message: getProblemMessageCode(problem, "public_web_password_change_unknown_error"),
+    problem,
+    status,
+  };
+}
+
+export async function requestMyEmailChange(
+  input: ChangeEmailInput,
+): Promise<ChangeEmailResult> {
+  const response = await requestGateway("/api/auth/change-email", {
+    body: input,
+    method: "POST",
+  });
+
+  if ("error" in response) {
+    return {
+      kind: "upstreamError",
+      message: "public_web_email_change_service_unavailable",
+      problem: response.error.problem,
+      status: response.error.status,
+    };
+  }
+
+  const { data, status } = response;
+  if (status === 202 || status === 204 || status === 200) {
+    return { kind: "accepted" };
+  }
+
+  const problem = parseProblemDetails(data, status);
+  if (status === 400) {
+    return {
+      kind: "validationError",
+      errors: problem.errors ?? {},
+      message: getProblemMessageCode(problem, "public_web_email_change_validation_error"),
+      problem,
+    };
+  }
+
+  if (status === 401) return { kind: "unauthorized", problem };
+  if (status === 403) return { kind: "forbidden", problem };
+
+  if (status >= 500) {
+    return {
+      kind: "upstreamError",
+      message: "public_web_email_change_service_unavailable",
+      problem,
+      status,
+    };
+  }
+
+  return {
+    kind: "unknownError",
+    message: getProblemMessageCode(problem, "public_web_email_change_unknown_error"),
+    problem,
+    status,
+  };
 }
 
 export async function getPublicProfileByUsername(
