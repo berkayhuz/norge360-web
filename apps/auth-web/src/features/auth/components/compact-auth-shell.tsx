@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 import { FieldDescription } from "@workspace/ui/components/primitives/field"
 
@@ -34,6 +37,8 @@ export function CompactAuthShell({
   themeLightLabel,
   title,
 }: CompactAuthShellProps) {
+  const t = useTranslations("auth.compactShell")
+
   return (
     <main className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
       <div className="w-full max-w-sm space-y-4">
@@ -69,23 +74,23 @@ export function CompactAuthShell({
         <div className="p-4 text-xs font-medium text-muted-foreground">
           <footer className="flex flex-row gap-4 text-xs text-muted-foreground md:items-center md:justify-between">
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-              <p>© {new Date().getFullYear()} Norge360. All rights reserved.</p>
+              <p>{t("footerCopyright", { year: new Date().getFullYear() })}</p>
 
               <nav aria-label="Footer links">
                 <ul className="flex items-center gap-3">
                   <li>
                     <a href="/terms" className="transition-colors hover:text-foreground">
-                      Terms
+                      {t("footerLinks.terms")}
                     </a>
                   </li>
                   <li>
                     <a href="/privacy" className="transition-colors hover:text-foreground">
-                      Privacy
+                      {t("footerLinks.privacy")}
                     </a>
                   </li>
                   <li>
                     <a href="/security" className="transition-colors hover:text-foreground">
-                      Security
+                      {t("footerLinks.security")}
                     </a>
                   </li>
                 </ul>

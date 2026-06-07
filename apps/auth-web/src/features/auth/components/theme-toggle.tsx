@@ -1,9 +1,11 @@
 "use client"
 
+import * as React from "react"
 import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
 
 import { Button } from "@workspace/ui/components/primitives/button"
+
+import { useTheme } from "@/components/theme-provider"
 
 type ThemeToggleProps = {
   darkLabel: string
@@ -12,7 +14,13 @@ type ThemeToggleProps = {
 
 export function ThemeToggle({ darkLabel, lightLabel }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme()
-  const isDark = resolvedTheme === "dark"
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const isDark = mounted && resolvedTheme === "dark"
   const label = isDark ? lightLabel : darkLabel
 
   return (
@@ -24,7 +32,7 @@ export function ThemeToggle({ darkLabel, lightLabel }: ThemeToggleProps) {
       variant="outline"
       rounded="lg"
     >
-      {isDark ? <Sun /> : <Moon />}
+      {!mounted ? null : isDark ? <Sun /> : <Moon />}
     </Button>
   )
 }

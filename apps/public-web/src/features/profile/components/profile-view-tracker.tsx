@@ -15,6 +15,7 @@ export function ProfileViewTracker({ enabled, username }: ProfileViewTrackerProp
 
     const controller = new AbortController();
     void fetch(`/api/accounts/profiles/${encodeURIComponent(username)}/views`, {
+      credentials: "include",
       method: "POST",
       signal: controller.signal,
     }).catch(() => {

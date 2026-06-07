@@ -22,6 +22,7 @@ type ResetPasswordFormProps = {
 export function ResetPasswordForm({ token = "", userId = "" }: ResetPasswordFormProps) {
   const t = useTranslations("auth.resetPassword.form")
   const tErrors = useTranslations("auth.errors")
+  const tValidation = useTranslations("auth.validation")
 
   const [fieldErrors, setFieldErrors] = React.useState<ValidationErrors>({})
   const [message, setMessage] = React.useState<{ text: string; tone: "danger" | "success" } | null>(null)
@@ -83,8 +84,8 @@ export function ResetPasswordForm({ token = "", userId = "" }: ResetPasswordForm
       {message ? <FieldMessage tone={message.tone}>{message.text}</FieldMessage> : null}
       <input name="userId" type="hidden" value={userId} />
       <input name="token" type="hidden" value={token} />
-      <PasswordField autoComplete="new-password" disabled={pending} fieldErrors={fieldErrors} label={t("newPasswordLabel")} maxLength={128} minLength={12} name="newPassword" required />
-      <PasswordField autoComplete="new-password" disabled={pending} fieldErrors={fieldErrors} label={t("confirmPasswordLabel")} maxLength={128} minLength={12} name="confirmPassword" required />
+      <PasswordField autoComplete="new-password" disabled={pending} fieldErrors={fieldErrors} label={t("newPasswordLabel")} maxLength={128} minLength={12} name="newPassword" required translateError={tValidation} />
+      <PasswordField autoComplete="new-password" disabled={pending} fieldErrors={fieldErrors} label={t("confirmPasswordLabel")} maxLength={128} minLength={12} name="confirmPassword" required translateError={tValidation} />
       <TurnstileWidget ref={turnstileRef} disabled={pending} />
       <SubmitButton disabled={pending}>{pending ? t("submitting") : t("submit")}</SubmitButton>
     </form>

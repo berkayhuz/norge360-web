@@ -15,6 +15,7 @@ import {
 type Props = {
   username: string;
   profileId: string;
+  onBlockChange?: (blocked: boolean) => void;
 };
 
 type RelationPayload = {
@@ -22,7 +23,7 @@ type RelationPayload = {
   blockerProfileIds: string[];
 };
 
-export function ProfileActionsMenu({ username, profileId }: Props) {
+export function ProfileActionsMenu({ username, profileId, onBlockChange }: Props) {
   const t = useTranslations("public-web");
   const translate = t as unknown as (key: string) => string;
   const [loading, setLoading] = useState(false);
@@ -32,12 +33,16 @@ export function ProfileActionsMenu({ username, profileId }: Props) {
     let cancelled = false;
     (async () => {
       try {
-        const response = await fetch("/api/accounts/blocks/me/relations", { cache: "no-store" });
+        const response = await fetch("/api/accounts/blocks/me/relations", {
+          cache: "no-store",
+          credentials: "include",
+        });
         if (!response.ok) return;
         const payload = (await response.json()) as RelationPayload;
         if (cancelled) return;
         const blocked = Array.isArray(payload.blockedProfileIds) && payload.blockedProfileIds.includes(profileId);
         setBlockedByMe(blocked);
+        onBlockChange?.(blocked);
       } catch {
         // no-op
       }
@@ -45,7 +50,7 @@ export function ProfileActionsMenu({ username, profileId }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [profileId]);
+  }, [onBlockChange, profileId]);
 
   const blockLabel = useMemo(
     () => (blockedByMe ? translate("profile.actionsMenu.unblock") : translate("profile.actionsMenu.block")),
@@ -57,9 +62,16 @@ export function ProfileActionsMenu({ username, profileId }: Props) {
     try {
       const endpoint = `/api/accounts/blocks/${encodeURIComponent(username)}`;
       const method = blockedByMe ? "DELETE" : "POST";
-      const response = await fetch(endpoint, { method });
+      const response = await fetch(endpoint, {
+        credentials: "include",
+        method,
+      });
       if (response.ok || response.status === 204) {
-        setBlockedByMe((value) => !value);
+        setBlockedByMe((value) => {
+          const nextValue = !value;
+          onBlockChange?.(nextValue);
+          return nextValue;
+        });
       }
     } finally {
       setLoading(false);

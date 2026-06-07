@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@workspace/ui/components/primitives/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@workspace/ui/components/overlay/dialog";
 
-const REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "🔥"] as const;
+const REACTIONS = ["\u{1F44D}", "\u{2764}\u{FE0F}", "\u{1F602}", "\u{1F62E}", "\u{1F622}", "\u{1F525}"] as const;
 
 export function CommunityReactionDialog({
   currentReaction,
@@ -31,7 +31,7 @@ export function CommunityReactionDialog({
         <DialogHeader>
           <DialogTitle>{t("community.reaction.add")}</DialogTitle>
         </DialogHeader>
-        {currentReaction ? <p className="text-xs text-muted-foreground">Seçili tepki: {currentReaction}</p> : null}
+        {currentReaction ? <p className="text-xs text-muted-foreground">{t("community.reaction.current", { reaction: currentReaction })}</p> : null}
         <div className="flex flex-wrap gap-2">
           {REACTIONS.map((emoji) => (
             <Button

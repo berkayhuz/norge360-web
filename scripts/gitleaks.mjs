@@ -88,7 +88,7 @@ async function main() {
   }
 
   if (findings.length > 0) {
-    console.error("Potential secret-bearing files detected:")
+    console.error("gitleaks_potential_secret_files")
     for (const finding of [...new Set(findings)].sort()) {
       console.error(`- ${finding}`)
     }
@@ -97,7 +97,7 @@ async function main() {
   }
 
   if (!(await exists(path.join(root, "infra", "terraform")))) {
-    console.warn("No infra/terraform directory found; skipping scan.")
+    console.warn("gitleaks_no_infra_terraform_skipping")
   }
 }
 

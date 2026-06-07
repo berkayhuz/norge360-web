@@ -16,6 +16,7 @@
     "@workspace/i18n": "workspace:*",
     "@workspace/search": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "emoji-picker-react": "^4.19.1",
     "lucide-react": "^1.17.0",
     "next": "16.2.6",
     "next-intl": "^4.4.0",
@@ -25,6 +26,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@norge360/eslint-config": "workspace:^",
+    "@norge360/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -33,8 +36,6 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5.1.1",
-    "@norge360/eslint-config": "workspace:^",
-    "@norge360/typescript-config": "workspace:*",
     "eslint": "^9",
     "jsdom": "^27.2.0",
     "typescript": "^5",

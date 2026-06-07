@@ -26,6 +26,7 @@ export function RegisterForm({ locale = "en-US" }: RegisterFormProps) {
   const router = useRouter()
   const t = useTranslations("auth.register.form")
   const tErrors = useTranslations("auth.errors")
+  const tValidation = useTranslations("auth.validation")
 
   const [fieldErrors, setFieldErrors] = React.useState<ValidationErrors>({})
   const [message, setMessage] = React.useState<{ text: string; tone: "danger" | "success" } | null>(null)
@@ -94,12 +95,12 @@ export function RegisterForm({ locale = "en-US" }: RegisterFormProps) {
       <FieldGroup>
         {message ? <FieldMessage tone={message.tone}>{message.text}</FieldMessage> : null}
         <div className="grid gap-4 sm:grid-cols-2">
-          <TextField autoComplete="given-name" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("firstNameLabel")} name="firstName" />
-          <TextField autoComplete="family-name" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("lastNameLabel")} name="lastName" />
+          <TextField autoComplete="given-name" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("firstNameLabel")} name="firstName" translateError={tValidation} />
+          <TextField autoComplete="family-name" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("lastNameLabel")} name="lastName" translateError={tValidation} />
         </div>
-        <TextField autoComplete="username" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("userNameLabel")} maxLength={64} minLength={3} name="userName" required />
-        <TextField autoComplete="email" disabled={isSubmitting} fieldErrors={fieldErrors} inputMode="email" label={t("emailLabel")} maxLength={256} name="email" required type="email" />
-        <PasswordField autoComplete="new-password" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("passwordLabel")} maxLength={128} minLength={12} name="password" required />
+        <TextField autoComplete="username" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("userNameLabel")} maxLength={64} minLength={3} name="userName" required translateError={tValidation} />
+        <TextField autoComplete="email" disabled={isSubmitting} fieldErrors={fieldErrors} inputMode="email" label={t("emailLabel")} maxLength={256} name="email" required type="email" translateError={tValidation} />
+        <PasswordField autoComplete="new-password" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("passwordLabel")} maxLength={128} minLength={12} name="password" required translateError={tValidation} />
         <TurnstileWidget ref={turnstileRef} disabled={isSubmitting} />
         <input name="culture" type="hidden" value={locale} />
         <SubmitButton disabled={isSubmitting}>{isSubmitting ? t("submitting") : t("submit")}</SubmitButton>

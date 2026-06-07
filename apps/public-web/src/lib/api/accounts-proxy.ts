@@ -12,10 +12,20 @@ const ACCOUNTS_ALLOWED_ROUTES: Array<{ method: string; pattern: RegExp }> = [
   { method: "POST", pattern: /^\/profiles\/[A-Za-z0-9_.-]{1,64}\/views$/ },
   { method: "POST", pattern: /^\/profiles\/me\/avatar\/upload-intent$/ },
   { method: "POST", pattern: /^\/profiles\/me\/avatar\/complete$/ },
+  { method: "POST", pattern: /^\/profiles\/me\/cover-photo\/upload-intent$/ },
+  { method: "POST", pattern: /^\/profiles\/me\/cover-photo\/complete$/ },
   { method: "POST", pattern: /^\/blocks\/[A-Za-z0-9_.-]{1,64}$/ },
   { method: "DELETE", pattern: /^\/blocks\/[A-Za-z0-9_.-]{1,64}$/ },
   { method: "POST", pattern: /^\/follows\/[A-Za-z0-9_.-]{1,64}$/ },
   { method: "DELETE", pattern: /^\/follows\/[A-Za-z0-9_.-]{1,64}$/ },
+  { method: "POST", pattern: /^\/follows\/requests\/[A-Za-z0-9_.-]{1,64}\/accept$/ },
+  { method: "DELETE", pattern: /^\/follows\/requests\/[A-Za-z0-9_.-]{1,64}$/ },
+  { method: "GET", pattern: /^\/follows\/[A-Za-z0-9_.-]{1,64}\/status$/ },
+  { method: "GET", pattern: /^\/follows\/[A-Za-z0-9_.-]{1,64}\/followers$/ },
+  { method: "GET", pattern: /^\/follows\/[A-Za-z0-9_.-]{1,64}\/following$/ },
+  { method: "GET", pattern: /^\/profile-notifications\/[A-Za-z0-9_.-]{1,64}$/ },
+  { method: "POST", pattern: /^\/profile-notifications\/[A-Za-z0-9_.-]{1,64}$/ },
+  { method: "DELETE", pattern: /^\/profile-notifications\/[A-Za-z0-9_.-]{1,64}$/ },
   { method: "GET", pattern: /^\/blocks\/me\/relations$/ },
   { method: "GET", pattern: /^\/blocks\/me$/ },
 ];
@@ -35,15 +45,15 @@ export async function proxyAccountsRequest(
   request: NextRequest,
   params: AccountsProxyParams,
 ) {
-  const { env, error } = tryGetServerEnv();
+  const { env } = tryGetServerEnv();
 
   if (!env) {
     return NextResponse.json(
       {
-        detail: error.issues.map((issue) => issue.message).join("; "),
         errorCode: "public_web_config_invalid",
         status: 500,
-        title: "Public web configuration error",
+        detail: "public_web_config_invalid",
+        title: "public_web_config_invalid",
       },
       { status: 500 },
     );
@@ -55,7 +65,7 @@ export async function proxyAccountsRequest(
       {
         errorCode: "accounts_proxy_route_not_allowed",
         status: 404,
-        title: "Accounts endpoint is not allowed",
+        title: "accounts_proxy_route_not_allowed",
       },
       { status: 404 },
     );
@@ -78,10 +88,10 @@ export async function proxyAccountsRequest(
   } catch {
     return NextResponse.json(
       {
-        detail: "Accounts service could not be reached.",
         errorCode: "accounts_service_unavailable",
         status: 503,
-        title: "Accounts service unavailable",
+        detail: "accounts_service_unavailable",
+        title: "accounts_service_unavailable",
       },
       { status: 503 },
     );
@@ -110,12 +120,14 @@ function createForwardHeaders(request: NextRequest, publicWebAppUrl: string) {
   const acceptLanguage = sourceHeaders.get("accept-language");
   const cookie = sourceHeaders.get("cookie");
   const correlationId = sourceHeaders.get("x-correlation-id");
+  const contentType = sourceHeaders.get("content-type");
   const userAgent = sourceHeaders.get("user-agent");
 
   if (accept) headers.set("accept", accept);
   if (acceptLanguage) headers.set("accept-language", acceptLanguage);
   if (cookie) headers.set("cookie", cookie);
   if (correlationId) headers.set("x-correlation-id", correlationId);
+  if (contentType) headers.set("content-type", contentType);
   if (userAgent) headers.set("user-agent", userAgent);
 
   headers.set("origin", new URL(publicWebAppUrl).origin);

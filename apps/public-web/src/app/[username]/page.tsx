@@ -14,21 +14,30 @@ import {
   Sparkles,
   Users2,
 } from "lucide-react";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
+import { BlockedUsersPanel } from "@/features/profile/components/blocked-users-panel";
 import { ProfileOnboardingShell } from "@/features/profile/components/profile-onboarding-shell";
-import { ProfileActionsMenu } from "@/features/profile/components/profile-actions-menu";
+import { ProfileSocialPanel } from "@/features/profile/components/profile-social-panel";
 import { ProfileViewTracker } from "@/features/profile/components/profile-view-tracker";
 import { Username } from "@/features/profile/components/username";
 import { CommunityProfileFeed } from "@/features/community/components/community-profile-feed";
-import { getAuthSessionStatus, getMyProfile, getPublicProfileByUsername, resolveAuthUserIdByProfileId } from "@/lib/api/accounts-server";
+import {
+  getAuthSessionStatus,
+  getMyProfile,
+  getPublicProfileByUsername,
+  resolveAuthUserIdByProfileId,
+} from "@/lib/api/accounts-server";
 import type { PublicProfile } from "@/lib/api/accounts-types";
 import { calculateProfileCompletion } from "@/lib/api/profile-completion";
 import { getAuthWebLoginUrl } from "@/lib/auth-web-url";
+import { formatDateTimeLabel } from "@/lib/date-format";
 import { resolveRequestLocale } from "../../../lib/i18n/request";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type TranslationFn = (key: string, values?: Record<string, string | number | Date>) => string;
 
@@ -41,6 +50,8 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
   const t = await getTranslations("public-web");
   const translate = t as unknown as TranslationFn;
   const locale = await resolveRequestLocale();
+  const authSessionResult = await getAuthSessionStatus();
+  const isAuthenticatedSession = authSessionResult.kind === "authenticated";
   const result = await getPublicProfileByUsername(username);
 
   if (result.kind === "notFound" || result.kind === "invalidUsername") notFound();
@@ -69,9 +80,10 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
 
   const profile = result.profile;
   const profileAuthUserId = await resolveAuthUserIdByProfileId(profile.id);
-  const authSessionResult = await getAuthSessionStatus();
-  const isAuthenticatedSession = authSessionResult.kind === "authenticated";
   const myProfileResult = await getMyProfile();
+  const isFollowedByCurrentUser = profile.isFollowedByCurrentUser ?? false;
+  const isFollowRequestPending = profile.isFollowRequestPending ?? false;
+  const isProfileNotificationsEnabled = profile.isProfileNotificationsEnabled ?? false;
   const isOwnProfile =
     myProfileResult.kind === "success"
       ? isSameProfile(profile.id, profile.username, myProfileResult.profile.id, myProfileResult.profile.normalizedUsername)
@@ -95,9 +107,9 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
   const location = compactJoin([profile.country, profile.city, profile.district], ", ");
   const createdAt = formatDate(profile.createdAt, locale);
   const lastSeenAt = formatDate(profile.lastSeenAt, locale);
-  const postsCount = formatCount(profile.postsCount, locale);
-  const followersCount = formatCount(profile.followersCount, locale);
-  const followingCount = formatCount(profile.followingCount, locale);
+  const postsCount = profile.postsCount ?? 0;
+  const followersCount = profile.followersCount ?? 0;
+  const followingCount = profile.followingCount ?? 0;
 
   return (
     <main className="mx-auto flex w-full max-w-screen-xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
@@ -108,7 +120,10 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
           followersCount={followersCount}
           followingCount={followingCount}
           isAuthenticated={isAuthenticatedSession}
+          isFollowedByCurrentUser={isFollowedByCurrentUser}
+          isFollowRequestPending={isFollowRequestPending}
           isOwnProfile={isOwnProfile}
+          isProfileNotificationsEnabled={isProfileNotificationsEnabled}
           loginHref={getAuthWebLoginUrl()}
           location={location}
           postsCount={postsCount}
@@ -137,6 +152,8 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
               website={profile.website}
             />
 
+            {isOwnProfile && isAuthenticatedSession ? <BlockedUsersPanel /> : null}
+
             <CommunitySuggestionsCard t={translate} />
           </aside>
         </div>
@@ -150,7 +167,10 @@ function ProfileHero({
   followersCount,
   followingCount,
   isAuthenticated,
+  isFollowedByCurrentUser,
+  isFollowRequestPending,
   isOwnProfile,
+  isProfileNotificationsEnabled,
   loginHref,
   location,
   postsCount,
@@ -160,13 +180,16 @@ function ProfileHero({
   t,
 }: {
   displayName: string;
-  followersCount: string;
-  followingCount: string;
+  followersCount: number;
+  followingCount: number;
   isAuthenticated: boolean;
+  isFollowedByCurrentUser: boolean;
+  isFollowRequestPending: boolean;
   isOwnProfile: boolean;
+  isProfileNotificationsEnabled: boolean;
   loginHref: string;
   location: string | null;
-  postsCount: string;
+  postsCount: number;
   profile: PublicProfile;
   safeAvatarUrl: string | null;
   safeCoverUrl: string | null;
@@ -228,67 +251,23 @@ function ProfileHero({
               </div>
             </div>
 
-            <div className="mt-1 flex flex-col items-start gap-3 sm:items-end">
-              <HeroStatsInline
-                followersCount={followersCount}
-                followingCount={followingCount}
-                postsCount={postsCount}
-                t={t}
-              />
-
-              <div className="flex w-full items-center gap-2 sm:w-auto">
-                {isOwnProfile ? (
-                  <Button asChild className="flex-1 sm:flex-none" size="sm" variant="outline">
-                    <Link href="/settings/profile">{t("profile.hero.editProfile")}</Link>
-                  </Button>
-                ) : (
-                  <>
-                    <Button asChild className="flex-1 sm:flex-none" size="sm" variant="outline">
-                      <Link href={isAuthenticated ? "#" : loginHref}>{t("profile.hero.message")}</Link>
-                    </Button>
-                    <Button asChild className="flex-1 sm:flex-none" size="sm">
-                      <Link href={isAuthenticated ? "#" : loginHref}>{t("profile.hero.follow")}</Link>
-                    </Button>
-                    {isAuthenticated ? (
-                      <ProfileActionsMenu profileId={profile.id} username={profile.username} />
-                    ) : null}
-                  </>
-                )}
-              </div>
-            </div>
+            <ProfileSocialPanel
+              initialFollowersCount={followersCount}
+              initialFollowingCount={followingCount}
+              initialIsFollowing={isFollowedByCurrentUser}
+              initialIsFollowRequestPending={isFollowRequestPending}
+              initialProfileNotificationsEnabled={isProfileNotificationsEnabled}
+              initialPostsCount={postsCount}
+              isAuthenticated={isAuthenticated}
+              isOwnProfile={isOwnProfile}
+              loginHref={loginHref}
+              profileId={profile.id}
+              username={profile.username}
+            />
           </div>
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function HeroStatsInline({
-  followersCount,
-  followingCount,
-  postsCount,
-  t,
-}: {
-  followersCount: string;
-  followingCount: string;
-  postsCount: string;
-  t: TranslationFn;
-}) {
-  return (
-    <div className="grid w-full grid-cols-3 sm:w-auto">
-      <CompactStatItem label={t("profile.stats.posts")} value={postsCount} />
-      <CompactStatItem label={t("profile.stats.followers")} value={followersCount} />
-      <CompactStatItem label={t("profile.stats.following")} value={followingCount} />
-    </div>
-  );
-}
-
-function CompactStatItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-1 px-3 py-2.5 text-center sm:min-w-20">
-      <p className="text-base font-semibold leading-none text-foreground">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
-    </div>
   );
 }
 
@@ -517,13 +496,7 @@ function hasValue(value: string | null | undefined): value is string {
 
 function formatDate(value: string | null, locale: string) {
   if (!hasValue(value) || typeof value !== "string") return null;
-  const date = new Date(value.trim());
-  if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(date);
-}
-
-function formatCount(value: number | null, locale: string) {
-  return new Intl.NumberFormat(locale).format(typeof value === "number" ? value : 0);
+  return formatDateTimeLabel(value, locale);
 }
 
 function normalizeWebsiteHref(value: string) {

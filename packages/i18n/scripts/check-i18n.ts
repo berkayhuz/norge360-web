@@ -20,7 +20,7 @@ export interface I18nValidationOptions {
 const htmlTagPattern = /<\s*\/?\s*[a-zA-Z][^>]*>/;
 
 const fail = (message: string): never => {
-  throw new Error(`[i18n:check] ${message}`);
+  throw new Error(`i18n_check_failed_${message}`);
 };
 
 const requireValue = <T>(value: T | undefined, message: string): NonNullable<T> => {

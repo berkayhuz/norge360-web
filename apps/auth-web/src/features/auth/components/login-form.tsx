@@ -29,6 +29,7 @@ export function LoginForm({ className }: LoginFormProps) {
   const router = useRouter()
   const t = useTranslations("auth.login.form")
   const tErrors = useTranslations("auth.errors")
+  const tValidation = useTranslations("auth.validation")
 
   const [fieldErrors, setFieldErrors] = React.useState<ValidationErrors>({})
   const [formMessage, setFormMessage] = React.useState<string | null>(null)
@@ -96,17 +97,19 @@ export function LoginForm({ className }: LoginFormProps) {
         <FieldGroup>
           {formMessage ? <FieldMessage tone="danger">{formMessage}</FieldMessage> : null}
           <Field>
-            <TextField
-              autoComplete="username" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("emailOrUserNameLabel")} maxLength={256} name="emailOrUserName" required
-            />
+              <TextField
+                autoComplete="username" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("emailOrUserNameLabel")} maxLength={256} name="emailOrUserName" required
+                translateError={tValidation}
+              />
           </Field>
           <Field>
             <PasswordField autoComplete="current-password" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("passwordLabel")} maxLength={256} name="password" required
+              translateError={tValidation}
             />
             {isMfaRequired ? (
               <div className="grid gap-4">
-                <TextField autoComplete="one-time-code" disabled={isSubmitting} fieldErrors={fieldErrors} inputMode="numeric" label={t("mfaCodeLabel")} maxLength={32} name="mfaCode" />
-                <TextField autoComplete="one-time-code" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("recoveryCodeLabel")} maxLength={128} name="recoveryCode" placeholder={t("recoveryCodePlaceholder")} />
+                <TextField autoComplete="one-time-code" disabled={isSubmitting} fieldErrors={fieldErrors} inputMode="numeric" label={t("mfaCodeLabel")} maxLength={32} name="mfaCode" translateError={tValidation} />
+                <TextField autoComplete="one-time-code" disabled={isSubmitting} fieldErrors={fieldErrors} label={t("recoveryCodeLabel")} maxLength={128} name="recoveryCode" placeholder={t("recoveryCodePlaceholder")} translateError={tValidation} />
               </div>
             ) : null}
 

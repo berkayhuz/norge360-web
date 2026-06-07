@@ -24,6 +24,7 @@ type FieldProps = {
   name: string
   placeholder?: string
   required?: boolean
+  translateError?: (message: any) => string
   type?: React.HTMLInputTypeAttribute
 }
 
@@ -40,10 +41,12 @@ export function TextField({
   name,
   placeholder,
   required,
+  translateError,
   type = "text",
 }: FieldProps) {
   const error = firstFieldError(fieldErrors, name)
-  const errorId = error ? `${name}-error` : undefined
+  const translatedError = error ? translateError?.(error) ?? error : undefined
+  const errorId = translatedError ? `${name}-error` : undefined
   const descriptionId = description ? `${name}-description` : undefined
 
   return (
@@ -53,11 +56,9 @@ export function TextField({
       </Label>
       <Input
         aria-describedby={[descriptionId, errorId].filter(Boolean).join(" ")}
-        aria-invalid={Boolean(error)}
+        aria-invalid={Boolean(translatedError)}
         autoComplete={autoComplete}
-        className={cn(
-          error && "border-destructive focus-visible:border-destructive"
-        )}
+        className={cn(translatedError && "border-destructive focus-visible:border-destructive")}
         defaultValue={defaultValue}
         disabled={disabled}
         id={name}
@@ -74,9 +75,9 @@ export function TextField({
           {description}
         </p>
       ) : null}
-      {error ? (
+      {translatedError ? (
         <p className="text-xs text-destructive" id={errorId} role="alert">
-          {error}
+          {translatedError}
         </p>
       ) : null}
     </div>
@@ -124,4 +125,3 @@ export function SubmitButton({
     </Button>
   )
 }
-

@@ -24,21 +24,25 @@ import type { CommunityFeedActions } from "@/features/community/lib/hooks";
 import type { CommunityFeedItem } from "@/features/community/lib/types";
 import { getCommunityLocationLabel } from "@/features/community/lib/location-options";
 import { getAuthWebLoginUrl } from "@/lib/auth-web-url";
+import { formatRelativeTimeLabel } from "@/lib/date-format";
 
 export function CommunityPostCardUserHeaders({
   item,
   actions,
   onProtectedAction,
-  postHref = `/posts/${item.id}`,
+  postHref = item.author?.username && item.slug ? `/${item.author.username}/feed/${item.slug}` : "#",
+  isAuthenticated = false,
   showMenu = true,
 }: {
   item: CommunityFeedItem;
   actions?: CommunityFeedActions;
   onProtectedAction?: (callback: () => Promise<void>) => Promise<void>;
   postHref?: string;
+  isAuthenticated?: boolean;
   showMenu?: boolean;
 }) {
   const t = useTranslations("public-web");
+  const tNavigation = useTranslations("navigation");
   const [reactionOpen, setReactionOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -52,16 +56,14 @@ export function CommunityPostCardUserHeaders({
   }, [authorName]);
 
   const locationLabel = useMemo(
-    () => getCommunityLocationLabel(item.city ?? null, item.district ?? null),
-    [item.city, item.district],
+    () => getCommunityLocationLabel(item.city ?? null, item.district ?? null) ?? t("community.location.general"),
+    [item.city, item.district, t],
   );
 
-  const createdAtLabel = useMemo(() => {
-    const date = new Date(item.createdAt);
-    return Number.isNaN(date.getTime())
-      ? ""
-      : new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
-  }, [item.createdAt]);
+  const createdAtLabel = useMemo(() => formatRelativeTimeLabel(item.createdAt) ?? "", [item.createdAt]);
+  const isOwnerPost = item.canDelete || item.canEdit;
+  const commentsEnabled = item.commentsEnabled ?? true;
+  const hideLikeCounts = item.hideLikeCountOverride ?? item.author?.hideLikeCounts ?? false;
 
   async function protectedAction(callback: () => Promise<void>) {
     if (!onProtectedAction) {
@@ -77,7 +79,7 @@ export function CommunityPostCardUserHeaders({
   }
 
   const menu =
-    showMenu && actions ? (
+    showMenu && isAuthenticated && actions ? (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -86,36 +88,54 @@ export function CommunityPostCardUserHeaders({
             size="icon-sm"
             rounded="full"
             border="none"
-            aria-label="Daha fazla"
-            className="text-muted-foreground hover:text-foreground"
+            aria-label={tNavigation("moreActions")}
+            className="text-muted-foreground hover:text-foreground shrink-0 size-9"
           >
-            <EllipsisVertical className="size-5" />
+            <EllipsisVertical className="size-5 shrink-0" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onSelect={() => setReactionOpen(true)}>
-            {t("community.reaction.add")}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => void protectedAction(() => actions.setInterest(item.id, "Interested"))}>
-            {t("community.post.interested")}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => void protectedAction(() => actions.setInterest(item.id, "NotInterested"))}>
-            {t("community.post.notInterested")}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setReportOpen(true)}>
-            {t("community.post.report")}
-          </DropdownMenuItem>
-          {item.canEdit || item.canDelete ? <DropdownMenuSeparator /> : null}
-          {item.canEdit ? (
-            <DropdownMenuItem onSelect={() => setEditOpen(true)}>
-              {t("community.post.edit")}
-            </DropdownMenuItem>
-          ) : null}
-          {item.canDelete ? (
-            <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
-              {t("community.post.delete")}
-            </DropdownMenuItem>
-          ) : null}
+          {isOwnerPost ? (
+            <>
+              {item.canEdit ? (
+                <DropdownMenuItem onSelect={() => setEditOpen(true)}>
+                  {t("community.post.edit")}
+                </DropdownMenuItem>
+              ) : null}
+              {item.canEdit && item.canDelete ? <DropdownMenuSeparator /> : null}
+              {item.canEdit && actions ? (
+                <DropdownMenuItem onSelect={() => void protectedAction(() => actions.setCommentsEnabled(item.id, !commentsEnabled))}>
+                  {commentsEnabled ? "Yorumları kapat" : "Yorumları aç"}
+                </DropdownMenuItem>
+              ) : null}
+              {item.canEdit && actions ? (
+                <DropdownMenuItem onSelect={() => void protectedAction(() => actions.setHideLikeCount(item.id, !hideLikeCounts))}>
+                  {hideLikeCounts ? "Beğeni sayılarını göster" : "Beğeni sayılarını gizle"}
+                </DropdownMenuItem>
+              ) : null}
+              {item.canEdit && actions ? <DropdownMenuSeparator /> : null}
+              {item.canDelete ? (
+                <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
+                  {t("community.post.delete")}
+                </DropdownMenuItem>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <DropdownMenuItem onSelect={() => setReactionOpen(true)}>
+                {t("community.reaction.add")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => void protectedAction(() => actions.setInterest(item.id, "Interested"))}>
+                {t("community.post.interested")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => void protectedAction(() => actions.setInterest(item.id, "NotInterested"))}>
+                {t("community.post.notInterested")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setReportOpen(true)}>
+                {t("community.post.report")}
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     ) : null;
@@ -123,7 +143,7 @@ export function CommunityPostCardUserHeaders({
   return (
     <>
       <PostHeader menu={menu}>
-        <Link href={postHref} className="flex min-w-0 items-center gap-3">
+        <Link href={`/${item.author?.username}`} className="flex min-w-0 items-center gap-3">
           <Avatar className="mt-0.5" size="lg">
             <AvatarImage src={item.author?.avatarUrl ?? undefined} alt={authorName} />
             <AvatarFallback>{authorInitials}</AvatarFallback>
@@ -132,7 +152,7 @@ export function CommunityPostCardUserHeaders({
             <p className="truncate text-sm font-semibold text-foreground">{authorName}</p>
             <div className="flex items-center gap-1">
               <p className="truncate text-xs text-muted-foreground">{locationLabel}</p>
-              {createdAtLabel ? <span className="text-xs text-muted-foreground">•</span> : null}
+              {createdAtLabel ? <span className="text-xs text-muted-foreground">·</span> : null}
               {createdAtLabel ? <span className="text-xs text-muted-foreground">{createdAtLabel}</span> : null}
             </div>
           </div>

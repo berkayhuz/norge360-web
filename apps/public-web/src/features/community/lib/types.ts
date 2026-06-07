@@ -7,6 +7,7 @@ export type CommunityAuthor = {
   displayName?: string;
   avatarUrl?: string | null;
   isVerified?: boolean;
+  hideLikeCounts?: boolean;
 };
 
 export type CommunityPostMedia = {
@@ -30,6 +31,7 @@ export type CommunityReactionSummary = {
 
 export type CommunityComment = {
   id: string;
+  slug?: string;
   postId?: string;
   userId?: string;
   parentCommentId?: string | null;
@@ -42,12 +44,15 @@ export type CommunityComment = {
   isLikedByCurrentUser?: boolean;
   currentUserReaction?: string | null;
   reactionsSummary?: CommunityReactionSummary[];
+  replyCount?: number;
+  pinnedReply?: CommunityComment | null;
   canDelete?: boolean;
   canReport?: boolean;
 };
 
 export type CommunityPost = {
   id: string;
+  slug?: string;
   userId?: string;
   caption?: string | null;
   city?: string | null;
@@ -55,6 +60,8 @@ export type CommunityPost = {
   createdAt: string;
   updatedAt?: string | null;
   status?: string;
+  commentsEnabled?: boolean;
+  hideLikeCountOverride?: boolean | null;
   author?: CommunityAuthor;
   media: CommunityPostMedia[];
   isLikedByCurrentUser?: boolean;
@@ -83,4 +90,12 @@ export type PagedCommunityFeedResponse = {
 export type ToggleActionResponse = {
   active: boolean;
   count: number;
+};
+
+export type PagedCommunityCommentsResponse = {
+  items: CommunityComment[];
+  page: number;
+  pageSize: number;
+  totalCount?: number;
+  hasNextPage?: boolean;
 };

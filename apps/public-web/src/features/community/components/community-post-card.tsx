@@ -4,12 +4,12 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-import { Image } from "@workspace/ui/components/primitives/image";
 import { PostBody } from "@workspace/ui/components/app/social/post/post-body/post-body";
 import { PostCard } from "@workspace/ui/components/app/social/post/post-card/post-card";
 
 import { CommunityPostActions } from "@/features/community/components/community-post-actions";
 import { CommunityPostCardUserHeaders } from "@/features/community/components/community-post-card-user-headers";
+import { CommunityPostMediaViewer } from "@/features/community/components/community-post-media-viewer";
 import type { CommunityFeedActions } from "@/features/community/lib/hooks";
 import type { CommunityFeedItem } from "@/features/community/lib/types";
 
@@ -18,11 +18,13 @@ const CAPTION_PREVIEW_LENGTH = 260;
 export function CommunityPostCard({
   item,
   actions,
+  isAuthenticated = false,
   readOnly = false,
-  postHref = `/posts/${item.id}`,
+  postHref = item.author?.username && item.slug ? `/${item.author.username}/feed/${item.slug}` : "#",
 }: {
   item: CommunityFeedItem;
   actions?: CommunityFeedActions;
+  isAuthenticated?: boolean;
   readOnly?: boolean;
   postHref?: string;
 }) {
@@ -54,28 +56,14 @@ export function CommunityPostCard({
           item={item}
           actions={actions}
           onProtectedAction={onProtectedAction}
+          isAuthenticated={isAuthenticated}
           postHref={postHref}
           showMenu={Boolean(actions) || readOnly}
         />
       }
       body={
         <PostBody
-          media={
-            hasMedia ? (
-              <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {item.media.map((media, index) => (
-                  <div key={media.id ?? `${media.url}-${index}`} className="min-w-full snap-start">
-                    <Image
-                      src={media.url}
-                      alt={media.altText ?? item.caption ?? t("community.post.mediaAlt")}
-                      aspect="video"
-                      radius="xl"
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : null
-          }
+          media={hasMedia ? <CommunityPostMediaViewer media={item.media} alt={item.caption ?? t("community.post.mediaAlt")} /> : null}
         >
           {item.caption ? (
             <div className="space-y-1">
@@ -92,6 +80,7 @@ export function CommunityPostCard({
             <CommunityPostActions
               item={item}
               actions={actions}
+              isAuthenticated={isAuthenticated}
               onProtectedAction={onProtectedAction}
               postHref={postHref}
             />

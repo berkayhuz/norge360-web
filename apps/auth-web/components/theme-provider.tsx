@@ -1,71 +1,78 @@
 "use client"
 
 import * as React from "react"
-import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes"
 
-function ThemeProvider({
-  children,
-  ...props
-}: React.ComponentProps<typeof NextThemesProvider>) {
-  return (
-    <NextThemesProvider
-      attribute="class"
-      defaultTheme="system"
-      disableTransitionOnChange
-      enableSystem
-      {...props}
-    >
-      <ThemeHotkey />
-      {children}
-    </NextThemesProvider>
-  )
+type Theme = "light" | "dark"
+export type ThemePreference = Theme | "system"
+
+type ThemeProviderProps = {
+  children: React.ReactNode
 }
 
-function isTypingTarget(target: EventTarget | null) {
-  if (!(target instanceof HTMLElement)) {
-    return false
-  }
-
-  return (
-    target.isContentEditable ||
-    target.tagName === "INPUT" ||
-    target.tagName === "TEXTAREA" ||
-    target.tagName === "SELECT"
-  )
+type ThemeContextValue = {
+  theme: ThemePreference
+  resolvedTheme: Theme
+  setTheme: (theme: ThemePreference) => void
 }
 
-function ThemeHotkey() {
-  const { resolvedTheme, setTheme } = useTheme()
+const ThemeContext = React.createContext<ThemeContextValue | null>(null)
+const THEME_STORAGE_KEY = "norge360.theme"
+
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const [theme, setThemeState] = React.useState<ThemePreference>("system")
+  const [systemTheme, setSystemTheme] = React.useState<Theme>("light")
 
   React.useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.defaultPrevented || event.repeat) {
-        return
-      }
-
-      if (event.metaKey || event.ctrlKey || event.altKey) {
-        return
-      }
-
-      if (typeof event.key !== "string" || event.key.toLowerCase() !== "d") {
-        return
-      }
-
-      if (isTypingTarget(event.target)) {
-        return
-      }
-
-      setTheme(resolvedTheme === "dark" ? "light" : "dark")
+    const saved = window.localStorage.getItem(THEME_STORAGE_KEY)
+    if (saved === "dark" || saved === "light" || saved === "system") {
+      setThemeState(saved)
     }
 
-    window.addEventListener("keydown", onKeyDown)
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown)
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+    const updateSystemTheme = () => {
+      setSystemTheme(mediaQuery.matches ? "dark" : "light")
     }
-  }, [resolvedTheme, setTheme])
 
-  return null
+    updateSystemTheme()
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", updateSystemTheme)
+      return () => mediaQuery.removeEventListener("change", updateSystemTheme)
+    }
+
+    mediaQuery.addListener(updateSystemTheme)
+    return () => mediaQuery.removeListener(updateSystemTheme)
+  }, [])
+
+  const resolvedTheme: Theme = theme === "system" ? systemTheme : theme
+
+  React.useEffect(() => {
+    const root = document.documentElement
+    root.classList.toggle("dark", resolvedTheme === "dark")
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme)
+  }, [resolvedTheme, theme])
+
+  const setTheme = React.useCallback((nextTheme: ThemePreference) => {
+    setThemeState(nextTheme)
+  }, [])
+
+  const value = React.useMemo<ThemeContextValue>(
+    () => ({
+      theme,
+      resolvedTheme,
+      setTheme,
+    }),
+    [setTheme, theme, resolvedTheme]
+  )
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 
-export { ThemeProvider }
+export function useTheme() {
+  const context = React.useContext(ThemeContext)
+  if (!context) {
+    throw new Error("theme_provider_missing")
+  }
+
+  return context
+}

@@ -13,9 +13,11 @@ export function CommunityProfileFeed({ userId }: { userId: string | null }) {
   const t = useTranslations("public-web");
   const { error, hasNextPage, items, loadInitial, loadMore, loading } = useCommunityUserPosts(userId ?? "");
   const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
+  const initialLoadStartedRef = useRef(false);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || initialLoadStartedRef.current) return;
+    initialLoadStartedRef.current = true;
     void loadInitial();
   }, [loadInitial, userId]);
 

@@ -14,13 +14,15 @@ function PostCard({ className, header, body, actions, children, ...props }: Post
         <article
             data-slot="post-card"
             className={cn(
-                "space-y-4 p-4 border border-transparent bg-transparent",
+                "space-y-2 p-4 border border-transparent bg-transparent",
                 className,
             )}
             {...props}
         >
-            {header}
-            {body}
+            <div className="space-y-4">
+                {header}
+                {body}
+            </div>
             {actions}
             {children}
         </article>

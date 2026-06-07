@@ -46,7 +46,7 @@ function parseArgs(argv) {
       printHelpAndExit();
     }
 
-    throw new Error(`Unknown argument: ${current}`);
+    throw new Error(`sync_secrets_unknown_argument_${current}`);
   }
 
   return args;
@@ -54,10 +54,10 @@ function parseArgs(argv) {
 
 function printHelpAndExit() {
   console.log([
-    'Usage:',
+    'sync_secrets_usage',
     '  node scripts/tools/sync-github-secrets.mjs [--file .env.secrets.production] [--repo owner/name] [--token-env GH_TOKEN] [--dry-run]',
     '',
-    'Environment:',
+    'sync_secrets_environment',
     '  GH_TOKEN, GITHUB_TOKEN, or the env name passed with --token-env',
   ].join('\n'));
   process.exit(0);
@@ -78,7 +78,7 @@ function detectRepository() {
     return `${httpsMatch[1]}/${httpsMatch[2]}`;
   }
 
-  throw new Error(`Unable to detect GitHub repository from origin URL: ${remoteUrl}`);
+  throw new Error(`sync_secrets_detect_repo_failed_${remoteUrl}`);
 }
 
 function parseEnvValue(rawValue) {
@@ -122,7 +122,7 @@ function parseSecretsFile(content) {
       }
 
       if (index >= lines.length) {
-        throw new Error(`Missing heredoc terminator "${delimiter}" for ${key}`);
+        throw new Error(`sync_secrets_missing_heredoc_terminator_${delimiter}_${key}`);
       }
 
       entries.push({ key, value: valueLines.join('\n') });
@@ -131,14 +131,14 @@ function parseSecretsFile(content) {
 
     const separatorIndex = normalized.indexOf('=');
     if (separatorIndex < 0) {
-      throw new Error(`Invalid secret line: ${originalLine}`);
+      throw new Error(`sync_secrets_invalid_secret_line_${originalLine}`);
     }
 
     const key = normalized.slice(0, separatorIndex).trim();
     const value = parseEnvValue(normalized.slice(separatorIndex + 1));
 
     if (!key) {
-      throw new Error(`Invalid secret key in line: ${originalLine}`);
+      throw new Error(`sync_secrets_invalid_secret_key_${originalLine}`);
     }
 
     entries.push({ key, value });
@@ -152,7 +152,7 @@ async function fetchJson(url, options = {}) {
   const text = await response.text();
 
   if (!response.ok) {
-    throw new Error(`GitHub API request failed (${response.status}): ${text}`);
+    throw new Error(`sync_secrets_github_api_failed_${response.status}`);
   }
 
   return text ? JSON.parse(text) : {};
@@ -202,7 +202,7 @@ async function main() {
   const token = process.env[tokenName];
 
   if (!token) {
-    throw new Error(`Missing GitHub token. Set ${tokenName} or pass --token-env.`);
+    throw new Error(`sync_secrets_missing_token_${tokenName}`);
   }
 
   const filePath = path.resolve(process.cwd(), args.file);
@@ -211,15 +211,15 @@ async function main() {
   validateProductionSecrets(secrets, args.file);
 
   if (secrets.length === 0) {
-    throw new Error(`No secrets found in ${args.file}`);
+    throw new Error(`sync_secrets_no_secrets_${args.file}`);
   }
 
   await sodium.ready;
 
-  console.log(`Repository: ${repo}`);
-  console.log(`Source file: ${filePath}`);
+  console.log(`sync_secrets_repository_${repo}`);
+  console.log(`sync_secrets_source_${filePath}`);
   if (args.dryRun) {
-    console.log('Mode: dry-run');
+    console.log('sync_secrets_mode_dry_run');
   }
 
   for (const secret of secrets) {
@@ -265,10 +265,10 @@ function validateProductionSecrets(secrets, fileName) {
 
   if (problems.length > 0) {
     throw new Error([
-      'Production secret file validation failed:',
+      'sync_secrets_validation_failed',
       ...problems.map((problem) => `- ${problem}`),
       '',
-      'Set the backend/gateway URLs to the real production endpoints before syncing secrets.',
+      'sync_secrets_set_production_endpoints',
     ].join('\n'));
   }
 }

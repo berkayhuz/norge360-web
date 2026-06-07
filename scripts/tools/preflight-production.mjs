@@ -36,7 +36,7 @@ async function main() {
   }
 
   if (missing.length > 0) {
-    console.error("Production preflight failed. Missing required paths:")
+    console.error("preflight_production_failed_missing_paths")
     for (const item of missing) {
       console.error(`- ${item}`)
     }
@@ -44,7 +44,7 @@ async function main() {
     return
   }
 
-  console.log("Production preflight checks passed.")
+  console.log("preflight_production_ok")
 }
 
 await main()

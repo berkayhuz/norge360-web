@@ -3,14 +3,14 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage:
+setup_runner_usage:
   sudo bash scripts/ops/setup-hetzner-frontend-runner.sh --repo owner/name --token TOKEN [options]
 
-Required:
+setup_runner_required:
   --repo        GitHub repository in owner/name format
   --token       GitHub runner registration token
 
-Optional:
+setup_runner_optional:
   --runner-name Runner name shown in GitHub Actions (default: norge360-frontend-1)
   --labels      Comma-separated runner labels (default: self-hosted,linux,x64,norge360-frontend-1)
   --runner-user Unix user that runs the runner (default: actions-runner)
@@ -66,7 +66,7 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     *)
-      echo "Unknown argument: $1" >&2
+    echo "setup_runner_unknown_argument_$1" >&2
       usage
       exit 1
       ;;
@@ -79,7 +79,7 @@ if [[ -z "$repo" || -z "$token" ]]; then
 fi
 
 if [[ "$(id -u)" -ne 0 ]]; then
-  echo "This script must be run as root." >&2
+  echo "setup_runner_requires_root" >&2
   exit 1
 fi
 
@@ -136,7 +136,7 @@ runuser -u "$runner_user" -- ./config.sh \
 ./svc.sh install "$runner_user"
 ./svc.sh start
 
-echo "GitHub Actions runner installed and started."
-echo "Repository: $repo"
-echo "Runner name: $runner_name"
-echo "Labels: $labels"
+echo "setup_runner_ok"
+echo "setup_runner_repository_$repo"
+echo "setup_runner_runner_name_$runner_name"
+echo "setup_runner_labels_$labels"

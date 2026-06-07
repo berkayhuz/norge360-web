@@ -2,6 +2,10 @@
   "brand": {
     "communityBadge": "Norge360 lokalsamfund"
   },
+  "metadata": {
+    "title": "Norge360",
+    "description": "Norge360 offentlig web"
+  },
   "profile": {
     "status": {
       "forbiddenTitle": "Adgang begrænset",
@@ -13,14 +17,32 @@
       "editProfile": "Rediger profil",
       "message": "Send besked",
       "follow": "Følg",
+      "following": "Following",
+      "unfollow": "Unfollow",
       "occupationFallback": "Medlem af fællesskabet",
       "coverAlt": "Forsidebillede til {name}",
-      "avatarAlt": "Profilbillede til {name}"
+      "avatarAlt": "Profilbillede til {name}",
+      "requested": "Requested",
+      "cancelRequest": "Cancel request",
+      "notificationsOn": "Notifications on",
+      "notificationsOff": "Notify me"
     },
     "stats": {
       "posts": "Indlæg",
       "followers": "Følgere",
       "following": "Følger"
+    },
+    "social": {
+      "followersTitle": "Followers",
+      "followingTitle": "Following",
+      "followersDescription": "People following @{username}.",
+      "followingDescription": "People @{username} follows.",
+      "emptyFollowers": "No followers yet.",
+      "emptyFollowing": "Not following anyone yet.",
+      "loadError": "People could not be loaded.",
+      "loadMore": "Load more",
+      "viewProfile": "View profile",
+      "actionError": "Follow action could not be completed."
     },
     "feed": {
       "title": "Fællesskabsfeed",
@@ -62,6 +84,14 @@
       "unblock": "Unblock user",
       "report": "Report",
       "reportSoon": "Reporting will be available soon."
+    },
+    "blocked": {
+      "title": "Blocked users",
+      "description": "People you block cannot interact with your profile until you unblock them.",
+      "empty": "No blocked users yet.",
+      "loadError": "Blocked users could not be loaded.",
+      "loadMore": "Load more",
+      "unblock": "Unblock"
     }
   },
   "onboarding": {
@@ -140,9 +170,29 @@
       "updating": "Opdaterer...",
       "updateButton": "Upload avatar"
     },
+    "coverPhoto": {
+      "title": "Cover photo",
+      "description": "JPG, PNG or WebP. Up to 10 MB.",
+      "hint": "Use a wide image for the best profile header result.",
+      "optional": "Optional",
+      "fileLabel": "Cover photo file",
+      "fileSelected": "{fileName} ({fileSize})",
+      "fileDefault": "You can upload only JPG, PNG or WebP.",
+      "validImage": "Select a valid image.",
+      "fileTooLarge": "The file size can be at most 10 MB.",
+      "uploadStartError": "Cover photo upload could not be started.",
+      "uploadFormatError": "Cover photo upload response was not in the expected format.",
+      "uploadFailed": "The image file could not be uploaded. Please try again.",
+      "attachFailed": "Cover photo could not be attached to the profile.",
+      "profileUnreadable": "Cover photo was updated, but the profile data could not be read.",
+      "unexpectedError": "An unexpected error occurred during cover photo upload.",
+      "updating": "Updating...",
+      "updateButton": "Upload cover photo"
+    },
     "alert": {
       "successTitle": "Succes",
       "avatarErrorTitle": "Avatar kunne ikke opdateres",
+      "coverPhotoErrorTitle": "Forsidebilledet kunne ikke opdateres",
       "saveErrorTitle": "Profilen kunne ikke opdateres",
       "successMessage": "Dine profiloplysninger er blevet opdateret.",
       "validationMessage": "Kontroller venligst felterne.",
@@ -179,6 +229,68 @@
     "actions": {
       "save": "Gem ændringer",
       "saving": "Gemmer..."
+    },
+    "notifications": {
+      "sidebarLabel": "Notifications",
+      "title": "Notification preferences",
+      "description": "Choose which in-app notifications you want to receive.",
+      "loadError": "Notification preferences could not be loaded.",
+      "retry": "Retry",
+      "save": "Save preferences",
+      "saved": "Preferences saved.",
+      "saveError": "Preferences could not be saved.",
+      "categories": {
+        "community": "Community",
+        "security": "Security",
+        "social": "Social",
+        "system": "System"
+      },
+      "types": {
+        "newFollower": {
+          "label": "New followers",
+          "description": "When someone follows you."
+        },
+        "followRequest": {
+          "label": "Follow requests",
+          "description": "When someone asks to follow your private profile."
+        },
+        "followRequestAccepted": {
+          "label": "Accepted follow requests",
+          "description": "When your follow request is accepted."
+        },
+        "profilePost": {
+          "label": "Profile bell posts",
+          "description": "When a profile you subscribed to shares a post."
+        },
+        "cityPost": {
+          "label": "City posts",
+          "description": "When a post is shared for your city."
+        },
+        "followedFirstPost": {
+          "label": "First posts from people you follow",
+          "description": "When someone you follow shares their first post."
+        },
+        "postLike": {
+          "label": "Post likes",
+          "description": "When your post receives a like."
+        },
+        "commentLike": {
+          "label": "Comment likes",
+          "description": "When your comment receives a like."
+        },
+        "postComment": {
+          "label": "Post comments",
+          "description": "When someone comments on your post."
+        },
+        "commentReply": {
+          "label": "Comment replies",
+          "description": "When someone replies to your comment."
+        },
+        "generic": {
+          "label": "Other notifications",
+          "description": "Other relevant account or community updates."
+        }
+      }
     }
   },
   "search": {
@@ -194,6 +306,24 @@
       }
     }
   },
+  "discovery": {
+    "page": {
+      "title": "Udforsk hubben",
+      "description": "Opdag mennesker og signaler fra fællesskabet."
+    },
+    "sections": {
+      "popular": "Populære personer",
+      "trending": "Trendende personer",
+      "suggested": "Forslag til personer, du kan følge"
+    },
+    "actions": {
+      "follow": "Følg",
+      "viewMore": "Se mere"
+    },
+    "errors": {
+      "loadFailed": "Udforskningshubben kunne ikke indlæses."
+    }
+  },
   "community": {
     "feed": {
       "title": "Community-feed",
@@ -201,7 +331,19 @@
       "emptyDescription": "V?r den f?rste til at dele med communityet.",
       "loadMore": "Indl?s flere",
       "loading": "Indl?ser feed...",
-      "error": "Feed kunne ikke indl?ses."
+      "error": "Feed kunne ikke indl?ses.",
+      "sortBest": "Top rated",
+      "sortNew": "Newest",
+      "sortLiked": "Most liked",
+      "sortCommented": "Most commented",
+      "sortTrending": "Trending",
+      "noCityResults": "Sorry, no posts were found for the city you're looking for. You can keep browsing posts from other cities below.",
+      "otherCities": "Other cities",
+      "sortPlaceholder": "Sort by",
+      "cityPlaceholder": "Select a city",
+      "districtPlaceholder": "Select a district",
+      "allCities": "All cities",
+      "allDistricts": "All districts"
     },
     "post": {
       "createTitle": "Opret opslag",
@@ -238,12 +380,22 @@
       "deleteError": "Kunne ikke slette opslag.",
       "reports": "Rapporter",
       "hide": "Skjul",
-      "restore": "Gendan"
+      "restore": "Gendan",
+      "backToFeed": "Back to feed",
+      "moreActions": "More"
     },
     "comment": {
       "title": "Kommentarer",
       "placeholder": "Skriv en kommentar",
+      "hint": "Skriv dine tanker om dette indlæg.",
       "reply": "Svar",
+      "replyPrompt": "Skriv dit svar",
+      "delete": "Slet kommentar",
+      "deleteTitle": "Slet kommentar",
+      "deleteDescription": "Denne handling kan ikke fortrydes.",
+      "deleteConfirm": "Slet",
+      "deleteCancel": "Annuller",
+      "deleteConfirmPrompt": "Slet denne kommentar?",
       "send": "Send",
       "empty": "Ingen kommentarer endnu.",
       "loading": "Indl?ser kommentarer...",
@@ -251,7 +403,8 @@
     },
     "reaction": {
       "add": "Tilf?j reaktion",
-      "remove": "Fjern reaktion"
+      "remove": "Fjern reaktion",
+      "current": "Selected reaction: {reaction}"
     },
     "report": {
       "title": "Rapport?r",
@@ -278,6 +431,43 @@
       "reports": "Rapporter",
       "hide": "Skjul",
       "restore": "Gendan"
+    },
+    "location": {
+      "general": "General"
+    },
+    "scaffold": {
+      "home": "Home",
+      "discover": "Discover",
+      "notifications": "Notifications",
+      "profile": "Profile",
+      "bookmarks": "Bookmarks",
+      "settings": "Settings",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service"
+    }
+  },
+  "communityFooter": {
+    "about": "About",
+    "accessibility": "Accessibility",
+    "help": "Help",
+    "services": "Services",
+    "settings": "Settings",
+    "copyright": "Copyright {year} Norge360"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Your recent follows, requests, post activity, comments and community updates.",
+    "loginRequiredTitle": "Sign in required",
+    "loginRequiredDescription": "Sign in to view your notifications.",
+    "empty": "No notifications yet.",
+    "loadError": "Notifications could not be loaded.",
+    "loadMore": "Load more",
+    "viewAll": "View all",
+    "unseenBadge": "Unread notifications",
+    "actions": {
+      "accept": "Accept",
+      "done": "Done",
+      "followBack": "Follow back"
     }
   }
 }

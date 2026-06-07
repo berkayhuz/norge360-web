@@ -6,6 +6,8 @@ import {
   type ProfileSettingsFormState,
   type ProfileSettingsValues,
 } from "@/features/profile/components/profile-settings-form";
+import { ProfileSettingsSidebar } from "@/features/profile/components/profile-settings-sidebar";
+import { buildProfileSettingsSidebarItems } from "@/features/profile/components/profile-settings-sidebar-data";
 import type { MyProfile } from "@/lib/api/accounts-types";
 import { getMyProfile, updateMyProfile } from "@/lib/api/accounts-server";
 
@@ -75,6 +77,14 @@ export default async function ProfileSettingsPage() {
 
   const profile = myProfileResult.profile;
   const initialValues = toProfileSettingsValues(profile);
+  const sidebarItems = buildProfileSettingsSidebarItems({
+    accountPrivacy: "Hesap gizliliği",
+    blockedUsers: "Engellenenler",
+    commentPermissions: "Yorum izinleri",
+    editProfile: t("profile.hero.editProfile"),
+    hideLikeCounts: "Beğeni sayıları",
+    notifications: t("settings.notifications.sidebarLabel"),
+  });
 
   async function updateProfileAction(
     _prevState: ProfileSettingsFormState,
@@ -152,13 +162,22 @@ export default async function ProfileSettingsPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
-      <ProfileSettingsForm
-        action={updateProfileAction}
-        avatarUrl={profile.avatarUrl}
-        initialValues={initialValues}
-        username={profile.username}
+    <main className="mx-auto grid w-full max-w-6xl flex-1 gap-4 px-4 py-8 sm:px-6 lg:grid-cols-4 lg:px-2">
+      <ProfileSettingsSidebar
+        description={t("settings.description")}
+        items={sidebarItems}
+        title={t("settings.title")}
       />
+
+      <div className="relative col-span-4 block w-full lg:col-span-3">
+        <ProfileSettingsForm
+          action={updateProfileAction}
+          avatarUrl={profile.avatarUrl}
+          coverPhotoUrl={profile.coverPhotoUrl}
+          initialValues={initialValues}
+          username={profile.username}
+        />
+      </div>
     </main>
   );
 }

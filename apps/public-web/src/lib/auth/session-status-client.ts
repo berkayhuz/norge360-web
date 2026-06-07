@@ -19,7 +19,10 @@ export async function getClientAuthSessionStatus(): Promise<ClientAuthSessionSta
 
   inFlightSessionStatusPromise = (async () => {
     try {
-      const response = await fetch("/api/auth/session-status", { cache: "no-store" });
+      const response = await fetch("/api/auth/session-status", {
+        cache: "no-store",
+        credentials: "include",
+      });
 
       if (!response.ok) {
         cachedSessionStatus = {
@@ -47,4 +50,9 @@ export async function getClientAuthSessionStatus(): Promise<ClientAuthSessionSta
   })();
 
   return inFlightSessionStatusPromise;
+}
+
+export function resetClientAuthSessionStatusCache() {
+  inFlightSessionStatusPromise = null;
+  cachedSessionStatus = null;
 }

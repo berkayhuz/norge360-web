@@ -1,5 +1,5 @@
-const DEFAULT_LOGIN_PATH = "/login";
-const DEFAULT_REGISTER_PATH = "/register";
+const DEFAULT_LOGIN_PATH = "https://auth.norge360.com/login";
+const DEFAULT_REGISTER_PATH = "https://auth.norge360.com/register";
 
 export function getAuthWebLoginUrl() {
   return buildAuthWebUrl(DEFAULT_LOGIN_PATH);

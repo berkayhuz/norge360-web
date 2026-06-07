@@ -33,15 +33,15 @@ export async function proxyAuthRequest(
   request: NextRequest,
   params: AuthProxyParams
 ) {
-  const { env, error } = tryGetServerEnv()
+  const { env } = tryGetServerEnv()
 
   if (!env) {
     return NextResponse.json(
       {
-        title: "Auth web configuration error",
         status: 500,
-        detail: error.issues.map((issue) => issue.message).join("; "),
         errorCode: "auth_web_config_invalid",
+        detail: "auth_web_config_invalid",
+        title: "auth_web_config_invalid",
       },
       { status: 500 }
     )
@@ -51,9 +51,9 @@ export async function proxyAuthRequest(
   if (!isAllowedAuthRoute(request.method, authPath)) {
     return NextResponse.json(
       {
-        title: "Auth endpoint is not allowed",
         status: 404,
         errorCode: "auth_proxy_route_not_allowed",
+        title: "auth_proxy_route_not_allowed",
       },
       { status: 404 }
     )
@@ -75,10 +75,10 @@ export async function proxyAuthRequest(
   } catch {
     return NextResponse.json(
       {
-        title: "Auth service unavailable",
         status: 503,
-        detail: "Authentication service could not be reached.",
         errorCode: "auth_service_unavailable",
+        detail: "auth_service_unavailable",
+        title: "auth_service_unavailable",
       },
       { status: 503 }
     )

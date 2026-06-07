@@ -1,5 +1,6 @@
 "use client"
 
+import { FALLBACK_LOCALE, resolveLocale } from "@workspace/i18n"
 import { parseProblemResponse } from "./problem"
 
 type AuthRequestOptions = {
@@ -54,7 +55,7 @@ export async function authRequest<TResponse>(
     return (await response.json()) as TResponse
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
-      throw new Error("The request timed out. Please try again.")
+      throw new Error("auth_request_timeout")
     }
 
     throw error
@@ -65,7 +66,7 @@ export async function authRequest<TResponse>(
 
 function resolveCulture() {
   const locale =
-    document.documentElement.lang || window.navigator.language || "tr-TR"
+    document.documentElement.lang || window.navigator.language || FALLBACK_LOCALE
 
-  return locale.toLowerCase().startsWith("tr") ? "tr-TR" : "en-US"
+  return resolveLocale(locale, FALLBACK_LOCALE)
 }

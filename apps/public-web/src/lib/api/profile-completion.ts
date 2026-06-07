@@ -39,7 +39,6 @@ export function calculateProfileCompletion(
     { key: "occupation", completed: hasValue(profile.occupation) },
     { key: "company", completed: hasValue(profile.company) },
     { key: "website", completed: hasValue(profile.website) },
-    // Cover photo upload is out of scope for now; keep as a bonus signal.
     { key: "coverPhotoBonus", completed: hasValue(profile.coverPhotoUrl) },
   ];
 

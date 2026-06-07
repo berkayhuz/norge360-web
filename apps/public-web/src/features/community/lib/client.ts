@@ -1,4 +1,12 @@
-import type { CommunityAuthor, CommunityComment, CommunityPostInterestType, CommunityReportReason, PagedCommunityFeedResponse, ToggleActionResponse } from "./types";
+import type {
+  CommunityAuthor,
+  CommunityComment,
+  CommunityPostInterestType,
+  CommunityReportReason,
+  PagedCommunityCommentsResponse,
+  PagedCommunityFeedResponse,
+  ToggleActionResponse,
+} from "./types";
 
 async function readJson<T>(response: Response): Promise<T> {
   const data = (await response.json().catch(() => null)) as T | null;
@@ -18,6 +26,56 @@ export async function getCommunityPost(postId: string) {
   const response = await fetch(`/api/community/posts/${postId}`, { cache: "no-store" });
   const data = await readJson<BackendPost>(response);
   return mapPost(data);
+}
+
+export async function getCommunityPostBySlug(username: string, postSlug: string) {
+  try {
+    const response = await fetch(`/api/community/${encodeURIComponent(username)}/feed/${encodeURIComponent(postSlug)}`, { cache: "no-store" });
+    const data = await readJson<BackendPost>(response);
+    return mapPost(data);
+  } catch (error) {
+    const fallbackPostId = decodePublicIdSlug(postSlug);
+    if (!fallbackPostId) {
+      throw error;
+    }
+
+    return getCommunityPost(fallbackPostId);
+  }
+}
+
+export async function getCommunityComment(commentId: string) {
+  const response = await fetch(`/api/community/comments/${commentId}`, { cache: "no-store" });
+  const data = await readJson<BackendComment>(response);
+  const authors = await getCommentAuthors([data.userId, ...(data.pinnedReply ? [data.pinnedReply.userId] : [])]);
+  return mapComment(data, authors.get(data.userId));
+}
+
+export async function getCommunityCommentBySlug(username: string, postSlug: string, commentSlug: string) {
+  try {
+    const response = await fetch(`/api/community/${encodeURIComponent(username)}/feed/${encodeURIComponent(postSlug)}/comments/${encodeURIComponent(commentSlug)}`, { cache: "no-store" });
+    const data = await readJson<BackendComment>(response);
+    const authors = await getCommentAuthors([data.userId, ...(data.pinnedReply ? [data.pinnedReply.userId] : [])]);
+    return mapComment(data, authors.get(data.userId));
+  } catch (error) {
+    const fallbackCommentId = decodePublicIdSlug(commentSlug);
+    if (!fallbackCommentId) {
+      throw error;
+    }
+
+    const post = await getCommunityPostBySlug(username, postSlug);
+    return getCommunityCommentFromPost(post.id, fallbackCommentId);
+  }
+}
+
+export async function getCommunityCommentFromPost(postId: string, commentId: string) {
+  const comments = await loadAllPostComments(postId);
+  const comment = comments.find((item) => item.id === commentId);
+  if (!comment) {
+    throw new Error("community_comment_not_found");
+  }
+
+  const authors = await getCommentAuthors([comment.userId, ...(comment.pinnedReply ? [comment.pinnedReply.userId] : [])]);
+  return mapComment(comment, authors.get(comment.userId));
 }
 
 export async function getCommunityUserPosts(userId: string, page: number, pageSize: number) {
@@ -68,6 +126,24 @@ export async function deleteCommunityPost(postId: string) {
   if (!response.ok) throw new Error("community_delete_failed");
 }
 
+export async function setPostCommentsEnabled(postId: string, enabled: boolean) {
+  const response = await fetch(`/api/community/posts/${postId}/comments-enabled`, {
+    body: JSON.stringify({ Enabled: enabled }),
+    headers: { "content-type": "application/json" },
+    method: "PUT",
+  });
+  return readJson<BackendPost>(response);
+}
+
+export async function setPostHideLikeCount(postId: string, hideLikeCount: boolean) {
+  const response = await fetch(`/api/community/posts/${postId}/hide-like-count`, {
+    body: JSON.stringify({ HideLikeCount: hideLikeCount }),
+    headers: { "content-type": "application/json" },
+    method: "PUT",
+  });
+  return readJson<BackendPost>(response);
+}
+
 export async function togglePostLike(postId: string, shouldLike: boolean) {
   const response = await fetch(`/api/community/posts/${postId}/like`, { method: shouldLike ? "POST" : "DELETE" });
   return readJson<ToggleActionResponse>(response);
@@ -106,10 +182,36 @@ export async function removePostReaction(postId: string) {
   return readJson<ToggleActionResponse>(response);
 }
 
-export async function getPostComments(postId: string) {
-  const response = await fetch(`/api/community/posts/${postId}/comments`, { cache: "no-store" });
-  const data = await readJson<BackendPagedCommentsResponse>(response);
-  return { items: data.items };
+export async function getPostComments(postId: string, page: number, pageSize: number) {
+  const response = await fetch(`/api/community/posts/${postId}/comments?page=${page}&pageSize=${pageSize}`, { cache: "no-store" });
+  return readJson<BackendPagedCommentsResponse>(response);
+}
+
+export async function getPostCommentsBySlug(username: string, postSlug: string, page: number, pageSize: number) {
+  const response = await fetch(`/api/community/${encodeURIComponent(username)}/feed/${encodeURIComponent(postSlug)}/comments?page=${page}&pageSize=${pageSize}`, { cache: "no-store" });
+  return readJson<BackendPagedCommentsResponse>(response);
+}
+
+export async function getCommentReplies(commentId: string, page: number, pageSize: number) {
+  const response = await fetch(`/api/community/comments/${commentId}/replies?page=${page}&pageSize=${pageSize}`, { cache: "no-store" });
+  return readJson<BackendPagedCommentsResponse>(response);
+}
+
+export async function getCommentRepliesBySlug(username: string, postSlug: string, commentSlug: string, page: number, pageSize: number) {
+  const response = await fetch(`/api/community/${encodeURIComponent(username)}/feed/${encodeURIComponent(postSlug)}/comments/${encodeURIComponent(commentSlug)}/replies?page=${page}&pageSize=${pageSize}`, { cache: "no-store" });
+  return readJson<BackendPagedCommentsResponse>(response);
+}
+
+export async function getCommentRepliesFromPost(postId: string, commentId: string, page: number, pageSize: number) {
+  const comments = await loadAllPostComments(postId);
+  const replies = comments.filter((item) => item.parentCommentId === commentId);
+  const start = (page - 1) * pageSize;
+  return {
+    items: replies.slice(start, start + pageSize),
+    page,
+    pageSize,
+    totalCount: replies.length,
+  } satisfies BackendPagedCommentsResponse;
 }
 
 export async function getAccountBatchSummary(userIds: string[]) {
@@ -227,12 +329,29 @@ export async function reportComment(commentId: string, reason: CommunityReportRe
   return { reported: true };
 }
 
+export async function deleteCommunityComment(commentId: string) {
+  const response = await fetch(`/api/community/comments/${commentId}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error("community_comment_delete_failed");
+  }
+}
+
+export async function toggleCommentLike(commentId: string, shouldLike: boolean) {
+  const response = await fetch(`/api/community/comments/${commentId}/like`, {
+    method: shouldLike ? "POST" : "DELETE",
+  });
+  return readJson<ToggleActionResponse>(response);
+}
+
 type BackendAuthor = {
   userId: string;
   username?: string | null;
   displayName?: string | null;
   avatarUrl?: string | null;
   isVerified?: boolean;
+  hideLikeCounts?: boolean;
 };
 
 type BackendPostMedia = {
@@ -248,6 +367,7 @@ type BackendPostMedia = {
 
 type BackendPost = {
   id: string;
+  slug: string;
   userId: string;
   caption?: string | null;
   city?: string | null;
@@ -255,6 +375,8 @@ type BackendPost = {
   status: string;
   createdAt: string;
   updatedAt?: string | null;
+  commentsEnabled: boolean;
+  hideLikeCountOverride?: boolean | null;
   commentsCount: number;
   likesCount: number;
   savesCount: number;
@@ -271,7 +393,7 @@ type BackendPost = {
 
 type BackendReactionSummary = { emojiCode: string; emoji: string; count: number };
 type BackendFeedItem = { post: BackendPost; reactionSummary: BackendReactionSummary[] };
-type BackendPagedFeedResponse = { items: BackendFeedItem[]; page: number; pageSize: number; totalCount: number };
+type BackendPagedFeedResponse = { items: BackendFeedItem[]; page: number; pageSize: number; totalCount: number; hasNextPage?: boolean };
 type BackendBatchSummaryResponse = {
   items: Array<{
     userId: string;
@@ -292,8 +414,9 @@ type BackendPublicProfileResponse = {
   isVerified: boolean;
 };
 
-type BackendComment = {
+export type BackendComment = {
   id: string;
+  slug: string;
   postId: string;
   userId: string;
   parentCommentId?: string | null;
@@ -304,14 +427,16 @@ type BackendComment = {
   currentUserReaction?: string | null;
   likesCount: number;
   reactions: BackendReactionSummary[];
+  replyCount?: number;
+  pinnedReply?: BackendComment | null;
   canDelete: boolean;
   canReport: boolean;
 };
 
-type BackendPagedCommentsResponse = { items: BackendComment[] };
+export type BackendPagedCommentsResponse = { items: BackendComment[]; page: number; pageSize: number; totalCount: number };
 
 function mapPagedFeed(data: BackendPagedFeedResponse): PagedCommunityFeedResponse {
-  const hasNextPage = data.page * data.pageSize < data.totalCount;
+  const hasNextPage = data.hasNextPage ?? data.page * data.pageSize < data.totalCount;
   return {
     hasNextPage,
     items: data.items.map((item) => ({
@@ -320,9 +445,11 @@ function mapPagedFeed(data: BackendPagedFeedResponse): PagedCommunityFeedRespons
           avatarUrl: item.post.author.avatarUrl ?? null,
           displayName: item.post.author.displayName ?? undefined,
           id: item.post.author.userId,
+          hideLikeCounts: item.post.author.hideLikeCounts ?? false,
           username: item.post.author.username ?? undefined,
         }
         : undefined,
+      commentsEnabled: item.post.commentsEnabled,
       canDelete: item.post.canDelete,
       canEdit: item.post.canEdit,
       canReport: item.post.canReport,
@@ -334,8 +461,10 @@ function mapPagedFeed(data: BackendPagedFeedResponse): PagedCommunityFeedRespons
       currentUserReaction: item.post.currentUserReaction ?? null,
       district: item.post.district ?? null,
       id: item.post.id,
+      slug: item.post.slug ?? encodePublicIdSlug(item.post.id),
       isLikedByCurrentUser: item.post.isLikedByCurrentUser,
       isSavedByCurrentUser: item.post.isSavedByCurrentUser,
+      hideLikeCountOverride: item.post.hideLikeCountOverride ?? null,
       likesCount: item.post.likesCount,
       media: item.post.media.map((media) => ({
         contentType: media.contentType,
@@ -361,15 +490,17 @@ function mapPagedFeed(data: BackendPagedFeedResponse): PagedCommunityFeedRespons
 
 function mapPost(post: BackendPost) {
   return {
-    author: post.author
+      author: post.author
       ? {
         avatarUrl: post.author.avatarUrl ?? null,
         displayName: post.author.displayName ?? undefined,
         id: post.author.userId,
         isVerified: post.author.isVerified,
+        hideLikeCounts: post.author.hideLikeCounts ?? false,
         username: post.author.username ?? undefined,
       }
       : undefined,
+    commentsEnabled: post.commentsEnabled,
     canDelete: post.canDelete,
     canEdit: post.canEdit,
     canReport: post.canReport,
@@ -381,8 +512,10 @@ function mapPost(post: BackendPost) {
     currentUserReaction: post.currentUserReaction ?? null,
     district: post.district ?? null,
     id: post.id,
+    slug: post.slug ?? encodePublicIdSlug(post.id),
     isLikedByCurrentUser: post.isLikedByCurrentUser,
     isSavedByCurrentUser: post.isSavedByCurrentUser,
+    hideLikeCountOverride: post.hideLikeCountOverride ?? null,
     likesCount: post.likesCount,
     media: post.media.map((media) => ({
       contentType: media.contentType,
@@ -411,10 +544,74 @@ function mapComment(comment: BackendComment, author?: CommunityAuthor): Communit
     canReport: comment.canReport,
     currentUserReaction: comment.currentUserReaction ?? null,
     id: comment.id,
+    slug: comment.slug ?? encodePublicIdSlug(comment.id),
     isLikedByCurrentUser: comment.isLikedByCurrentUser,
     likesCount: comment.likesCount,
     parentCommentId: comment.parentCommentId ?? null,
     postId: comment.postId,
+    pinnedReply: comment.pinnedReply ? mapComment(comment.pinnedReply) : null,
     reactionsSummary: comment.reactions.map((reaction) => ({ count: reaction.count, emoji: reaction.emoji, emojiCode: reaction.emojiCode })),
+    replyCount: comment.replyCount ?? 0,
   };
+}
+
+export function encodePublicIdSlug(id: string) {
+  const normalized = id.trim().toLowerCase();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(normalized)) {
+    return normalized;
+  }
+
+  const hex = normalized.replaceAll("-", "");
+  return BigInt(`0x${hex}`).toString(10);
+}
+
+export function decodePublicIdSlug(slug: string) {
+  const normalized = slug.trim();
+  if (!/^\d{1,39}$/.test(normalized)) {
+    return null;
+  }
+
+  try {
+    const hex = BigInt(normalized).toString(16).padStart(32, "0");
+    const formatted = [
+      hex.slice(0, 8),
+      hex.slice(8, 12),
+      hex.slice(12, 16),
+      hex.slice(16, 20),
+      hex.slice(20, 32),
+    ].join("-");
+    return formatted;
+  } catch {
+    return null;
+  }
+}
+
+function mapPagedComments(data: BackendPagedCommentsResponse): PagedCommunityCommentsResponse {
+  const hasNextPage = data.page * data.pageSize < data.totalCount;
+  return {
+    hasNextPage,
+    items: data.items.map((comment) => mapComment(comment)),
+    page: data.page,
+    pageSize: data.pageSize,
+    totalCount: data.totalCount,
+  };
+}
+
+async function loadAllPostComments(postId: string) {
+  const pageSize = 100;
+  const items: BackendComment[] = [];
+  let page = 1;
+  let totalCount = Number.POSITIVE_INFINITY;
+
+  while (items.length < totalCount) {
+    const response = await getPostComments(postId, page, pageSize);
+    items.push(...response.items);
+    totalCount = response.totalCount;
+    if (page * pageSize >= totalCount || response.items.length === 0) {
+      break;
+    }
+    page += 1;
+  }
+
+  return items;
 }

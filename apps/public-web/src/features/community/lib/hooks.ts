@@ -6,23 +6,36 @@ import {
   clearPostInterest,
   createCommunityPost,
   deleteCommunityPost,
+  deleteCommunityComment,
   createPostComment,
+  getCommunityComment,
+  getCommunityCommentFromPost,
+  getCommunityCommentBySlug,
   getCommentAuthors,
+  getCommentReplies,
+  getCommentRepliesBySlug,
+  getCommentRepliesFromPost,
   getCommunityFeed,
   getCommunityPost,
+  getCommunityPostBySlug,
   getCommunityUserPosts,
   getPostComments,
   removePostReaction,
   reportComment,
   reportPost,
   replyComment,
+  setPostCommentsEnabled,
+  setPostHideLikeCount,
+  toggleCommentLike,
   updateCommunityPost,
   setPostInterest,
   setPostReaction,
   togglePostLike,
   togglePostSave,
 } from "./client";
-import type { CommunityComment, CommunityFeedItem, CommunityPostInterestType, CommunityReportReason } from "./types";
+import type { BackendComment } from "./client";
+import { encodePublicIdSlug } from "./client";
+import type { CommunityAuthor, CommunityComment, CommunityFeedItem, CommunityPostInterestType, CommunityReportReason } from "./types";
 
 const PAGE_SIZE = 10;
 
@@ -96,6 +109,14 @@ export function useCommunityFeed() {
       await deleteCommunityPost(postId);
       setItems((prev) => prev.filter((item) => item.id !== postId));
     },
+    async setCommentsEnabled(postId: string, enabled: boolean) {
+      await setPostCommentsEnabled(postId, enabled);
+      await requireRefresh();
+    },
+    async setHideLikeCount(postId: string, hideLikeCount: boolean) {
+      await setPostHideLikeCount(postId, hideLikeCount);
+      await requireRefresh();
+    },
     async toggleLike(postId: string, isLiked: boolean) {
       optimisticPatch(postId, (item) => ({ ...item, isLikedByCurrentUser: !isLiked, likesCount: Math.max(0, (item.likesCount ?? 0) + (isLiked ? -1 : 1)) }));
       try { await togglePostLike(postId, !isLiked); } catch { await requireRefresh(); }
@@ -142,48 +163,67 @@ export function useCommunityActions() {
 
 export function useCommunityComments(postId: string) {
   const [items, setItems] = useState<CommunityComment[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const PAGE_SIZE = 20;
 
-  const load = useCallback(async () => {
+  const loadPage = useCallback(async (targetPage: number, append: boolean) => {
+    if (!postId) {
+      setItems([]);
+      setPage(1);
+      setHasNextPage(false);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      const response = await getPostComments(postId);
-      const authors = await getCommentAuthors(response.items.map((comment) => comment.userId));
-      setItems(response.items.map((comment) => {
-        const author = authors.get(comment.userId);
-        return {
-          author: author
-            ? {
-              avatarUrl: author.avatarUrl,
-              displayName: author.displayName,
-              id: author.id,
-              isVerified: author.isVerified,
-              username: author.username,
-            }
-            : { id: comment.userId },
-          canDelete: comment.canDelete,
-          canReport: comment.canReport,
-          content: comment.body,
-          createdAt: comment.createdAt,
-          currentUserReaction: comment.currentUserReaction ?? null,
-          id: comment.id,
-          isLikedByCurrentUser: comment.isLikedByCurrentUser,
-          likesCount: comment.likesCount,
-          parentCommentId: comment.parentCommentId ?? null,
-          postId: comment.postId,
-          reactionsSummary: comment.reactions.map((reaction) => ({ count: reaction.count, emoji: reaction.emoji, emojiCode: reaction.emojiCode })),
-          userId: comment.userId,
-          updatedAt: comment.updatedAt ?? null,
-        };
-      }));
+      if (!append) {
+        setLoadMoreError(null);
+      }
+      const response = await getPostComments(postId, targetPage, PAGE_SIZE);
+      const authors = await getCommentAuthors(collectCommentAuthorIds(response.items));
+      const mapped = response.items.map((comment) => mapCommentWithAuthors(comment, authors));
+      setItems((prev) => {
+        const merged = append ? [...prev, ...mapped] : mapped;
+        return dedupeById(merged);
+      });
+      setPage(response.page);
+      setHasNextPage(response.page * response.pageSize < response.totalCount);
+      setLoadMoreError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "community_comment_error");
+      const message = err instanceof Error ? err.message : "community_comment_error";
+      if (append) {
+        setLoadMoreError(message);
+      } else {
+        setError(message);
+      }
     } finally {
       setLoading(false);
     }
   }, [postId]);
+
+  const load = useCallback(async () => {
+    await loadPage(1, false);
+  }, [loadPage]);
+
+  const loadMore = useCallback(async () => {
+    if (loading || loadingMore || !hasNextPage) {
+      return;
+    }
+
+    setLoadingMore(true);
+    try {
+      await loadPage(page + 1, true);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [hasNextPage, loadPage, loading, loadingMore, page]);
 
   const addComment = useCallback(async (content: string) => {
     await createPostComment(postId, content);
@@ -199,7 +239,268 @@ export function useCommunityComments(postId: string) {
     await reportComment(commentId, reason, description);
   }, []);
 
-  return { addComment, error, items, load, loading, reply, report };
+  const deleteComment = useCallback(async (commentId: string) => {
+    await deleteCommunityComment(commentId);
+    await load();
+  }, [load]);
+
+  const toggleLike = useCallback(async (commentId: string, isLiked: boolean) => {
+    await toggleCommentLike(commentId, !isLiked);
+    await load();
+  }, [load]);
+
+  return { addComment, deleteComment, error, hasNextPage, items, load, loadMore, loadMoreError, loading, loadingMore, reply, report, toggleLike };
+}
+
+export function useCommunityCommentReplies(
+  commentId: string,
+  postId?: string,
+  slugContext?: { username: string; postSlug: string; commentSlug: string },
+) {
+  const [items, setItems] = useState<CommunityComment[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const PAGE_SIZE = 20;
+
+  const loadPage = useCallback(async (targetPage: number, append: boolean) => {
+    if (!commentId) {
+      setItems([]);
+      setPage(1);
+      setHasNextPage(false);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      if (!append) {
+        setLoadMoreError(null);
+      }
+      let response;
+      try {
+        if (slugContext) {
+          response = await getCommentRepliesBySlug(slugContext.username, slugContext.postSlug, slugContext.commentSlug, targetPage, PAGE_SIZE);
+        } else {
+          response = await getCommentReplies(commentId, targetPage, PAGE_SIZE);
+        }
+      } catch {
+        if (!postId) {
+          throw new Error("community_comment_error");
+        }
+        response = await getCommentRepliesFromPost(postId, commentId, targetPage, PAGE_SIZE);
+      }
+      const authors = await getCommentAuthors(collectCommentAuthorIds(response.items));
+      const mapped = response.items.map((comment) => mapCommentWithAuthors(comment, authors));
+      setItems((prev) => {
+        const merged = append ? [...prev, ...mapped] : mapped;
+        return dedupeById(merged);
+      });
+      setPage(response.page);
+      setHasNextPage(response.page * response.pageSize < response.totalCount);
+      setLoadMoreError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "community_comment_error";
+      if (append) {
+        setLoadMoreError(message);
+      } else {
+        setError(message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [commentId, postId, slugContext?.commentSlug, slugContext?.postSlug, slugContext?.username]);
+
+  const load = useCallback(async () => {
+    await loadPage(1, false);
+  }, [loadPage]);
+
+  const loadMore = useCallback(async () => {
+    if (loading || loadingMore || !hasNextPage) {
+      return;
+    }
+
+    setLoadingMore(true);
+    try {
+      await loadPage(page + 1, true);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [hasNextPage, loadPage, loading, loadingMore, page]);
+
+  const addReply = useCallback(async (content: string) => {
+    await replyComment(commentId, content);
+    await load();
+  }, [commentId, load]);
+
+  const report = useCallback(async (replyId: string, reason: CommunityReportReason, description: string) => {
+    await reportComment(replyId, reason, description);
+  }, []);
+
+  const deleteReply = useCallback(async (replyId: string) => {
+    await deleteCommunityComment(replyId);
+    await load();
+  }, [load]);
+
+  const toggleLike = useCallback(async (replyId: string, isLiked: boolean) => {
+    await toggleCommentLike(replyId, !isLiked);
+    await load();
+  }, [load]);
+
+  return { addReply, deleteReply, error, hasNextPage, items, load, loadMore, loadMoreError, loading, loadingMore, report, toggleLike };
+}
+
+export function useCommunityComment(commentId: string, postId?: string) {
+  const [item, setItem] = useState<CommunityComment | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    if (!commentId) {
+      setItem(null);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      let comment;
+      try {
+        comment = await getCommunityComment(commentId);
+      } catch {
+        if (!postId) {
+          throw new Error("community_comment_error");
+        }
+        comment = await getCommunityCommentFromPost(postId, commentId);
+      }
+      setItem(comment);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "community_comment_error");
+    } finally {
+      setLoading(false);
+    }
+  }, [commentId, postId]);
+
+  const toggleLike = useCallback(async (isLiked: boolean) => {
+    await toggleCommentLike(commentId, !isLiked);
+    await load();
+  }, [commentId, load]);
+
+  return { error, item, load, loading, toggleLike };
+}
+
+export function useCommunityPostBySlug(username: string, postSlug: string) {
+  const [item, setItem] = useState<CommunityFeedItem | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    if (!username || !postSlug) {
+      setItem(null);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getCommunityPostBySlug(username, postSlug);
+      setItem(response);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "community_post_error");
+    } finally {
+      setLoading(false);
+    }
+  }, [postSlug, username]);
+
+  return { error, item, load, loading };
+}
+
+export function useCommunityCommentBySlug(username: string, postSlug: string, commentSlug: string) {
+  const [item, setItem] = useState<CommunityComment | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    if (!username || !postSlug || !commentSlug) {
+      setItem(null);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const comment = await getCommunityCommentBySlug(username, postSlug, commentSlug);
+      setItem(comment);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "community_comment_error");
+    } finally {
+      setLoading(false);
+    }
+  }, [commentSlug, postSlug, username]);
+
+  const toggleLike = useCallback(async (isLiked: boolean) => {
+    if (!item?.id) {
+      return;
+    }
+
+    await toggleCommentLike(item.id, !isLiked);
+    await load();
+  }, [item?.id, load]);
+
+  return { error, item, load, loading, toggleLike };
+}
+
+function collectCommentAuthorIds(items: BackendComment[]) {
+  const ids = new Set<string>();
+
+  for (const item of items) {
+    if (item.userId) {
+      ids.add(item.userId);
+    }
+
+    if (item.pinnedReply?.userId) {
+      ids.add(item.pinnedReply.userId);
+    }
+  }
+
+  return Array.from(ids);
+}
+
+function mapCommentWithAuthors(comment: BackendComment, authors: Map<string, CommunityAuthor>): CommunityComment {
+  const author = authors.get(comment.userId);
+  const pinnedReply = comment.pinnedReply ? mapCommentWithAuthors(comment.pinnedReply, authors) : null;
+
+  return {
+    author: author
+      ? {
+        avatarUrl: author.avatarUrl,
+        displayName: author.displayName,
+        id: author.id,
+        isVerified: author.isVerified,
+        username: author.username,
+      }
+      : { id: comment.userId },
+    canDelete: comment.canDelete,
+    canReport: comment.canReport,
+    content: comment.body,
+    createdAt: comment.createdAt,
+    currentUserReaction: comment.currentUserReaction ?? null,
+    id: comment.id,
+    slug: comment.slug ?? encodePublicIdSlug(comment.id),
+    isLikedByCurrentUser: comment.isLikedByCurrentUser,
+    likesCount: comment.likesCount,
+    parentCommentId: comment.parentCommentId ?? null,
+    pinnedReply,
+    postId: comment.postId,
+    reactionsSummary: comment.reactions.map((reaction) => ({ count: reaction.count, emoji: reaction.emoji, emojiCode: reaction.emojiCode })),
+    replyCount: comment.replyCount ?? 0,
+    userId: comment.userId,
+    updatedAt: comment.updatedAt ?? null,
+  };
 }
 
 export function useCommunityPost(postId: string) {

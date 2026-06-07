@@ -16,6 +16,7 @@ import { TurnstileWidget, type TurnstileWidgetHandle } from "./turnstile-widget"
 export function ForgotPasswordForm() {
   const t = useTranslations("auth.forgotPassword.form")
   const tErrors = useTranslations("auth.errors")
+  const tValidation = useTranslations("auth.validation")
 
   const [fieldErrors, setFieldErrors] = React.useState<ValidationErrors>({})
   const [message, setMessage] = React.useState<{ text: string; tone: "danger" | "success" } | null>(null)
@@ -55,7 +56,7 @@ export function ForgotPasswordForm() {
   return (
     <form className="grid gap-4" noValidate onSubmit={onSubmit}>
       {message ? <FieldMessage tone={message.tone}>{message.text}</FieldMessage> : null}
-      <TextField autoComplete="email" disabled={pending} fieldErrors={fieldErrors} inputMode="email" label={t("emailLabel")} name="email" required type="email" />
+      <TextField autoComplete="email" disabled={pending} fieldErrors={fieldErrors} inputMode="email" label={t("emailLabel")} name="email" required type="email" translateError={tValidation} />
       <TurnstileWidget ref={turnstileRef} disabled={pending} />
       <SubmitButton disabled={pending}>{pending ? t("submitting") : t("submit")}</SubmitButton>
     </form>

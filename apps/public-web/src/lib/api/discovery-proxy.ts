@@ -14,15 +14,15 @@ const RESPONSE_HEADERS_TO_FORWARD = ["cache-control", "content-language", "conte
 type DiscoveryProxyParams = { path: string[] };
 
 export async function proxyDiscoveryRequest(request: NextRequest, params: DiscoveryProxyParams) {
-  const { env, error } = tryGetServerEnv();
+  const { env } = tryGetServerEnv();
   if (!env) {
-    return NextResponse.json({ detail: error.issues.map((issue) => issue.message).join("; "), errorCode: "public_web_config_invalid", status: 500, title: "Public web configuration error" }, { status: 500 });
+    return NextResponse.json({ detail: "public_web_config_invalid", errorCode: "public_web_config_invalid", status: 500, title: "public_web_config_invalid" }, { status: 500 });
   }
 
   const discoveryPath = `/${params.path.join("/")}`;
   const method = request.method.toUpperCase();
   if (!DISCOVERY_ALLOWED_ROUTES.some((route) => route.method === method && route.pattern.test(discoveryPath))) {
-    return NextResponse.json({ errorCode: "discovery_proxy_route_not_allowed", status: 404, title: "Discovery endpoint is not allowed" }, { status: 404 });
+    return NextResponse.json({ errorCode: "discovery_proxy_route_not_allowed", status: 404, title: "discovery_proxy_route_not_allowed" }, { status: 404 });
   }
 
   const upstreamUrl = new URL(`/api/discovery${discoveryPath}`, env.gatewayApiBaseUrl);
@@ -38,7 +38,7 @@ export async function proxyDiscoveryRequest(request: NextRequest, params: Discov
       signal: AbortSignal.timeout(15_000),
     });
   } catch {
-    return NextResponse.json({ detail: "Discovery service could not be reached.", errorCode: "discovery_service_unavailable", status: 503, title: "Discovery service unavailable" }, { status: 503 });
+    return NextResponse.json({ detail: "discovery_service_unavailable", errorCode: "discovery_service_unavailable", status: 503, title: "discovery_service_unavailable" }, { status: 503 });
   }
 
   const responseHeaders = new Headers();

@@ -15,6 +15,7 @@ import { resendConfirmEmailSchema } from "../schemas/auth-schemas"
 export function ResendConfirmEmailForm() {
   const t = useTranslations("auth.resendConfirmEmail.form")
   const tErrors = useTranslations("auth.errors")
+  const tValidation = useTranslations("auth.validation")
 
   const [fieldErrors, setFieldErrors] = React.useState<ValidationErrors>({})
   const [message, setMessage] = React.useState<{ text: string; tone: "danger" | "success" } | null>(null)
@@ -45,7 +46,7 @@ export function ResendConfirmEmailForm() {
   return (
     <form className="grid gap-4" noValidate onSubmit={onSubmit}>
       {message ? <FieldMessage tone={message.tone}>{message.text}</FieldMessage> : null}
-      <TextField autoComplete="email" disabled={pending} fieldErrors={fieldErrors} inputMode="email" label={t("emailLabel")} name="email" required type="email" />
+      <TextField autoComplete="email" disabled={pending} fieldErrors={fieldErrors} inputMode="email" label={t("emailLabel")} name="email" required type="email" translateError={tValidation} />
       <SubmitButton disabled={pending}>{pending ? t("submitting") : t("submit")}</SubmitButton>
     </form>
   )

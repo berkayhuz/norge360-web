@@ -15,11 +15,12 @@ import {
   FieldSeparator,
 } from "@workspace/ui/components/primitives/field";
 import { Input } from "@workspace/ui/components/forms/input";
-import { NativeSelect } from "@workspace/ui/components/forms/native-select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/forms/select";
 import { Textarea } from "@workspace/ui/components/forms/textarea";
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState, type Dispatch, type RefObject, type SetStateAction } from "react";
 
 import {
   normalizeAvatarUploadIntent,
@@ -27,6 +28,13 @@ import {
   type MyProfile,
   type UpdateMyProfileInput,
 } from "@/lib/api/accounts-types";
+import { buildCountryOptions } from "@/features/profile/lib/profile-country-options";
+import {
+  COMMUNITY_LOCATION_OPTIONS,
+  getCommunityDistrictOptions,
+  normalizeCommunityCityValue,
+  normalizeCommunityDistrictValue,
+} from "@/features/community/lib/location-options";
 
 export const PROFILE_VISIBILITY_OPTIONS = ["Public", "Private", "FollowersOnly"] as const;
 
@@ -57,11 +65,13 @@ export type ProfileSettingsAction = (
 type ProfileSettingsFormProps = {
   action: ProfileSettingsAction;
   avatarUrl: string | null;
+  coverPhotoUrl: string | null;
   initialValues: ProfileSettingsValues;
   username: string;
 };
 
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
+const MAX_COVER_PHOTO_BYTES = 10 * 1024 * 1024;
 const ALLOWED_AVATAR_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export function toProfileSettingsValues(profile: MyProfile): ProfileSettingsValues {
@@ -81,24 +91,42 @@ export function toProfileSettingsValues(profile: MyProfile): ProfileSettingsValu
 export function ProfileSettingsForm({
   action,
   avatarUrl,
+  coverPhotoUrl,
   initialValues,
   username,
 }: ProfileSettingsFormProps) {
   const t = useTranslations("public-web");
+  const locale = useLocale();
   const router = useRouter();
   const [state, formAction, pending] = useActionState(action, {
     fieldErrors: {},
     values: initialValues,
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedCoverFile, setSelectedCoverFile] = useState<File | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingCoverPhoto, setUploadingCoverPhoto] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const [avatarSuccess, setAvatarSuccess] = useState<string | null>(null);
+  const [coverPhotoError, setCoverPhotoError] = useState<string | null>(null);
+  const [coverPhotoSuccess, setCoverPhotoSuccess] = useState<string | null>(null);
+  const [country, setCountry] = useState(initialValues.country);
+  const [city, setCity] = useState(normalizeCommunityCityValue(initialValues.city));
+  const [district, setDistrict] = useState(normalizeCommunityDistrictValue(initialValues.city, initialValues.district));
+  const [profileVisibility, setProfileVisibility] = useState(initialValues.profileVisibility || "Public");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const coverPhotoInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrl = useMemo(
     () => (selectedFile ? URL.createObjectURL(selectedFile) : null),
     [selectedFile],
   );
+  const coverPhotoPreviewUrl = useMemo(
+    () => (selectedCoverFile ? URL.createObjectURL(selectedCoverFile) : null),
+    [selectedCoverFile],
+  );
+  const countryOptions = useMemo(() => buildCountryOptions(locale, country), [country, locale]);
+  const cityOptions = COMMUNITY_LOCATION_OPTIONS;
+  const districtOptions = useMemo(() => getCommunityDistrictOptions(city), [city]);
   const translate = t as unknown as (key: string, values?: Record<string, string | number>) => string;
 
   useEffect(() => {
@@ -115,11 +143,38 @@ export function ProfileSettingsForm({
     };
   }, [previewUrl]);
 
+  useEffect(() => {
+    return () => {
+      if (coverPhotoPreviewUrl) {
+        URL.revokeObjectURL(coverPhotoPreviewUrl);
+      }
+    };
+  }, [coverPhotoPreviewUrl]);
+
+  useEffect(() => {
+    setCountry(initialValues.country);
+    setCity(normalizeCommunityCityValue(initialValues.city));
+    setDistrict(normalizeCommunityDistrictValue(initialValues.city, initialValues.district));
+    setProfileVisibility(initialValues.profileVisibility || "Public");
+  }, [initialValues.city, initialValues.country, initialValues.district, initialValues.profileVisibility]);
+
+  useEffect(() => {
+    const nextDistrictOptions = getCommunityDistrictOptions(city);
+    if (nextDistrictOptions.length === 0) {
+      setDistrict("");
+      return;
+    }
+
+    if (!nextDistrictOptions.some((option) => option.value === district)) {
+      setDistrict(nextDistrictOptions[0]?.value ?? "");
+    }
+  }, [city, district]);
+
   const text = {
     avatar: {
       attachFailed: t("settings.avatar.attachFailed"),
       fileDefault: t("settings.avatar.fileDefault"),
-      fileSelected: t("settings.avatar.fileSelected"),
+      fileLabel: t("settings.avatar.fileLabel"),
       fileTooLarge: t("settings.avatar.fileTooLarge"),
       optional: t("settings.avatar.optional"),
       profileUnreadable: t("settings.avatar.profileUnreadable"),
@@ -131,8 +186,27 @@ export function ProfileSettingsForm({
       validImage: t("settings.avatar.validImage"),
       updating: t("settings.avatar.updating"),
     },
+    coverPhoto: {
+      attachFailed: t("settings.coverPhoto.attachFailed"),
+      description: t("settings.coverPhoto.description"),
+      fileDefault: t("settings.coverPhoto.fileDefault"),
+      fileLabel: t("settings.coverPhoto.fileLabel"),
+      fileTooLarge: t("settings.coverPhoto.fileTooLarge"),
+      optional: t("settings.coverPhoto.optional"),
+      profileUnreadable: t("settings.coverPhoto.profileUnreadable"),
+      title: t("settings.coverPhoto.title"),
+      unexpectedError: t("settings.coverPhoto.unexpectedError"),
+      updateButton: t("settings.coverPhoto.updateButton"),
+      uploadFailed: t("settings.coverPhoto.uploadFailed"),
+      uploadFormatError: t("settings.coverPhoto.uploadFormatError"),
+      uploadStartError: t("settings.coverPhoto.uploadStartError"),
+      validImage: t("settings.coverPhoto.validImage"),
+      updating: t("settings.coverPhoto.updating"),
+      hint: t("settings.coverPhoto.hint"),
+    },
     alert: {
       avatarErrorTitle: t("settings.alert.avatarErrorTitle"),
+      coverPhotoErrorTitle: t("settings.alert.coverPhotoErrorTitle"),
       saveErrorTitle: t("settings.alert.saveErrorTitle"),
       successTitle: t("settings.alert.successTitle"),
     },
@@ -170,27 +244,118 @@ export function ProfileSettingsForm({
   } as const;
 
   async function handleAvatarUpload() {
-    if (!selectedFile) {
-      setAvatarError(text.avatar.validImage);
+    await uploadProfileMedia({
+      completePath: "/api/accounts/profiles/me/avatar/complete",
+      file: selectedFile,
+      fileInputRef,
+      intentPath: "/api/accounts/profiles/me/avatar/upload-intent",
+      setError: setAvatarError,
+      setFile: setSelectedFile,
+      setSuccess: setAvatarSuccess,
+      setUploading: setUploadingAvatar,
+      successMessage: t("settings.alert.successMessage"),
+      fileTooLargeMessage: text.avatar.fileTooLarge,
+      uploadFailedMessage: text.avatar.uploadFailed,
+      uploadFormatErrorMessage: text.avatar.uploadFormatError,
+      uploadStartErrorMessage: text.avatar.uploadStartError,
+      attachFailedMessage: text.avatar.attachFailed,
+      profileUnreadableMessage: text.avatar.profileUnreadable,
+      unexpectedErrorMessage: text.avatar.unexpectedError,
+      validFileMessage: text.avatar.validImage,
+      maxBytes: MAX_AVATAR_BYTES,
+    });
+  }
+
+  async function handleCoverPhotoUpload() {
+    await uploadProfileMedia({
+      completePath: "/api/accounts/profiles/me/cover-photo/complete",
+      file: selectedCoverFile,
+      fileInputRef: coverPhotoInputRef,
+      intentPath: "/api/accounts/profiles/me/cover-photo/upload-intent",
+      setError: setCoverPhotoError,
+      setFile: setSelectedCoverFile,
+      setSuccess: setCoverPhotoSuccess,
+      setUploading: setUploadingCoverPhoto,
+      successMessage: t("settings.alert.successMessage"),
+      fileTooLargeMessage: text.coverPhoto.fileTooLarge,
+      uploadFailedMessage: text.coverPhoto.uploadFailed,
+      uploadFormatErrorMessage: text.coverPhoto.uploadFormatError,
+      uploadStartErrorMessage: text.coverPhoto.uploadStartError,
+      attachFailedMessage: text.coverPhoto.attachFailed,
+      profileUnreadableMessage: text.coverPhoto.profileUnreadable,
+      unexpectedErrorMessage: text.coverPhoto.unexpectedError,
+      validFileMessage: text.coverPhoto.validImage,
+      maxBytes: MAX_COVER_PHOTO_BYTES,
+    });
+  }
+
+  async function uploadProfileMedia({
+    attachFailedMessage,
+    completePath,
+    file,
+    fileInputRef,
+    intentPath,
+    profileUnreadableMessage,
+    setError,
+    setFile,
+    setSuccess,
+    setUploading,
+    successMessage,
+    unexpectedErrorMessage,
+    fileTooLargeMessage,
+    uploadFailedMessage,
+    uploadFormatErrorMessage,
+    uploadStartErrorMessage,
+    validFileMessage,
+    maxBytes,
+  }: {
+    attachFailedMessage: string;
+    completePath: string;
+    file: File | null;
+    fileInputRef: RefObject<HTMLInputElement | null>;
+    intentPath: string;
+    profileUnreadableMessage: string;
+    setError: Dispatch<SetStateAction<string | null>>;
+    setFile: Dispatch<SetStateAction<File | null>>;
+    setSuccess: Dispatch<SetStateAction<string | null>>;
+    setUploading: Dispatch<SetStateAction<boolean>>;
+    successMessage: string;
+    unexpectedErrorMessage: string;
+    fileTooLargeMessage: string;
+    uploadFailedMessage: string;
+    uploadFormatErrorMessage: string;
+    uploadStartErrorMessage: string;
+    validFileMessage: string;
+    maxBytes: number;
+  }) {
+    if (!file) {
+      setError(validFileMessage);
       return;
     }
 
-    const clientValidationError = validateAvatarFile(selectedFile, text.avatar);
+    const clientValidationError = validateAvatarFile(
+      file,
+      {
+        fileTooLarge: fileTooLargeMessage,
+        validImage: validFileMessage,
+      },
+      maxBytes,
+    );
     if (clientValidationError) {
-      setAvatarError(clientValidationError);
+      setError(clientValidationError);
       return;
     }
 
-    setUploadingAvatar(true);
-    setAvatarError(null);
-    setAvatarSuccess(null);
+    setUploading(true);
+    setError(null);
+    setSuccess(null);
 
     try {
-      const intentResponse = await fetch("/api/accounts/profiles/me/avatar/upload-intent", {
+      const intentResponse = await fetch(intentPath, {
         body: JSON.stringify({
-          contentLength: selectedFile.size,
-          contentType: selectedFile.type,
-          fileName: selectedFile.name,
+          contentLength: file.size,
+          contentType: file.type,
+          fileName: file.name,
         }),
         cache: "no-store",
         headers: {
@@ -201,13 +366,13 @@ export function ProfileSettingsForm({
 
       const intentData = await safeReadJson(intentResponse);
       if (!intentResponse.ok) {
-        setAvatarError(mapAvatarApiError(intentResponse.status, intentData, text.avatar.uploadStartError));
+        setError(mapAvatarApiError(intentResponse.status, intentData, uploadStartErrorMessage));
         return;
       }
 
       const intent = normalizeAvatarUploadIntent(intentData);
       if (!intent) {
-        setAvatarError(text.avatar.uploadFormatError);
+        setError(uploadFormatErrorMessage);
         return;
       }
 
@@ -219,22 +384,22 @@ export function ProfileSettingsForm({
       }
 
       if (!uploadHeaders.has("Content-Type")) {
-        uploadHeaders.set("Content-Type", selectedFile.type);
+        uploadHeaders.set("Content-Type", file.type);
       }
 
       const uploadResponse = await fetch(intent.uploadUrl, {
-        body: selectedFile,
+        body: file,
         credentials: "omit",
         headers: uploadHeaders,
         method: "PUT",
       });
 
       if (!uploadResponse.ok) {
-        setAvatarError(text.avatar.uploadFailed);
+        setError(uploadFailedMessage);
         return;
       }
 
-      const completeResponse = await fetch("/api/accounts/profiles/me/avatar/complete", {
+      const completeResponse = await fetch(completePath, {
         body: JSON.stringify({ storageKey: intent.storageKey }),
         cache: "no-store",
         headers: {
@@ -245,26 +410,26 @@ export function ProfileSettingsForm({
 
       const completeData = await safeReadJson(completeResponse);
       if (!completeResponse.ok) {
-        setAvatarError(mapAvatarApiError(completeResponse.status, completeData, text.avatar.attachFailed));
+        setError(mapAvatarApiError(completeResponse.status, completeData, attachFailedMessage));
         return;
       }
 
       const normalizedProfile = normalizeMyProfile(completeData);
       if (!normalizedProfile) {
-        setAvatarError(text.avatar.profileUnreadable);
+        setError(profileUnreadableMessage);
         return;
       }
 
-      setSelectedFile(null);
+      setFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-      setAvatarSuccess(t("settings.alert.successMessage"));
+      setSuccess(successMessage);
       router.refresh();
     } catch {
-      setAvatarError(text.avatar.unexpectedError);
+      setError(unexpectedErrorMessage);
     } finally {
-      setUploadingAvatar(false);
+      setUploading(false);
     }
   }
 
@@ -276,7 +441,7 @@ export function ProfileSettingsForm({
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <Card className="border-dashed">
+          <Card id="avatar" className="scroll-mt-24 border-dashed">
             <CardHeader>
               <CardTitle>{text.titles.avatar}</CardTitle>
               <CardDescription>{text.titles.avatarDescription}</CardDescription>
@@ -295,7 +460,7 @@ export function ProfileSettingsForm({
 
               <FieldGroup>
                 <Field>
-                  <FieldLabel htmlFor="avatarFile">{t("settings.avatar.fileLabel")}</FieldLabel>
+                  <FieldLabel htmlFor="avatarFile">{text.avatar.fileLabel}</FieldLabel>
                   <FieldContent>
                     <Input
                       accept="image/jpeg,image/png,image/webp"
@@ -317,7 +482,7 @@ export function ProfileSettingsForm({
                       <FieldDescription>
                         {translate("settings.avatar.fileSelected", {
                           fileName: selectedFile.name,
-                          fileSize: formatFileSize(selectedFile.size),
+                          fileSize: formatFileSize(selectedFile.size, locale),
                         })}
                       </FieldDescription>
                     ) : (
@@ -353,6 +518,93 @@ export function ProfileSettingsForm({
             </CardContent>
           </Card>
 
+          <Card id="cover-photo" className="scroll-mt-24 border-dashed">
+            <CardHeader>
+              <CardTitle>{text.coverPhoto.title}</CardTitle>
+              <CardDescription>{text.coverPhoto.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="overflow-hidden rounded-3xl border bg-muted/40">
+                  <div className="relative aspect-[3/1] w-full">
+                    {coverPhotoPreviewUrl || coverPhotoUrl ? (
+                      <img
+                        alt={username}
+                        className="h-full w-full object-cover"
+                        src={coverPhotoPreviewUrl ?? coverPhotoUrl ?? ""}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="rounded-full bg-background/80 px-4 py-2 text-sm text-muted-foreground shadow-sm backdrop-blur">
+                          {text.coverPhoto.optional}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">{text.coverPhoto.hint}</p>
+              </div>
+
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="coverPhotoFile">{text.coverPhoto.fileLabel}</FieldLabel>
+                  <FieldContent>
+                    <Input
+                      accept="image/jpeg,image/png,image/webp"
+                      disabled={uploadingCoverPhoto}
+                      id="coverPhotoFile"
+                      ref={coverPhotoInputRef}
+                      onClick={(event) => {
+                        event.currentTarget.value = "";
+                      }}
+                      onChange={(event) => {
+                        const file = event.target.files?.[0] ?? null;
+                        setCoverPhotoError(null);
+                        setCoverPhotoSuccess(null);
+                        setSelectedCoverFile(file);
+                      }}
+                      type="file"
+                    />
+                    {selectedCoverFile ? (
+                      <FieldDescription>
+                        {translate("settings.coverPhoto.fileSelected", {
+                          fileName: selectedCoverFile.name,
+                          fileSize: formatFileSize(selectedCoverFile.size, locale),
+                        })}
+                      </FieldDescription>
+                    ) : (
+                      <FieldDescription>{text.coverPhoto.fileDefault}</FieldDescription>
+                    )}
+                  </FieldContent>
+                </Field>
+              </FieldGroup>
+
+              {coverPhotoError ? (
+                <Alert variant="destructive">
+                  <AlertTitle>{text.alert.coverPhotoErrorTitle}</AlertTitle>
+                  <AlertDescription>{coverPhotoError}</AlertDescription>
+                </Alert>
+              ) : null}
+
+              {coverPhotoSuccess ? (
+                <Alert>
+                  <AlertTitle>{text.alert.successTitle}</AlertTitle>
+                  <AlertDescription>{coverPhotoSuccess}</AlertDescription>
+                </Alert>
+              ) : null}
+
+              <div className="flex items-center justify-end">
+                <Button
+                  disabled={!selectedCoverFile || uploadingCoverPhoto}
+                  onClick={handleCoverPhotoUpload}
+                  type="button"
+                >
+                  {uploadingCoverPhoto ? text.coverPhoto.updating : text.coverPhoto.updateButton}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           <form action={formAction} className="space-y-6">
             {state.formError ? (
               <Alert variant="destructive">
@@ -368,121 +620,177 @@ export function ProfileSettingsForm({
               </Alert>
             ) : null}
 
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="displayName">{text.fields.displayName}</FieldLabel>
-                <FieldContent>
-                  <Input
-                    defaultValue={state.values.displayName}
-                    id="displayName"
-                    maxLength={100}
-                    name="displayName"
-                    placeholder={text.fields.displayNamePlaceholder}
-                  />
-                  <FieldError errors={toFieldMessages(state.fieldErrors.displayName)} />
-                </FieldContent>
-              </Field>
+            <section id="basic-info" className="scroll-mt-24 space-y-6">
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="displayName">{text.fields.displayName}</FieldLabel>
+                  <FieldContent>
+                    <Input
+                      defaultValue={state.values.displayName}
+                      id="displayName"
+                      maxLength={100}
+                      name="displayName"
+                      placeholder={text.fields.displayNamePlaceholder}
+                    />
+                    <FieldError errors={toFieldMessages(state.fieldErrors.displayName)} />
+                  </FieldContent>
+                </Field>
 
-              <Field>
-                <FieldLabel htmlFor="bio">{text.fields.bio}</FieldLabel>
-                <FieldContent>
-                  <Textarea
-                    defaultValue={state.values.bio}
-                    id="bio"
-                    maxLength={500}
-                    name="bio"
-                    placeholder={text.fields.bioPlaceholder}
-                    rows={5}
-                  />
-                  <FieldDescription>{text.fields.bioHint}</FieldDescription>
-                  <FieldError errors={toFieldMessages(state.fieldErrors.bio)} />
-                </FieldContent>
-              </Field>
+                <Field>
+                  <FieldLabel htmlFor="bio">{text.fields.bio}</FieldLabel>
+                  <FieldContent>
+                    <Textarea
+                      defaultValue={state.values.bio}
+                      id="bio"
+                      maxLength={500}
+                      name="bio"
+                      placeholder={text.fields.bioPlaceholder}
+                      rows={5}
+                    />
+                    <FieldDescription>{text.fields.bioHint}</FieldDescription>
+                    <FieldError errors={toFieldMessages(state.fieldErrors.bio)} />
+                  </FieldContent>
+                </Field>
+              </FieldGroup>
+            </section>
 
-              <FieldSeparator>{text.fields.sectionLocation}</FieldSeparator>
+            <section id="location" className="scroll-mt-24 space-y-6">
+              <FieldGroup>
+                <FieldSeparator>{text.fields.sectionLocation}</FieldSeparator>
 
-              <Field>
-                <FieldLabel htmlFor="country">{text.fields.country}</FieldLabel>
-                <FieldContent>
-                  <Input defaultValue={state.values.country} id="country" maxLength={64} name="country" />
-                  <FieldError errors={toFieldMessages(state.fieldErrors.country)} />
-                </FieldContent>
-              </Field>
+                <Field>
+                  <FieldLabel htmlFor="country">{text.fields.country}</FieldLabel>
+                  <FieldContent>
+                    <Select name="country" value={country} onValueChange={setCountry}>
+                      <SelectTrigger className="w-full" id="country">
+                        <SelectValue placeholder={text.fields.country} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countryOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FieldError errors={toFieldMessages(state.fieldErrors.country)} />
+                  </FieldContent>
+                </Field>
 
-              <Field>
-                <FieldLabel htmlFor="city">{text.fields.city}</FieldLabel>
-                <FieldContent>
-                  <Input defaultValue={state.values.city} id="city" maxLength={64} name="city" />
-                  <FieldError errors={toFieldMessages(state.fieldErrors.city)} />
-                </FieldContent>
-              </Field>
+                <Field>
+                  <FieldLabel htmlFor="city">{text.fields.city}</FieldLabel>
+                  <FieldContent>
+                    <Select
+                      name="city"
+                      value={city}
+                      onValueChange={(value) => {
+                        setCity(value);
+                        const nextDistrictOptions = getCommunityDistrictOptions(value);
+                        setDistrict(nextDistrictOptions[0]?.value ?? "");
+                      }}
+                    >
+                      <SelectTrigger className="w-full" id="city">
+                        <SelectValue placeholder={text.fields.city} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {cityOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FieldError errors={toFieldMessages(state.fieldErrors.city)} />
+                  </FieldContent>
+                </Field>
 
-              <Field>
-                <FieldLabel htmlFor="district">{text.fields.district}</FieldLabel>
-                <FieldContent>
-                  <Input defaultValue={state.values.district} id="district" maxLength={64} name="district" />
-                  <FieldError errors={toFieldMessages(state.fieldErrors.district)} />
-                </FieldContent>
-              </Field>
+                <Field>
+                  <FieldLabel htmlFor="district">{text.fields.district}</FieldLabel>
+                  <FieldContent>
+                    <Select name="district" value={district} onValueChange={setDistrict} disabled={!city}>
+                      <SelectTrigger className="w-full" id="district">
+                        <SelectValue placeholder={text.fields.district} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {districtOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FieldError errors={toFieldMessages(state.fieldErrors.district)} />
+                  </FieldContent>
+                </Field>
+              </FieldGroup>
+            </section>
 
-              <FieldSeparator>{text.fields.sectionProfessional}</FieldSeparator>
+            <section id="professional" className="scroll-mt-24 space-y-6">
+              <FieldGroup>
+                <FieldSeparator>{text.fields.sectionProfessional}</FieldSeparator>
 
-              <Field>
-                <FieldLabel htmlFor="occupation">{text.fields.occupation}</FieldLabel>
-                <FieldContent>
-                  <Input
-                    defaultValue={state.values.occupation}
-                    id="occupation"
-                    maxLength={128}
-                    name="occupation"
-                  />
-                  <FieldError errors={toFieldMessages(state.fieldErrors.occupation)} />
-                </FieldContent>
-              </Field>
+                <Field>
+                  <FieldLabel htmlFor="occupation">{text.fields.occupation}</FieldLabel>
+                  <FieldContent>
+                    <Input
+                      defaultValue={state.values.occupation}
+                      id="occupation"
+                      maxLength={128}
+                      name="occupation"
+                    />
+                    <FieldError errors={toFieldMessages(state.fieldErrors.occupation)} />
+                  </FieldContent>
+                </Field>
 
-              <Field>
-                <FieldLabel htmlFor="company">{text.fields.company}</FieldLabel>
-                <FieldContent>
-                  <Input defaultValue={state.values.company} id="company" maxLength={128} name="company" />
-                  <FieldError errors={toFieldMessages(state.fieldErrors.company)} />
-                </FieldContent>
-              </Field>
+                <Field>
+                  <FieldLabel htmlFor="company">{text.fields.company}</FieldLabel>
+                  <FieldContent>
+                    <Input defaultValue={state.values.company} id="company" maxLength={128} name="company" />
+                    <FieldError errors={toFieldMessages(state.fieldErrors.company)} />
+                  </FieldContent>
+                </Field>
+              </FieldGroup>
+            </section>
 
-              <FieldSeparator>{text.fields.sectionLinksVisibility}</FieldSeparator>
+            <section id="links-visibility" className="scroll-mt-24 space-y-6">
+              <FieldGroup>
+                <FieldSeparator>{text.fields.sectionLinksVisibility}</FieldSeparator>
 
-              <Field>
-                <FieldLabel htmlFor="website">{text.fields.website}</FieldLabel>
-                <FieldContent>
-                  <Input
-                    defaultValue={state.values.website}
-                    id="website"
-                    maxLength={256}
-                    name="website"
-                    placeholder={text.fields.websitePlaceholder}
-                  />
-                  <FieldDescription>{text.fields.websiteHint}</FieldDescription>
-                  <FieldError errors={toFieldMessages(state.fieldErrors.website)} />
-                </FieldContent>
-              </Field>
+                <Field>
+                  <FieldLabel htmlFor="website">{text.fields.website}</FieldLabel>
+                  <FieldContent>
+                    <Input
+                      defaultValue={state.values.website}
+                      id="website"
+                      maxLength={256}
+                      name="website"
+                      placeholder={text.fields.websitePlaceholder}
+                    />
+                    <FieldDescription>{text.fields.websiteHint}</FieldDescription>
+                    <FieldError errors={toFieldMessages(state.fieldErrors.website)} />
+                  </FieldContent>
+                </Field>
 
-              <Field>
-                <FieldLabel htmlFor="profileVisibility">{text.fields.profileVisibility}</FieldLabel>
-                <FieldContent>
-                  <NativeSelect
-                    defaultValue={state.values.profileVisibility}
-                    id="profileVisibility"
-                    name="profileVisibility"
-                  >
-                    {getVisibilityOptions(state.values.profileVisibility).map((option) => (
-                      <option key={option} value={option}>
-                        {getVisibilityLabel(option, text.visibility)}
-                      </option>
-                    ))}
-                  </NativeSelect>
-                  <FieldError errors={toFieldMessages(state.fieldErrors.profileVisibility)} />
-                </FieldContent>
-              </Field>
-            </FieldGroup>
+                <Field id="privacy" className="scroll-mt-24">
+                  <FieldLabel htmlFor="profileVisibility">{text.fields.profileVisibility}</FieldLabel>
+                  <FieldContent>
+                    <Select name="profileVisibility" value={profileVisibility} onValueChange={setProfileVisibility}>
+                      <SelectTrigger className="w-full" id="profileVisibility">
+                        <SelectValue placeholder={text.fields.profileVisibility} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getVisibilityOptions(profileVisibility).map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {getVisibilityLabel(option, text.visibility)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FieldError errors={toFieldMessages(state.fieldErrors.profileVisibility)} />
+                  </FieldContent>
+                </Field>
+              </FieldGroup>
+            </section>
 
             <div className="flex justify-end">
               <Button disabled={pending} type="submit">
@@ -544,10 +852,30 @@ function normalizeOptionalText(value: string) {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-function formatFileSize(size: number) {
-  if (size < 1024) return `${size} B`;
-  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
-  return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+function formatFileSize(size: number, locale: string) {
+  if (size < 1024) {
+    return new Intl.NumberFormat(locale, {
+      style: "unit",
+      unit: "byte",
+      unitDisplay: "narrow",
+    }).format(size);
+  }
+
+  if (size < 1024 * 1024) {
+    return new Intl.NumberFormat(locale, {
+      maximumFractionDigits: 1,
+      style: "unit",
+      unit: "kilobyte",
+      unitDisplay: "narrow",
+    }).format(size / 1024);
+  }
+
+  return new Intl.NumberFormat(locale, {
+    maximumFractionDigits: 2,
+    style: "unit",
+    unit: "megabyte",
+    unitDisplay: "narrow",
+  }).format(size / (1024 * 1024));
 }
 
 function validateAvatarFile(
@@ -556,6 +884,7 @@ function validateAvatarFile(
     fileTooLarge: string;
     validImage: string;
   },
+  maxBytes = MAX_AVATAR_BYTES,
 ) {
   if (!file || file.size <= 0) {
     return messages.validImage;
@@ -565,7 +894,7 @@ function validateAvatarFile(
     return messages.validImage;
   }
 
-  if (file.size > MAX_AVATAR_BYTES) {
+  if (file.size > maxBytes) {
     return messages.fileTooLarge;
   }
 

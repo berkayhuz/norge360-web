@@ -22,7 +22,7 @@ describe("auth schemas", () => {
 
   it("rejects weak registration passwords", () => {
     const result = registerSchema.safeParse({
-      culture: "tr-TR",
+      culture: "en-US",
       email: "user@norge360.com",
       password: "short",
       turnstileToken: "token",
@@ -34,7 +34,7 @@ describe("auth schemas", () => {
 
   it("accepts valid registration payloads", () => {
     const result = registerSchema.safeParse({
-      culture: "tr-TR",
+      culture: "en-US",
       email: "user@norge360.com",
       password: validPassword,
       turnstileToken: "token",

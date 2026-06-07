@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Bookmark, Heart, MessageCircle } from "lucide-react";
 
@@ -20,11 +19,13 @@ export function CommunityPostActions({
   item,
   actions,
   onProtectedAction,
-  postHref = `/posts/${item.id}`,
+  isAuthenticated = false,
+  postHref = item.author?.username && item.slug ? `/${item.author.username}/feed/${item.slug}` : "#",
 }: {
   item: CommunityFeedItem;
   actions: CommunityFeedActions;
   onProtectedAction: (callback: () => Promise<void>) => Promise<void>;
+  isAuthenticated?: boolean;
   postHref?: string;
 }) {
   const t = useTranslations("public-web");
@@ -32,8 +33,16 @@ export function CommunityPostActions({
   const [reportOpen, setReportOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const likesCount = item.likesCount ?? 0;
+  const commentsCount = item.commentsCount ?? 0;
+  const hideLikeCounts = item.hideLikeCountOverride ?? item.author?.hideLikeCounts ?? false;
 
   async function protectedAction(callback: () => Promise<void>) {
+    if (!isAuthenticated) {
+      window.location.href = getAuthWebLoginUrl();
+      return;
+    }
+
     try {
       await onProtectedAction(callback);
     } catch {
@@ -45,33 +54,41 @@ export function CommunityPostActions({
     <>
       <PostActions
         leading={
-          <>
+          <div className="space-x-2">
             <Button
               type="button"
               variant="ghost"
-              size="icon-sm"
+              size="sm"
               rounded="full"
               border="none"
               aria-label={t("community.post.like")}
-              className={item.isLikedByCurrentUser ? "text-rose-500 hover:bg-transparent hover:text-rose-500" : "text-muted-foreground hover:bg-transparent hover:text-foreground"}
+              className={`gap-2 px-3 ${item.isLikedByCurrentUser ? "text-rose-500 hover:bg-transparent hover:text-rose-500" : "text-muted-foreground hover:bg-transparent hover:text-foreground"}`}
               onClick={() => void protectedAction(() => actions.toggleLike(item.id, !!item.isLikedByCurrentUser))}
             >
               <Heart className="size-6" fill={item.isLikedByCurrentUser ? "currentColor" : "none"} />
+              {hideLikeCounts ? null : <span className="text-sm tabular-nums">{likesCount}</span>}
             </Button>
             <Button
-              asChild
+              type="button"
               variant="ghost"
-              size="icon-sm"
+              size="sm"
               rounded="full"
               border="none"
               aria-label={t("community.post.comment")}
-              className="cursor-default text-muted-foreground hover:bg-transparent hover:text-foreground"
+              className="gap-2 px-3 text-muted-foreground hover:bg-transparent hover:text-foreground"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  window.location.href = getAuthWebLoginUrl();
+                  return;
+                }
+
+                window.location.href = `${postHref}#comments`;
+              }}
             >
-              <Link href={`${postHref}#comments`}>
-                <MessageCircle className="size-6" />
-              </Link>
+              <MessageCircle className="size-6" />
+              <span className="text-sm tabular-nums">{commentsCount}</span>
             </Button>
-          </>
+          </div>
         }
         trailing={
           <Button

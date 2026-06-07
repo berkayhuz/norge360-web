@@ -3,48 +3,75 @@
 import * as React from "react";
 
 type Theme = "light" | "dark";
+export type ThemePreference = Theme | "system";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
 };
 
 type ThemeContextValue = {
+  theme: ThemePreference;
   resolvedTheme: Theme;
-  setTheme: (theme: Theme) => void;
+  setTheme: (theme: ThemePreference) => void;
 };
 
 const ThemeContext = React.createContext<ThemeContextValue | null>(null);
 const THEME_STORAGE_KEY = "norge360.theme";
 
+function getSystemTheme(): Theme {
+  if (typeof window === "undefined") {
+    return "light";
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setThemeState] = React.useState<Theme>(() => {
+  const [theme, setThemeState] = React.useState<ThemePreference>(() => {
     if (typeof window === "undefined") {
-      return "light";
+      return "system";
     }
 
     const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
-    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    return saved === "dark" || saved === "light"
-      ? saved
-      : systemPrefersDark
-        ? "dark"
-        : "light";
+    return saved === "dark" || saved === "light" || saved === "system" ? saved : "system";
   });
+
+  const [systemTheme, setSystemTheme] = React.useState<Theme>(() => getSystemTheme());
+
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const updateSystemTheme = () => {
+      setSystemTheme(mediaQuery.matches ? "dark" : "light");
+    };
+
+    updateSystemTheme();
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", updateSystemTheme);
+      return () => mediaQuery.removeEventListener("change", updateSystemTheme);
+    }
+
+    mediaQuery.addListener(updateSystemTheme);
+    return () => mediaQuery.removeListener(updateSystemTheme);
+  }, []);
+
+  const resolvedTheme: Theme = theme === "system" ? systemTheme : theme;
 
   React.useEffect(() => {
     const root = document.documentElement;
-    root.classList.toggle("dark", theme === "dark");
+    root.classList.toggle("dark", resolvedTheme === "dark");
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-  }, [theme]);
+  }, [resolvedTheme, theme]);
 
-  const setTheme = React.useCallback((nextTheme: Theme) => {
+  const setTheme = React.useCallback((nextTheme: ThemePreference) => {
     setThemeState(nextTheme);
   }, []);
 
   const value = React.useMemo<ThemeContextValue>(() => ({
-    resolvedTheme: theme,
+    theme,
+    resolvedTheme,
     setTheme,
-  }), [setTheme, theme]);
+  }), [setTheme, theme, resolvedTheme]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
@@ -52,7 +79,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 export function useTheme() {
   const context = React.useContext(ThemeContext);
   if (!context) {
-    throw new Error("useTheme must be used within ThemeProvider");
+    throw new Error("theme_provider_missing");
   }
 
   return context;

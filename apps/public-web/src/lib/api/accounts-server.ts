@@ -183,7 +183,7 @@ export async function updateMyProfile(
   if ("error" in response) {
     return {
       kind: "upstreamError",
-      message: "The profile service is currently unavailable.",
+      message: "public_web_profile_service_unavailable",
       problem: response.error.problem,
       status: response.error.status,
     };
@@ -193,7 +193,7 @@ export async function updateMyProfile(
   if (status === 200) {
     const normalized = normalizeMyProfile(data);
     if (!normalized) {
-      return { kind: "unknownError", message: "Unexpected profile response format.", status };
+      return { kind: "unknownError", message: "public_web_profile_response_invalid", status };
     }
 
     return { kind: "success", profile: normalized };
@@ -204,7 +204,7 @@ export async function updateMyProfile(
     return {
       kind: "validationError",
       errors: problem.errors ?? {},
-      message: problem.detail ?? problem.title,
+      message: getProblemMessageCode(problem, "public_web_profile_validation_error"),
       problem,
     };
   }
@@ -216,7 +216,7 @@ export async function updateMyProfile(
   if (status >= 500) {
     return {
       kind: "upstreamError",
-      message: "The profile service is currently unavailable.",
+      message: "public_web_profile_service_unavailable",
       problem,
       status,
     };
@@ -224,7 +224,7 @@ export async function updateMyProfile(
 
   return {
     kind: "unknownError",
-    message: problem.detail ?? problem.title,
+    message: getProblemMessageCode(problem, "public_web_profile_unknown_error"),
     problem,
     status,
   };
@@ -241,7 +241,7 @@ export async function createAvatarUploadIntent(
   if ("error" in response) {
     return {
       kind: "upstreamError",
-      message: "Avatar upload intent service is currently unavailable.",
+      message: "public_web_avatar_upload_intent_service_unavailable",
       problem: response.error.problem,
       status: response.error.status,
     };
@@ -251,7 +251,7 @@ export async function createAvatarUploadIntent(
   if (status === 200) {
     const normalized = normalizeAvatarUploadIntent(data);
     if (!normalized) {
-      return { kind: "unknownError", message: "Unexpected upload intent response format.", status };
+      return { kind: "unknownError", message: "public_web_avatar_upload_intent_response_invalid", status };
     }
 
     return { kind: "success", intent: normalized };
@@ -262,7 +262,7 @@ export async function createAvatarUploadIntent(
     return {
       kind: "validationError",
       errors: problem.errors ?? {},
-      message: problem.detail ?? problem.title,
+      message: getProblemMessageCode(problem, "public_web_avatar_upload_intent_validation_error"),
       problem,
     };
   }
@@ -272,7 +272,7 @@ export async function createAvatarUploadIntent(
   if (status >= 500) {
     return {
       kind: "upstreamError",
-      message: "Avatar upload intent service is currently unavailable.",
+      message: "public_web_avatar_upload_intent_service_unavailable",
       problem,
       status,
     };
@@ -280,7 +280,63 @@ export async function createAvatarUploadIntent(
 
   return {
     kind: "unknownError",
-    message: problem.detail ?? problem.title,
+    message: getProblemMessageCode(problem, "public_web_avatar_upload_intent_unknown_error"),
+    problem,
+    status,
+  };
+}
+
+export async function createCoverPhotoUploadIntent(
+  input: CreateAvatarUploadIntentInput,
+): Promise<CreateAvatarUploadIntentResult> {
+  const response = await requestGateway("/api/accounts/profiles/me/cover-photo/upload-intent", {
+    body: input,
+    method: "POST",
+  });
+
+  if ("error" in response) {
+    return {
+      kind: "upstreamError",
+      message: "public_web_cover_photo_upload_intent_service_unavailable",
+      problem: response.error.problem,
+      status: response.error.status,
+    };
+  }
+
+  const { data, status } = response;
+  if (status === 200) {
+    const normalized = normalizeAvatarUploadIntent(data);
+    if (!normalized) {
+      return { kind: "unknownError", message: "public_web_cover_photo_upload_intent_response_invalid", status };
+    }
+
+    return { kind: "success", intent: normalized };
+  }
+
+  const problem = parseProblemDetails(data, status);
+  if (status === 400) {
+    return {
+      kind: "validationError",
+      errors: problem.errors ?? {},
+      message: getProblemMessageCode(problem, "public_web_cover_photo_upload_intent_validation_error"),
+      problem,
+    };
+  }
+
+  if (status === 401) return { kind: "unauthorized", problem };
+  if (status === 403) return { kind: "forbidden", problem };
+  if (status >= 500) {
+    return {
+      kind: "upstreamError",
+      message: "public_web_cover_photo_upload_intent_service_unavailable",
+      problem,
+      status,
+    };
+  }
+
+  return {
+    kind: "unknownError",
+    message: getProblemMessageCode(problem, "public_web_cover_photo_upload_intent_unknown_error"),
     problem,
     status,
   };
@@ -297,7 +353,7 @@ export async function completeAvatarUpload(
   if ("error" in response) {
     return {
       kind: "upstreamError",
-      message: "Avatar completion service is currently unavailable.",
+      message: "public_web_avatar_completion_service_unavailable",
       problem: response.error.problem,
       status: response.error.status,
     };
@@ -307,7 +363,7 @@ export async function completeAvatarUpload(
   if (status === 200) {
     const normalized = normalizeMyProfile(data);
     if (!normalized) {
-      return { kind: "unknownError", message: "Unexpected profile response format.", status };
+      return { kind: "unknownError", message: "public_web_avatar_completion_response_invalid", status };
     }
 
     return { kind: "success", profile: normalized };
@@ -318,7 +374,7 @@ export async function completeAvatarUpload(
     return {
       kind: "validationError",
       errors: problem.errors ?? {},
-      message: problem.detail ?? problem.title,
+      message: getProblemMessageCode(problem, "public_web_avatar_completion_validation_error"),
       problem,
     };
   }
@@ -329,7 +385,7 @@ export async function completeAvatarUpload(
   if (status >= 500) {
     return {
       kind: "upstreamError",
-      message: "Avatar completion service is currently unavailable.",
+      message: "public_web_avatar_completion_service_unavailable",
       problem,
       status,
     };
@@ -337,7 +393,64 @@ export async function completeAvatarUpload(
 
   return {
     kind: "unknownError",
-    message: problem.detail ?? problem.title,
+    message: getProblemMessageCode(problem, "public_web_avatar_completion_unknown_error"),
+    problem,
+    status,
+  };
+}
+
+export async function completeCoverPhotoUpload(
+  input: CompleteAvatarUploadInput,
+): Promise<CompleteAvatarUploadResult> {
+  const response = await requestGateway("/api/accounts/profiles/me/cover-photo/complete", {
+    body: input,
+    method: "POST",
+  });
+
+  if ("error" in response) {
+    return {
+      kind: "upstreamError",
+      message: "public_web_cover_photo_completion_service_unavailable",
+      problem: response.error.problem,
+      status: response.error.status,
+    };
+  }
+
+  const { data, status } = response;
+  if (status === 200) {
+    const normalized = normalizeMyProfile(data);
+    if (!normalized) {
+      return { kind: "unknownError", message: "public_web_cover_photo_completion_response_invalid", status };
+    }
+
+    return { kind: "success", profile: normalized };
+  }
+
+  const problem = parseProblemDetails(data, status);
+  if (status === 400) {
+    return {
+      kind: "validationError",
+      errors: problem.errors ?? {},
+      message: getProblemMessageCode(problem, "public_web_cover_photo_completion_validation_error"),
+      problem,
+    };
+  }
+
+  if (status === 401) return { kind: "unauthorized", problem };
+  if (status === 403) return { kind: "forbidden", problem };
+  if (status === 404) return { kind: "notFound", problem };
+  if (status >= 500) {
+    return {
+      kind: "upstreamError",
+      message: "public_web_cover_photo_completion_service_unavailable",
+      problem,
+      status,
+    };
+  }
+
+  return {
+    kind: "unknownError",
+    message: getProblemMessageCode(problem, "public_web_cover_photo_completion_unknown_error"),
     problem,
     status,
   };
@@ -419,6 +532,21 @@ function parseProblemDetails(data: unknown, status: number): AccountsProblemDeta
     traceId: toOptionalString(readProblemValue(value, "traceId", "TraceId")),
     type: toOptionalString(readProblemValue(value, "type", "Type")),
   };
+}
+
+function getProblemMessageCode(
+  problem: AccountsProblemDetails | undefined,
+  fallback: string,
+) {
+  if (problem?.errorCode) {
+    return problem.errorCode
+  }
+
+  if (problem?.status) {
+    return `${fallback}_${problem.status}`
+  }
+
+  return fallback
 }
 
 function toOptionalString(value: unknown) {

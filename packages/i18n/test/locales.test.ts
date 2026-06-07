@@ -32,7 +32,7 @@ describe("locale core", () => {
 
   it("asserts locale", () => {
     expect(() => assertSupportedLocale("sv-SE")).not.toThrow();
-    expect(() => assertSupportedLocale("x")).toThrow("Unsupported locale");
+    expect(() => assertSupportedLocale("x")).toThrow("unsupported_locale_x");
   });
 
   it("returns metadata and getters", () => {

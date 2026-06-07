@@ -81,7 +81,7 @@ export const isSupportedLocale = (value: unknown): value is SupportedLocale => {
 
 export const assertSupportedLocale = (value: unknown): asserts value is SupportedLocale => {
   if (!isSupportedLocale(value)) {
-    throw new Error(`Unsupported locale: ${String(value)}`);
+    throw new Error(`unsupported_locale_${String(value)}`);
   }
 };
 

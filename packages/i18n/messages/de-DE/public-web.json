@@ -2,6 +2,18 @@
   "brand": {
     "communityBadge": "Norge360 lokale Gemeinschaft"
   },
+  "metadata": {
+    "title": "Norge360",
+    "description": "Norge360 öffentliches Web"
+  },
+  "communityFooter": {
+    "about": "Über uns",
+    "accessibility": "Barrierefreiheit",
+    "help": "Hilfe",
+    "services": "Dienste",
+    "settings": "Einstellungen",
+    "copyright": "Copyright {year} Norge360"
+  },
   "profile": {
     "status": {
       "forbiddenTitle": "Zugriff eingeschränkt",
@@ -13,14 +25,32 @@
       "editProfile": "Profil bearbeiten",
       "message": "Nachricht senden",
       "follow": "Folgen",
+      "following": "Following",
+      "unfollow": "Unfollow",
       "occupationFallback": "Mitglied der Gemeinschaft",
       "coverAlt": "Titelbild für {name}",
-      "avatarAlt": "Profilbild für {name}"
+      "avatarAlt": "Profilbild für {name}",
+      "requested": "Requested",
+      "cancelRequest": "Cancel request",
+      "notificationsOn": "Notifications on",
+      "notificationsOff": "Notify me"
     },
     "stats": {
       "posts": "Beiträge",
       "followers": "Follower",
       "following": "Folgt"
+    },
+    "social": {
+      "followersTitle": "Followers",
+      "followingTitle": "Following",
+      "followersDescription": "People following @{username}.",
+      "followingDescription": "People @{username} follows.",
+      "emptyFollowers": "No followers yet.",
+      "emptyFollowing": "Not following anyone yet.",
+      "loadError": "People could not be loaded.",
+      "loadMore": "Load more",
+      "viewProfile": "View profile",
+      "actionError": "Follow action could not be completed."
     },
     "feed": {
       "title": "Community-Feed",
@@ -62,6 +92,14 @@
       "unblock": "Unblock user",
       "report": "Report",
       "reportSoon": "Reporting will be available soon."
+    },
+    "blocked": {
+      "title": "Blocked users",
+      "description": "People you block cannot interact with your profile until you unblock them.",
+      "empty": "No blocked users yet.",
+      "loadError": "Blocked users could not be loaded.",
+      "loadMore": "Load more",
+      "unblock": "Unblock"
     }
   },
   "onboarding": {
@@ -140,9 +178,29 @@
       "updating": "Wird aktualisiert...",
       "updateButton": "Avatar hochladen"
     },
+    "coverPhoto": {
+      "title": "Cover photo",
+      "description": "JPG, PNG or WebP. Up to 10 MB.",
+      "hint": "Use a wide image for the best profile header result.",
+      "optional": "Optional",
+      "fileLabel": "Cover photo file",
+      "fileSelected": "{fileName} ({fileSize})",
+      "fileDefault": "You can upload only JPG, PNG or WebP.",
+      "validImage": "Select a valid image.",
+      "fileTooLarge": "The file size can be at most 10 MB.",
+      "uploadStartError": "Cover photo upload could not be started.",
+      "uploadFormatError": "Cover photo upload response was not in the expected format.",
+      "uploadFailed": "The image file could not be uploaded. Please try again.",
+      "attachFailed": "Cover photo could not be attached to the profile.",
+      "profileUnreadable": "Cover photo was updated, but the profile data could not be read.",
+      "unexpectedError": "An unexpected error occurred during cover photo upload.",
+      "updating": "Updating...",
+      "updateButton": "Upload cover photo"
+    },
     "alert": {
       "successTitle": "Erfolgreich",
       "avatarErrorTitle": "Der Avatar konnte nicht aktualisiert werden",
+      "coverPhotoErrorTitle": "Das Titelbild konnte nicht aktualisiert werden",
       "saveErrorTitle": "Das Profil konnte nicht aktualisiert werden",
       "successMessage": "Deine Profilinformationen wurden aktualisiert.",
       "validationMessage": "Bitte überprüfe die Felder.",
@@ -179,6 +237,68 @@
     "actions": {
       "save": "Änderungen speichern",
       "saving": "Wird gespeichert..."
+    },
+    "notifications": {
+      "sidebarLabel": "Notifications",
+      "title": "Notification preferences",
+      "description": "Choose which in-app notifications you want to receive.",
+      "loadError": "Notification preferences could not be loaded.",
+      "retry": "Retry",
+      "save": "Save preferences",
+      "saved": "Preferences saved.",
+      "saveError": "Preferences could not be saved.",
+      "categories": {
+        "community": "Community",
+        "security": "Security",
+        "social": "Social",
+        "system": "System"
+      },
+      "types": {
+        "newFollower": {
+          "label": "New followers",
+          "description": "When someone follows you."
+        },
+        "followRequest": {
+          "label": "Follow requests",
+          "description": "When someone asks to follow your private profile."
+        },
+        "followRequestAccepted": {
+          "label": "Accepted follow requests",
+          "description": "When your follow request is accepted."
+        },
+        "profilePost": {
+          "label": "Profile bell posts",
+          "description": "When a profile you subscribed to shares a post."
+        },
+        "cityPost": {
+          "label": "City posts",
+          "description": "When a post is shared for your city."
+        },
+        "followedFirstPost": {
+          "label": "First posts from people you follow",
+          "description": "When someone you follow shares their first post."
+        },
+        "postLike": {
+          "label": "Post likes",
+          "description": "When your post receives a like."
+        },
+        "commentLike": {
+          "label": "Comment likes",
+          "description": "When your comment receives a like."
+        },
+        "postComment": {
+          "label": "Post comments",
+          "description": "When someone comments on your post."
+        },
+        "commentReply": {
+          "label": "Comment replies",
+          "description": "When someone replies to your comment."
+        },
+        "generic": {
+          "label": "Other notifications",
+          "description": "Other relevant account or community updates."
+        }
+      }
     }
   },
   "search": {
@@ -194,14 +314,47 @@
       }
     }
   },
+  "discovery": {
+    "page": {
+      "title": "Entdecken-Hub",
+      "description": "Entdecke Menschen und Signale aus der Community."
+    },
+    "sections": {
+      "popular": "Beliebte Personen",
+      "trending": "Trendende Personen",
+      "suggested": "Vorschläge zum Folgen"
+    },
+    "actions": {
+      "follow": "Folgen",
+      "viewMore": "Mehr anzeigen"
+    },
+    "errors": {
+      "loadFailed": "Der Entdecken-Hub konnte nicht geladen werden."
+    }
+  },
   "community": {
+    "location": {
+      "general": "Allgemein"
+    },
     "feed": {
       "title": "Community-Feed",
       "emptyTitle": "Noch keine Beitr?ge",
       "emptyDescription": "Teile als Erste:r etwas mit der Community.",
       "loadMore": "Mehr laden",
       "loading": "Feed wird geladen...",
-      "error": "Feed konnte nicht geladen werden."
+      "error": "Feed konnte nicht geladen werden.",
+      "sortBest": "Am besten bewertet",
+      "sortNew": "Neueste",
+      "sortLiked": "Am h?ufigsten geliked",
+      "sortCommented": "Am meisten kommentiert",
+      "sortTrending": "Im Trend",
+      "noCityResults": "Leider wurden keine Beitr?ge f?r die gesuchte Stadt gefunden. Unten k?nnen Sie weiterhin Beitr?ge aus anderen St?dten durchsuchen.",
+      "otherCities": "Andere St?dte",
+      "sortPlaceholder": "Sortieren nach",
+      "cityPlaceholder": "Stadt ausw?hlen",
+      "districtPlaceholder": "Bezirk ausw?hlen",
+      "allCities": "Alle St?dte",
+      "allDistricts": "Alle Bezirke"
     },
     "post": {
       "createTitle": "Beitrag erstellen",
@@ -223,6 +376,8 @@
       "mediaOptimizingNotice": "Bilder ?ber 1 MB k?nnen im Backend automatisch optimiert werden.",
       "authorFallback": "Community-Mitglied",
       "mediaAlt": "Beitragsbild",
+      "backToFeed": "Zur?ck zum Feed",
+      "moreActions": "Mehr",
       "edit": "Bearbeiten",
       "editTitle": "Beitrag bearbeiten",
       "saveChanges": "?nderungen speichern",
@@ -243,7 +398,15 @@
     "comment": {
       "title": "Kommentare",
       "placeholder": "Kommentar schreiben",
+      "hint": "Teile deine Gedanken zu diesem Beitrag.",
+      "replyPrompt": "Schreibe deine Antwort",
       "reply": "Antworten",
+      "delete": "Kommentar löschen",
+      "deleteTitle": "Kommentar löschen",
+      "deleteDescription": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "deleteConfirm": "Löschen",
+      "deleteCancel": "Abbrechen",
+      "deleteConfirmPrompt": "Diesen Kommentar löschen?",
       "send": "Senden",
       "empty": "Noch keine Kommentare.",
       "loading": "Kommentare werden geladen...",
@@ -251,7 +414,8 @@
     },
     "reaction": {
       "add": "Reaktion hinzuf?gen",
-      "remove": "Reaktion entfernen"
+      "remove": "Reaktion entfernen",
+      "current": "Ausgew?hlte Reaktion: {reaction}"
     },
     "report": {
       "title": "Melden",
@@ -274,10 +438,36 @@
       "unauthorized": "Bitte melde dich an.",
       "validation": "Bitte pr?fe deine Eingaben."
     },
+    "scaffold": {
+      "home": "Start",
+      "discover": "Entdecken",
+      "notifications": "Benachrichtigungen",
+      "profile": "Profil",
+      "bookmarks": "Lesezeichen",
+      "settings": "Einstellungen",
+      "privacyPolicy": "Datenschutzrichtlinie",
+      "termsOfService": "Nutzungsbedingungen"
+    },
     "moderation": {
       "reports": "Meldungen",
       "hide": "Ausblenden",
       "restore": "Wiederherstellen"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Your recent follows, requests, post activity, comments and community updates.",
+    "loginRequiredTitle": "Sign in required",
+    "loginRequiredDescription": "Sign in to view your notifications.",
+    "empty": "No notifications yet.",
+    "loadError": "Notifications could not be loaded.",
+    "loadMore": "Load more",
+    "viewAll": "View all",
+    "unseenBadge": "Unread notifications",
+    "actions": {
+      "accept": "Accept",
+      "done": "Done",
+      "followBack": "Follow back"
     }
   }
 }

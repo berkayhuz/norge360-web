@@ -22,14 +22,14 @@ export async function proxySearchRequest(
   request: NextRequest,
   params: SearchProxyParams,
 ) {
-  const { env, error } = tryGetServerEnv();
+  const { env } = tryGetServerEnv();
   if (!env) {
     return NextResponse.json(
       {
-        detail: error.issues.map((issue) => issue.message).join("; "),
         errorCode: "public_web_config_invalid",
         status: 500,
-        title: "Public web configuration error",
+        detail: "public_web_config_invalid",
+        title: "public_web_config_invalid",
       },
       { status: 500 },
     );
@@ -38,7 +38,7 @@ export async function proxySearchRequest(
   const searchPath = params.path.length > 0 ? `/${params.path.join("/")}` : "";
   if (!isAllowedSearchRoute(request.method, searchPath)) {
     return NextResponse.json(
-      { errorCode: "search_proxy_route_not_allowed", status: 404, title: "Search endpoint is not allowed" },
+      { errorCode: "search_proxy_route_not_allowed", status: 404, title: "search_proxy_route_not_allowed" },
       { status: 404 },
     );
   }
@@ -58,10 +58,10 @@ export async function proxySearchRequest(
   } catch {
     return NextResponse.json(
       {
-        detail: "Search service could not be reached.",
         errorCode: "search_service_unavailable",
         status: 503,
-        title: "Search service unavailable",
+        detail: "search_service_unavailable",
+        title: "search_service_unavailable",
       },
       { status: 503 },
     );

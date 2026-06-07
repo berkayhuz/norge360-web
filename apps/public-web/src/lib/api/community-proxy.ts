@@ -5,6 +5,10 @@ import { tryGetServerEnv } from "@/lib/env/server";
 const COMMUNITY_ALLOWED_ROUTES: Array<{ method: string; pattern: RegExp }> = [
   { method: "GET", pattern: /^\/feed$/ },
   { method: "GET", pattern: /^\/users\/[A-Za-z0-9-]{1,64}\/posts$/ },
+  { method: "GET", pattern: /^\/[A-Za-z0-9-]{1,64}\/feed\/[A-Za-z0-9-]{1,64}$/ },
+  { method: "GET", pattern: /^\/[A-Za-z0-9-]{1,64}\/feed\/[A-Za-z0-9-]{1,64}\/comments$/ },
+  { method: "GET", pattern: /^\/[A-Za-z0-9-]{1,64}\/feed\/[A-Za-z0-9-]{1,64}\/comments\/[A-Za-z0-9-]{1,64}$/ },
+  { method: "GET", pattern: /^\/[A-Za-z0-9-]{1,64}\/feed\/[A-Za-z0-9-]{1,64}\/comments\/[A-Za-z0-9-]{1,64}\/replies$/ },
   { method: "POST", pattern: /^\/posts$/ },
   { method: "GET", pattern: /^\/posts\/[A-Za-z0-9-]{1,64}$/ },
   { method: "PUT", pattern: /^\/posts\/[A-Za-z0-9-]{1,64}$/ },
@@ -23,6 +27,8 @@ const COMMUNITY_ALLOWED_ROUTES: Array<{ method: string; pattern: RegExp }> = [
   { method: "POST", pattern: /^\/posts\/[A-Za-z0-9-]{1,64}\/reports$/ },
   { method: "POST", pattern: /^\/comments\/[A-Za-z0-9-]{1,64}\/replies$/ },
   { method: "DELETE", pattern: /^\/comments\/[A-Za-z0-9-]{1,64}$/ },
+  { method: "GET", pattern: /^\/comments\/[A-Za-z0-9-]{1,64}$/ },
+  { method: "GET", pattern: /^\/comments\/[A-Za-z0-9-]{1,64}\/replies$/ },
   { method: "POST", pattern: /^\/comments\/[A-Za-z0-9-]{1,64}\/like$/ },
   { method: "DELETE", pattern: /^\/comments\/[A-Za-z0-9-]{1,64}\/like$/ },
   { method: "POST", pattern: /^\/comments\/[A-Za-z0-9-]{1,64}\/reactions$/ },
@@ -40,16 +46,16 @@ const RESPONSE_HEADERS_TO_FORWARD = ["cache-control", "content-language", "conte
 type CommunityProxyParams = { path: string[] };
 
 export async function proxyCommunityRequest(request: NextRequest, params: CommunityProxyParams) {
-  const { env, error } = tryGetServerEnv();
+  const { env } = tryGetServerEnv();
   if (!env) {
-    return NextResponse.json({ detail: error.issues.map((issue) => issue.message).join("; "), errorCode: "public_web_config_invalid", status: 500, title: "Public web configuration error" }, { status: 500 });
+    return NextResponse.json({ detail: "public_web_config_invalid", errorCode: "public_web_config_invalid", status: 500, title: "public_web_config_invalid" }, { status: 500 });
   }
 
   const communityPath = `/${params.path.join("/")}`;
   const method = request.method.toUpperCase();
 
   if (!isAllowedCommunityRoute(method, communityPath)) {
-    return NextResponse.json({ errorCode: "community_proxy_route_not_allowed", status: 404, title: "Community endpoint is not allowed" }, { status: 404 });
+    return NextResponse.json({ errorCode: "community_proxy_route_not_allowed", status: 404, title: "community_proxy_route_not_allowed" }, { status: 404 });
   }
 
   const upstreamUrl = new URL(`/api/community${communityPath}`, env.gatewayApiBaseUrl);
@@ -66,7 +72,7 @@ export async function proxyCommunityRequest(request: NextRequest, params: Commun
       signal: AbortSignal.timeout(20_000),
     });
   } catch {
-    return NextResponse.json({ detail: "Community service could not be reached.", errorCode: "community_service_unavailable", status: 503, title: "Community service unavailable" }, { status: 503 });
+    return NextResponse.json({ detail: "community_service_unavailable", errorCode: "community_service_unavailable", status: 503, title: "community_service_unavailable" }, { status: 503 });
   }
 
   const responseHeaders = new Headers();

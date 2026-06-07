@@ -14,7 +14,9 @@ export type MyProfile = {
   followingCount: number;
   id: string;
   isVerified: boolean;
+  hideLikeCounts: boolean;
   lastSeenAt: string | null;
+  commentAudience: string;
   normalizedUsername: string;
   occupation: string | null;
   postsCount: number;
@@ -38,8 +40,14 @@ export type PublicProfile = {
   followersCount: number | null;
   followingCount: number | null;
   id: string;
+  isFollowedByCurrentUser: boolean | null;
+  isFollowingCurrentUser: boolean | null;
+  isFollowRequestPending: boolean | null;
+  isProfileNotificationsEnabled: boolean | null;
   isVerified: boolean;
+  hideLikeCounts: boolean;
   lastSeenAt: string | null;
+  commentAudience: string;
   occupation: string | null;
   postsCount: number | null;
   profileVisibility: string;
@@ -75,8 +83,10 @@ export type UpdateMyProfileInput = {
   city?: string | null;
   company?: string | null;
   country?: string | null;
+  commentAudience?: string | null;
   displayName?: string | null;
   district?: string | null;
+  hideLikeCounts?: boolean | null;
   occupation?: string | null;
   profileVisibility?: string | null;
   website?: string | null;
@@ -223,11 +233,13 @@ export function normalizeMyProfile(input: unknown): MyProfile | null {
     country: readNullableString(source, "country", "Country"),
     coverPhotoUrl: readNullableString(source, "coverPhotoUrl", "CoverPhotoUrl"),
     createdAt,
+    commentAudience: readString(source, "commentAudience", "CommentAudience") ?? "Followers",
     displayName: readNullableString(source, "displayName", "DisplayName"),
     district: readNullableString(source, "district", "District"),
     followersCount,
     followingCount,
     id,
+    hideLikeCounts: readBoolean(source, "hideLikeCounts", "HideLikeCounts") ?? false,
     isVerified,
     lastSeenAt: readNullableString(source, "lastSeenAt", "LastSeenAt"),
     normalizedUsername,
@@ -263,11 +275,17 @@ export function normalizePublicProfile(input: unknown): PublicProfile | null {
     country: readNullableString(source, "country", "Country"),
     coverPhotoUrl: readNullableString(source, "coverPhotoUrl", "CoverPhotoUrl"),
     createdAt: readNullableString(source, "createdAt", "CreatedAt"),
+    commentAudience: readString(source, "commentAudience", "CommentAudience") ?? "Followers",
     displayName: readNullableString(source, "displayName", "DisplayName"),
     district: readNullableString(source, "district", "District"),
     followersCount: readNullableNumber(source, "followersCount", "FollowersCount"),
     followingCount: readNullableNumber(source, "followingCount", "FollowingCount"),
     id,
+    hideLikeCounts: readBoolean(source, "hideLikeCounts", "HideLikeCounts") ?? false,
+    isFollowedByCurrentUser: readNullableBoolean(source, "isFollowedByCurrentUser", "IsFollowedByCurrentUser"),
+    isFollowingCurrentUser: readNullableBoolean(source, "isFollowingCurrentUser", "IsFollowingCurrentUser"),
+    isFollowRequestPending: readNullableBoolean(source, "isFollowRequestPending", "IsFollowRequestPending"),
+    isProfileNotificationsEnabled: readNullableBoolean(source, "isProfileNotificationsEnabled", "IsProfileNotificationsEnabled"),
     isVerified,
     lastSeenAt: readNullableString(source, "lastSeenAt", "LastSeenAt"),
     occupation: readNullableString(source, "occupation", "Occupation"),
@@ -408,6 +426,13 @@ function readNullableNumber(source: Record<string, unknown>, ...keys: string[]) 
 
 function readBoolean(source: Record<string, unknown>, ...keys: string[]) {
   const value = readValue(source, ...keys);
+  if (typeof value !== "boolean") return null;
+  return value;
+}
+
+function readNullableBoolean(source: Record<string, unknown>, ...keys: string[]) {
+  const value = readValue(source, ...keys);
+  if (value === null || value === undefined) return null;
   if (typeof value !== "boolean") return null;
   return value;
 }

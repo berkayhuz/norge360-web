@@ -32,7 +32,13 @@ export const TurnstileWidget = React.forwardRef<TurnstileWidgetHandle, Turnstile
   { disabled = false },
   ref
 ) {
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? (process.env.NODE_ENV === "test" ? "test-site-key" : "")
+  const siteKey =
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ??
+    (process.env.NODE_ENV === "test"
+      ? "test-site-key"
+      : process.env.NODE_ENV === "development"
+        ? "0x4AAAAAADYZs62J8mYwqUhP"
+        : "")
   const widgetRef = React.useRef<HTMLDivElement | null>(null)
   const widgetIdRef = React.useRef<string | null>(null)
   const [token, setToken] = React.useState("")

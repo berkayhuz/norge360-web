@@ -103,7 +103,7 @@ export function normalizeCommunityDistrictValue(city?: string | null, district?:
 
 export function getCommunityLocationLabel(city?: string | null, district?: string | null) {
   if (!city || !district) {
-    return "Genel";
+    return null;
   }
 
   const cityOption = COMMUNITY_LOCATION_OPTIONS.find(

@@ -54,7 +54,7 @@ export function getProblemMessageKey(problem: ProblemDetails): AuthErrorMessageK
 }
 
 function getDefaultProblemUserMessage(problem: ProblemDetails): string {
-  return problem.title?.trim() || "Request failed"
+  return problem.title?.trim() || getProblemFallbackKey(problem)
 }
 
 function getKnownErrorMessageKey(errorCode: string | undefined) {
@@ -103,10 +103,22 @@ export async function parseProblemResponse(response: Response) {
 
   return new ApiProblemError({
     status: response.status,
-    title: response.statusText
+    title: `auth_http_${response.status}`
   })
 }
 
 function isProblemDetails(value: unknown): value is ProblemDetails {
   return typeof value === "object" && value !== null
+}
+
+function getProblemFallbackKey(problem: ProblemDetails) {
+  if (problem.errorCode) {
+    return problem.errorCode
+  }
+
+  if (problem.status) {
+    return `auth_problem_${problem.status}`
+  }
+
+  return "auth_problem_unknown"
 }

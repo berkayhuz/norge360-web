@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export async function GET(request: NextRequest) {
   const { env } = tryGetServerEnv();
   if (!env) {
-    return NextResponse.json({ title: "Public web configuration error" }, { status: 500 });
+    return NextResponse.json({ errorCode: "public_web_config_invalid", title: "public_web_config_invalid" }, { status: 500 });
   }
 
   const upstreamUrl = new URL("/api/auth/session-status", env.gatewayApiBaseUrl);
@@ -34,6 +34,6 @@ export async function GET(request: NextRequest) {
     const session = await response.json().catch(() => null);
     return NextResponse.json({ authenticated: true, session }, { status: 200 });
   } catch {
-    return NextResponse.json({ title: "Auth service unavailable" }, { status: 503 });
+    return NextResponse.json({ errorCode: "auth_service_unavailable", title: "auth_service_unavailable" }, { status: 503 });
   }
 }

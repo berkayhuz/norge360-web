@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 import "./globals.css";
 
@@ -18,10 +19,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Norge360",
-  description: "Norge360 public web sitesi",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("public-web");
+
+  return {
+    title: t("metadata.title"),
+    description: t("metadata.description"),
+  };
+}
 
 export default async function RootLayout({
   children,

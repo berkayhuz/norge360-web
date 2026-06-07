@@ -36,7 +36,7 @@ function useCarousel() {
   const context = React.useContext(CarouselContext)
 
   if (!context) {
-    throw new Error("useCarousel must be used within a <Carousel />")
+    throw new Error("ui_carousel_missing_provider")
   }
 
   return context
@@ -197,7 +197,7 @@ function CarouselPrevious({
       {...props}
     >
       <ChevronLeftIcon className="rtl:rotate-180" />
-      <span className="sr-only">Previous slide</span>
+      <span className="sr-only">ui.carousel.previousSlide</span>
     </Button>
   )
 }
@@ -227,7 +227,7 @@ function CarouselNext({
       {...props}
     >
       <ChevronRightIcon className="rtl:rotate-180" />
-      <span className="sr-only">Next slide</span>
+      <span className="sr-only">ui.carousel.nextSlide</span>
     </Button>
   )
 }
