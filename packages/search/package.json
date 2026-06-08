@@ -24,7 +24,7 @@
   "devDependencies": {
     "@norge360/eslint-config": "workspace:*",
     "@norge360/typescript-config": "workspace:*",
-    "eslint": "^9",
+    "eslint": "^10",
     "typescript": "^5.9.3"
   }
 }

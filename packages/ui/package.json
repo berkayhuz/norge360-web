@@ -39,7 +39,7 @@
     "@types/react-dom": "^19",
     "@norge360/eslint-config": "workspace:*",
     "@norge360/typescript-config": "workspace:*",
-    "eslint": "^9",
+    "eslint": "^10",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
