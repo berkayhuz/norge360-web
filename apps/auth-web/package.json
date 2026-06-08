@@ -32,7 +32,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-react": "^6.0.2",
     "@norge360/eslint-config": "workspace:^",
     "@norge360/typescript-config": "workspace:*",
     "eslint": "^9",
