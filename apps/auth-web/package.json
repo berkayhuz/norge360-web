@@ -36,7 +36,7 @@
     "@norge360/eslint-config": "workspace:^",
     "@norge360/typescript-config": "workspace:*",
     "eslint": "^9",
-    "jsdom": "^27.2.0",
+    "jsdom": "^29.1.1",
     "typescript": "^5",
     "vitest": "^4.0.14"
   }
