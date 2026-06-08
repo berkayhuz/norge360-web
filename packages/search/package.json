@@ -25,6 +25,6 @@
     "@norge360/eslint-config": "workspace:*",
     "@norge360/typescript-config": "workspace:*",
     "eslint": "^9",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   }
 }
