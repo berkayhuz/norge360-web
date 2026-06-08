@@ -35,7 +35,7 @@
     "@vitejs/plugin-react": "^5.1.1",
     "@norge360/eslint-config": "workspace:^",
     "@norge360/typescript-config": "workspace:*",
-    "eslint": "^9",
+    "eslint": "^10",
     "jsdom": "^27.2.0",
     "typescript": "^5",
     "vitest": "^4.0.14"
