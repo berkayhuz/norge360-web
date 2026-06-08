@@ -6,6 +6,7 @@ const DEFAULT_PUBLIC_WEB_APP_URL = "http://localhost:3000";
 const envSchema = z.object({
   authCookieNames: z.object({
     access: z.string().min(1),
+    refresh: z.string().min(1),
     session: z.string().min(1),
   }),
   internalApiBaseUrl: z.string().url(),
@@ -31,6 +32,7 @@ export function getServerEnv(): PublicWebServerEnv {
   return envSchema.parse({
     authCookieNames: {
       access: process.env.AUTH_ACCESS_COOKIE_NAME ?? "Norge360-access",
+      refresh: process.env.AUTH_REFRESH_COOKIE_NAME ?? "Norge360-refresh",
       session: process.env.AUTH_SESSION_COOKIE_NAME ?? "Norge360-session",
     },
     internalApiBaseUrl,
@@ -55,6 +57,7 @@ export function tryGetServerEnv() {
   const result = envSchema.safeParse({
     authCookieNames: {
       access: process.env.AUTH_ACCESS_COOKIE_NAME ?? "Norge360-access",
+      refresh: process.env.AUTH_REFRESH_COOKIE_NAME ?? "Norge360-refresh",
       session: process.env.AUTH_SESSION_COOKIE_NAME ?? "Norge360-session",
     },
     internalApiBaseUrl,

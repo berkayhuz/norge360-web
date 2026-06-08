@@ -9,19 +9,19 @@ export function CommunityFooter() {
   return (
     <div className="space-y-2 px-2">
       <div className="flex items-center justify-between space-x-2">
-        <Link href="" className="text-xs text-muted-foreground hover:underline">
+        <Link href="/about" className="text-xs text-muted-foreground hover:underline">
           {t("communityFooter.about")}
         </Link>
-        <Link href="" className="text-xs text-muted-foreground hover:underline">
+        <Link href="/accessibility" className="text-xs text-muted-foreground hover:underline">
           {t("communityFooter.accessibility")}
         </Link>
-        <Link href="" className="text-xs text-muted-foreground hover:underline">
+        <Link href="/help" className="text-xs text-muted-foreground hover:underline">
           {t("communityFooter.help")}
         </Link>
-        <Link href="" className="text-xs text-muted-foreground hover:underline">
+        <Link href="/services" className="text-xs text-muted-foreground hover:underline">
           {t("communityFooter.services")}
         </Link>
-        <Link href="" className="text-xs text-muted-foreground hover:underline">
+        <Link href="/settings" className="text-xs text-muted-foreground hover:underline">
           {t("communityFooter.settings")}
         </Link>
       </div>

@@ -1,6 +1,6 @@
 export type ProfileSettingsSidebarItem = Readonly<{
   href: string;
-  iconKey: "user" | "shield" | "lock" | "messageCircle" | "heart" | "ban" | "bell";
+  iconKey: "user" | "shield" | "lock" | "messageCircle" | "heart" | "ban" | "bell" | "history";
   label: string;
   searchTerms: readonly string[];
 }>;
@@ -11,6 +11,8 @@ export function buildProfileSettingsSidebarItems(text: {
   blockedUsers: string;
   commentPermissions: string;
   hideLikeCounts: string;
+  messaging: string;
+  searchHistory: string;
   notifications: string;
   security: string;
 }): readonly ProfileSettingsSidebarItem[] {
@@ -50,6 +52,18 @@ export function buildProfileSettingsSidebarItems(text: {
       iconKey: "bell",
       label: text.notifications,
       searchTerms: ["notifications", "notification settings", "follow requests", "follows", "requests", "alerts"],
+    },
+    {
+      href: "/settings/messaging",
+      iconKey: "messageCircle",
+      label: text.messaging,
+      searchTerms: ["messages", "messaging", "chat", "online", "presence", "read receipts", "typing"],
+    },
+    {
+      href: "/settings/search-history",
+      iconKey: "history",
+      label: text.searchHistory,
+      searchTerms: ["search history", "recent searches", "searches", "history", "search"],
     },
     {
       href: "/settings/password-security",

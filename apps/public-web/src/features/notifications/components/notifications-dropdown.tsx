@@ -91,7 +91,7 @@ export function NotificationsDropdown({ className }: NotificationsDropdownProps)
           className={cn("relative text-muted-foreground hover:text-foreground", className)}
           aria-label={t("notifications.title")}
         >
-          <Bell className="size-4" />
+          <Bell className="size-5" />
           {unreadCount > 0 ? (
             <span
               aria-label={t("notifications.unseenBadge")}

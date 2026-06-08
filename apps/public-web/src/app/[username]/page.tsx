@@ -126,6 +126,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
           loginHref={getAuthWebLoginUrl()}
           location={location}
           postsCount={postsCount}
+          profileAuthUserId={profileAuthUserId}
           profile={profile}
           safeAvatarUrl={safeAvatarUrl}
           safeCoverUrl={safeCoverUrl}
@@ -171,6 +172,7 @@ function ProfileHero({
   loginHref,
   location,
   postsCount,
+  profileAuthUserId,
   profile,
   safeAvatarUrl,
   safeCoverUrl,
@@ -187,6 +189,7 @@ function ProfileHero({
   loginHref: string;
   location: string | null;
   postsCount: number;
+  profileAuthUserId: string | null;
   profile: PublicProfile;
   safeAvatarUrl: string | null;
   safeCoverUrl: string | null;
@@ -258,6 +261,7 @@ function ProfileHero({
               isAuthenticated={isAuthenticated}
               isOwnProfile={isOwnProfile}
               loginHref={loginHref}
+              profileAuthUserId={profileAuthUserId}
               profileId={profile.id}
               username={profile.username}
             />

@@ -1,0 +1,6 @@
+
+> public-web@0.0.1 dev C:\Users\berka\Github\Norge360\norge360-web\apps\public-web
+> next dev "--port" "3000"
+
+[?25h
+ ELIFECYCLE  Command failed with exit code 1.

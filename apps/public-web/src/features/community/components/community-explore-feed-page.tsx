@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { CommunityPageScaffold } from "@/features/community/components/community-page-scaffold";
 import { CommunityPostCard } from "@/features/community/components/community-post-card";
 import { useCommunityFeed } from "@/features/community/lib/hooks";
+import { getAuthWebLoginUrl } from "@/lib/auth-web-url";
 import { getClientAuthSessionStatus } from "@/lib/auth/session-status-client";
 
 export function CommunityExploreFeedPage() {
@@ -27,17 +28,22 @@ export function CommunityExploreFeedPage() {
     void (async () => {
       try {
         const response = await getClientAuthSessionStatus();
-        if (!cancelled) {
-          setIsAuthenticated(response.authenticated);
+        if (cancelled) {
+          return;
         }
+        if (!response.authenticated) {
+          window.location.href = getAuthWebLoginUrl();
+          return;
+        }
+
+        setIsAuthenticated(true);
+        await loadInitial();
       } catch {
         if (!cancelled) {
           setIsAuthenticated(false);
         }
       }
     })();
-
-    void loadInitial();
     return () => {
       cancelled = true;
     };

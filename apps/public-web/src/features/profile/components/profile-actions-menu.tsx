@@ -12,6 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/overlay/dropdown-menu";
 
+import { CommunityReportDialog } from "@/features/community/components/community-report-dialog";
+import type { CommunityReportReason } from "@/features/community/lib/types";
+
 type Props = {
   username: string;
   profileId: string;
@@ -28,6 +31,7 @@ export function ProfileActionsMenu({ username, profileId, onBlockChange }: Props
   const translate = t as unknown as (key: string) => string;
   const [loading, setLoading] = useState(false);
   const [blockedByMe, setBlockedByMe] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,21 +80,41 @@ export function ProfileActionsMenu({ username, profileId, onBlockChange }: Props
     }
   }
 
+  async function onReport(reason: CommunityReportReason, description: string) {
+    const response = await fetch(`/api/accounts/reports/${encodeURIComponent(username)}`, {
+      body: JSON.stringify({ reasonCode: reason, description }),
+      credentials: "include",
+      headers: { "content-type": "application/json" },
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      throw new Error("profile_report_failed");
+    }
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button aria-label={translate("profile.actionsMenu.ariaLabel")} size="icon" type="button" variant="outline">
-          <MoreHorizontal className="size-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem disabled={loading} onClick={onToggleBlock}>
-          {blockLabel}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => window.alert(translate("profile.actionsMenu.reportSoon"))}>
-          {translate("profile.actionsMenu.report")}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button aria-label={translate("profile.actionsMenu.ariaLabel")} size="icon" type="button" variant="outline">
+            <MoreHorizontal className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem disabled={loading} onClick={onToggleBlock}>
+            {blockLabel}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setReportOpen(true)}>
+            {translate("profile.actionsMenu.report")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <CommunityReportDialog
+        onOpenChange={setReportOpen}
+        onSubmit={(reason, description) => onReport(reason, description)}
+        open={reportOpen}
+      />
+    </>
   );
 }

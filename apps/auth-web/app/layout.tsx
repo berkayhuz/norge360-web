@@ -74,6 +74,9 @@ export default async function RootLayout({
 
   return (
     <html className={cn("antialiased", fontMono.variable, "font-sans", inter.variable)} lang={locale} suppressHydrationWarning>
+      <head>
+        <script id="theme-bootstrap" dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
+      </head>
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider>{children}</ThemeProvider>
@@ -83,3 +86,5 @@ export default async function RootLayout({
   )
 }
 
+const THEME_BOOTSTRAP_SCRIPT =
+  `try{var key="norge360.theme";var saved=localStorage.getItem(key);var theme=saved==="light"||saved==="dark"||saved==="system"?saved:"system";var dark=theme==="dark"||theme==="system"&&matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",dark);document.documentElement.style.colorScheme=dark?"dark":"light";}catch{}`

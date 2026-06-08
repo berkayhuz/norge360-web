@@ -94,13 +94,13 @@ export function NotificationSettingsForm({ initialPreferences }: NotificationSet
   return (
     <div className="space-y-4">
       {grouped.map((group) => (
-        <Card className="border-border/70" key={group.category}>
-          <CardHeader>
+        <Card className="rounded-none border-none bg-transparent p-0 shadow-none ring-0" key={group.category}>
+          <CardHeader className="px-0">
             <CardTitle className="text-lg">{t(categoryLabelKey(group.category))}</CardTitle>
           </CardHeader>
           <CardContent className="divide-y divide-border/70 p-0">
             {group.items.map((item) => (
-              <div className="flex items-center justify-between gap-4 px-6 py-4" key={item.type}>
+              <div className="flex items-center justify-between gap-4 py-4" key={item.type}>
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-foreground">{t(typeLabelKey(item.type))}</p>
                   <p className="mt-1 text-xs text-muted-foreground">{t(typeDescriptionKey(item.type))}</p>

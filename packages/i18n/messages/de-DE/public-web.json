@@ -91,7 +91,9 @@
       "block": "Block user",
       "unblock": "Unblock user",
       "report": "Report",
-      "reportSoon": "Reporting will be available soon."
+      "reportSoon": "Report this profile",
+      "reportDescription": "Choose a reason for reporting this profile.",
+      "reportSubmitted": "Report submitted."
     },
     "blocked": {
       "title": "Blocked users",
@@ -323,7 +325,8 @@
       "pageTitle": "Password & Security",
       "pageDescription": "Update your password, request an email change, and review active sessions.",
       "actions": {
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "manage": "Manage"
       },
       "alert": {
         "successTitle": "Success",
@@ -401,10 +404,6 @@
         "missingTitle": "Missing protections",
         "missingBadge": "Missing",
         "complete": "Everything required is already enabled."
-      },
-      "actions": {
-        "saving": "Saving...",
-        "manage": "Manage"
       },
       "notifications": {
         "title": "Suspicious login notifications",
@@ -512,6 +511,46 @@
         "show": "Show like counts",
         "hide": "Hide like counts"
       }
+    },
+    "messaging": {
+      "sidebarLabel": "Messages",
+      "title": "Messaging settings",
+      "description": "Control who can message you and how live chat activity is shown.",
+      "loadError": "Messaging settings could not be loaded.",
+      "saveError": "Messaging settings could not be saved.",
+      "saved": "Messaging settings saved.",
+      "messagePermission": "Who can message you",
+      "messagePermissionDescription": "Choose who can start a direct conversation with you.",
+      "groupInvitePermission": "Who can add you to groups",
+      "groupInvitePermissionDescription": "Choose who can invite you to group conversations.",
+      "onlineVisibility": "Online status",
+      "onlineVisibilityDescription": "Choose who can see when you are active in chat.",
+      "readReceipts": "Read receipts",
+      "readReceiptsDescription": "Show blue read indicators only after you read a message.",
+      "typingIndicators": "Typing indicator",
+      "typingIndicatorsDescription": "Let people see when you are typing in a conversation.",
+      "linkPreviews": "Link previews",
+      "linkPreviewsDescription": "Show previews for links shared in messages.",
+      "permissions": {
+        "1": "Everyone",
+        "2": "Followers",
+        "3": "People you follow",
+        "4": "Mutual follows",
+        "5": "Nobody"
+      },
+      "groupInvites": {
+        "1": "Everyone",
+        "2": "People you follow",
+        "3": "Mutual follows",
+        "4": "Nobody"
+      },
+      "online": {
+        "1": "Everyone",
+        "2": "Followers",
+        "3": "People you follow",
+        "4": "Mutual follows",
+        "5": "Nobody"
+      }
     }
   },
   "search": {
@@ -526,6 +565,16 @@
         "noResults": "No results found."
       }
     }
+  },
+  "searchHistory": {
+    "sidebarLabel": "Suchverlauf",
+    "title": "Suchverlauf",
+    "description": "Kürzlich auf diesem Gerät gespeicherte Suchen. Du kannst sie jederzeit löschen.",
+    "recentSearch": "Letzte Suche",
+    "remove": "Suche entfernen",
+    "empty": "Noch kein Suchverlauf.",
+    "clearAll": "Verlauf löschen",
+    "savedAt": "Gespeichert {date}"
   },
   "discovery": {
     "page": {
@@ -612,7 +661,8 @@
       "showLikeCounts": "Show like counts",
       "hideLikeCounts": "Hide like counts",
       "previousImage": "Previous image",
-      "nextImage": "Next image"
+      "nextImage": "Next image",
+      "share": "Share"
     },
     "comment": {
       "title": "Kommentare",
@@ -667,6 +717,8 @@
     "scaffold": {
       "home": "Start",
       "discover": "Entdecken",
+      "exploreFeed": "Feed entdecken",
+      "discoverHub": "Entdecken-Hub",
       "notifications": "Benachrichtigungen",
       "profile": "Profil",
       "bookmarks": "Lesezeichen",
@@ -736,6 +788,147 @@
     },
     "errors": {
       "loadFailed": "Explore feed could not be loaded."
+    }
+  },
+  "messaging": {
+    "title": "Messages",
+    "e2eeLabel": "Messages",
+    "replyingTo": "Replying to: {text}",
+    "status": {
+      "connecting": "Connecting",
+      "conversationCount": "{count} conversations",
+      "loadingMessages": "Loading messages",
+      "typing": "{name} schreibt..."
+    },
+    "actions": {
+      "newConversation": "New conversation",
+      "searchInConversation": "Search in conversation",
+      "soundOn": "Turn sound on",
+      "soundOff": "Turn sound off",
+      "details": "Conversation details",
+      "addImage": "Add image",
+      "addFile": "Add file",
+      "voice": "Voice message",
+      "send": "Send",
+      "reply": "Reply",
+      "react": "React",
+      "recall": "Unsend",
+      "removeReply": "Remove reply",
+      "removeAttachment": "Remove attachment",
+      "cancel": "Cancel",
+      "openFull": "Open messages full screen",
+      "closeDock": "Close messages"
+    },
+    "search": {
+      "conversations": "Search conversations",
+      "messages": "Search messages",
+      "submit": "Search",
+      "clear": "Clear search",
+      "request": "Message request",
+      "encrypted": "Message",
+      "empty": "No messages yet",
+      "message": "Message",
+      "previous": "Previous match",
+      "next": "Next match"
+    },
+    "archive": {
+      "title": "Archived",
+      "empty": "No archived conversations"
+    },
+    "empty": {
+      "title": "No conversation selected",
+      "description": "Start a conversation from a profile or select an existing chat."
+    },
+    "emptyConversation": {
+      "title": "No messages yet",
+      "description": "Send the first message in this conversation."
+    },
+    "composer": {
+      "placeholder": "Write a message"
+    },
+    "details": {
+      "online": "Online",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "pin": "Pin",
+      "unpin": "Unpin",
+      "more": "More",
+      "markRead": "Mark as read",
+      "markUnread": "Mark as unread",
+      "clearHistory": "Clear history",
+      "block": "Block",
+      "report": "Report",
+      "shared": "Shared",
+      "links": "Links",
+      "noLinks": "No links shared yet",
+      "privacy": "Privacy",
+      "groupConversation": "Gruppenchat",
+      "someone": "Jemand",
+      "offline": "Offline"
+    },
+    "media": {
+      "images": "Images",
+      "files": "Files",
+      "audio": "Audio"
+    },
+    "message": {
+      "edited": "edited",
+      "recalled": "Message unsent",
+      "postShare": "Shared post",
+      "attachment": "Attachment",
+      "encryptedUnavailable": "Message unavailable",
+      "unavailable": "Message unavailable"
+    },
+    "block": {
+      "title": "Block user?",
+      "description": "Are you sure you want to block {name}? They will not be able to message you.",
+      "confirm": "Block"
+    },
+    "report": {
+      "title": "Report conversation",
+      "description": "Choose a reason for reporting this conversation.",
+      "submit": "Submit report",
+      "otherPlaceholder": "Write the reason",
+      "reasons": {
+        "Spam": "Spam",
+        "Harassment": "Harassment",
+        "HateSpeech": "Hate speech",
+        "Nudity": "Nudity",
+        "Violence": "Violence",
+        "Scam": "Scam",
+        "Other": "Other"
+      }
+    },
+    "errors": {
+      "unauthorized": "Please sign in to use messages.",
+      "loadConversations": "Conversations could not be loaded.",
+      "loadMessages": "Messages could not be loaded.",
+      "deviceRegistration": "Secure device registration failed.",
+      "encryption": "Message could not be prepared for the selected recipients.",
+      "send": "Message could not be sent. It will stay marked as failed.",
+      "realtime": "Live message connection could not be established.",
+      "action": "Conversation action could not be completed.",
+      "search": "Conversation search failed.",
+      "block": "User could not be blocked.",
+      "report": "Report could not be submitted.",
+      "openConversation": "Conversation could not be opened.",
+      "share": "Post could not be shared."
+    },
+    "share": {
+      "title": "Share post",
+      "description": "Search people or choose from recent conversations.",
+      "search": "Search people",
+      "recent": "Recent conversations",
+      "selected": "Ausgewählt",
+      "messagePlaceholder": "Add a message",
+      "send": "Share",
+      "sent": "Post shared",
+      "empty": "No people found"
+    },
+    "reactions": {
+      "title": "Add reaction"
     }
   }
 }

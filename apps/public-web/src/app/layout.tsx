@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { Geist_Mono, Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import Script from "next/script";
 
 import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/site-header";
+import { MessagingFloatingDock } from "@/features/messaging/components/messaging-floating-dock";
 import { getRequestI18n } from "../../lib/i18n/request";
 
 const inter = Inter({
@@ -43,9 +43,8 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <Script
+        <script
           id="theme-bootstrap"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: THEME_BOOTSTRAP_SCRIPT,
           }}
@@ -58,6 +57,7 @@ export default async function RootLayout({
             <section className="w-full max-w-screen-xl mx-auto">
               {children}
             </section>
+            <MessagingFloatingDock />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

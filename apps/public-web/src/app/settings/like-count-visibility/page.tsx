@@ -36,6 +36,8 @@ export default async function LikeCountVisibilitySettingsPage() {
     editProfile: t("profile.hero.editProfile"),
     hideLikeCounts: t("settings.sidebar.hideLikeCounts"),
     notifications: t("settings.notifications.sidebarLabel"),
+    searchHistory: t("searchHistory.sidebarLabel"),
+    messaging: t("settings.messaging.sidebarLabel"),
     security: t("settings.sidebar.security"),
   });
 

@@ -9,6 +9,7 @@ import {
   Compass,
   FileText,
   Home,
+  MapPinned,
   PlusCircle,
   Settings,
   ShieldCheck,
@@ -52,7 +53,8 @@ export function CommunityPageScaffold({ children, onPublishClick, publishHref = 
   const profileHref = isAuthenticated && myUsername ? `/${encodeURIComponent(myUsername)}` : authHref ?? "/";
   const navigationItems = [
     { href: "/", icon: Home, label: t("community.scaffold.home") },
-    { href: "/explore-feed", icon: Compass, label: t("community.scaffold.discover") },
+    { href: "/explore-feed", icon: Compass, label: t("community.scaffold.exploreFeed") },
+    { href: "/discover-hub", icon: MapPinned, label: t("community.scaffold.discoverHub") },
     { href: authHref ?? "/notifications", icon: Bell, label: t("community.scaffold.notifications") },
     {
       href: isAuthenticated ? publishHref : authHref ?? "",

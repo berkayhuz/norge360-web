@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Bell, BellRing, Loader2 } from "lucide-react";
 
@@ -28,6 +29,7 @@ type ProfileSocialPanelProps = {
   isAuthenticated: boolean;
   isOwnProfile: boolean;
   loginHref: string;
+  profileAuthUserId?: string | null;
   profileId: string;
   username: string;
 };
@@ -62,10 +64,12 @@ export function ProfileSocialPanel({
   isAuthenticated,
   isOwnProfile,
   loginHref,
+  profileAuthUserId,
   profileId,
   username,
 }: ProfileSocialPanelProps) {
   const t = useTranslations("public-web");
+  const router = useRouter();
   const locale = useLocale();
   const formatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const [isFollowHover, setIsFollowHover] = useState(false);
@@ -77,6 +81,7 @@ export function ProfileSocialPanel({
   const postsCount = initialPostsCount;
   const [blockedByMe, setBlockedByMe] = useState(false);
   const [pendingFollow, setPendingFollow] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState(false);
   const [pendingProfileNotifications, setPendingProfileNotifications] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [openList, setOpenList] = useState<FollowListKind | null>(null);
@@ -157,6 +162,57 @@ export function ProfileSocialPanel({
     }
   }
 
+  async function onOpenMessage() {
+    if (!isAuthenticated) {
+      router.push(loginHref);
+      return;
+    }
+
+    if (isOwnProfile || blockedByMe || pendingMessage) {
+      return;
+    }
+
+    setPendingMessage(true);
+    setActionError(null);
+    try {
+      const conversation = await openConversation(profileAuthUserId, profileId);
+      if (!conversation?.id) {
+        throw new Error("conversation_open_failed");
+      }
+
+      router.push(`/messages?conversationId=${encodeURIComponent(conversation.id)}`);
+    } catch {
+      setActionError(t("messaging.errors.openConversation"));
+    } finally {
+      setPendingMessage(false);
+    }
+  }
+
+  async function openConversation(targetUserId: string | null | undefined, targetProfileId: string) {
+    if (targetUserId) {
+      const directResponse = await fetch("/api/messaging/conversations/direct", {
+        body: JSON.stringify({ targetUserId, initialMessage: null }),
+        cache: "no-store",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        method: "POST",
+      });
+      if (directResponse.ok) {
+        const directConversation = normalizeConversationResponse(await directResponse.json().catch(() => null));
+        if (directConversation?.id) {
+          return directConversation;
+        }
+      }
+    }
+
+    const response = await fetch(`/api/messaging/profiles/${encodeURIComponent(targetProfileId)}/conversation?username=${encodeURIComponent(username)}`, {
+      cache: "no-store",
+      credentials: "include",
+      method: "POST",
+    });
+    return normalizeConversationResponse(await response.json().catch(() => null));
+  }
+
   const followButtonLabel = followRequestPending && isFollowHover
     ? t("profile.hero.cancelRequest")
     : followRequestPending
@@ -205,8 +261,9 @@ export function ProfileSocialPanel({
             </Button>
           ) : (
             <>
-              <Button asChild className="flex-1 sm:flex-none" size="sm" variant="outline">
-                <Link href={isAuthenticated ? "#" : loginHref}>{t("profile.hero.message")}</Link>
+              <Button className="flex-1 sm:flex-none" disabled={pendingMessage || blockedByMe} onClick={() => void onOpenMessage()} size="sm" type="button" variant="outline">
+                {pendingMessage ? <Loader2 aria-hidden="true" className="size-4 animate-spin" /> : null}
+                {t("profile.hero.message")}
               </Button>
               {blockedByMe ? null : (
                 isAuthenticated ? (
@@ -692,4 +749,10 @@ function normalizeFollowStatus(value: unknown) {
     isFollowRequestPending: readBoolean(source, "isFollowRequestPending", "IsFollowRequestPending"),
     isFollowing: readBoolean(source, "isFollowing", "IsFollowing", "viewerFollowsThisUser", "ViewerFollowsThisUser"),
   };
+}
+
+function normalizeConversationResponse(value: unknown) {
+  const source = asRecord(value);
+  const id = readString(source, "id", "Id");
+  return id ? { id } : null;
 }

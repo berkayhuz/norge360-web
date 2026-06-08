@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { BadgeCheck, Loader2, Search, X } from "lucide-react";
+import { BadgeCheck, Clock3, Loader2, Search, X } from "lucide-react";
 
 import type { SearchResultItem } from "@workspace/search";
 import { normalizeSearchSuggestResponse } from "@workspace/search";
@@ -13,11 +13,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@workspace/ui/
 import { Input } from "@workspace/ui/components/forms/input";
 import { cn } from "@workspace/ui/lib/utils";
 import { SURFACE_SOFT_CLASS } from "@/lib/surface";
+import {
+  addSearchHistoryEntry,
+  readSearchHistory,
+  removeSearchHistoryEntry,
+  subscribeSearchHistory,
+  type SearchHistoryEntry,
+} from "@/features/search/lib/search-history";
 
 const MAX_RESULTS = 8;
+const MAX_HISTORY_ITEMS = 10;
 
 export function HeaderSearch() {
   const t = useTranslations("navigation");
+  const tPublic = useTranslations("public-web");
   const router = useRouter();
   const desktopRootRef = useRef<HTMLDivElement | null>(null);
   const requestIdRef = useRef(0);
@@ -27,9 +36,14 @@ export function HeaderSearch() {
   const [hasError, setHasError] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [history, setHistory] = useState<SearchHistoryEntry[]>(() => readSearchHistory());
 
   const active = desktopOpen || mobileOpen;
   const trimmedQuery = query.trim();
+  const historyItems = useMemo(
+    () => (active && trimmedQuery.length === 0 ? history.slice(0, MAX_HISTORY_ITEMS) : []),
+    [active, history, trimmedQuery.length],
+  );
   const visibleItems = useMemo(() => {
     if (!active || trimmedQuery.length === 0) {
       return [];
@@ -38,6 +52,10 @@ export function HeaderSearch() {
     return items.slice(0, MAX_RESULTS);
   }, [active, items, trimmedQuery.length]);
   const displayLoading = active && isLoading;
+
+  useEffect(() => {
+    return subscribeSearchHistory(() => setHistory(readSearchHistory()));
+  }, []);
 
   useEffect(() => {
     if (!active || trimmedQuery.length === 0) {
@@ -106,9 +124,7 @@ export function HeaderSearch() {
   }, [desktopOpen]);
 
   function openDesktopSearch() {
-    if (trimmedQuery.length > 0) {
-      setDesktopOpen(true);
-    }
+    setDesktopOpen(true);
   }
 
   function openMobileSearch() {
@@ -121,17 +137,26 @@ export function HeaderSearch() {
   }
 
   function onSelectItem(item: SearchResultItem) {
+    if (item.type === "user") {
+      addSearchHistoryEntry(item);
+    }
     closeSearch();
     setQuery("");
     router.push(item.url || "/");
   }
 
+  function onSelectHistoryItem(entry: SearchHistoryEntry) {
+    closeSearch();
+    setQuery("");
+    router.push(entry.href);
+  }
+
   const emptyState = useMemo(() => {
     if (hasError) return t("searchUnavailable");
     if (displayLoading) return t("searching");
-    if (trimmedQuery.length === 0) return t("searchStartTyping");
+    if (trimmedQuery.length === 0) return historyItems.length > 0 ? null : t("searchStartTyping");
     return t("searchNoResults");
-  }, [displayLoading, hasError, t, trimmedQuery.length]);
+  }, [displayLoading, hasError, historyItems.length, t, trimmedQuery.length]);
 
   const desktopSearchField = (
     <div className="relative w-full" ref={desktopRootRef}>
@@ -147,7 +172,7 @@ export function HeaderSearch() {
           onChange={(event) => {
             const nextValue = event.target.value;
             setQuery(nextValue);
-            setDesktopOpen(nextValue.trim().length > 0);
+            setDesktopOpen(true);
           }}
           onFocus={openDesktopSearch}
           placeholder={t("search")}
@@ -184,7 +209,51 @@ export function HeaderSearch() {
                 <Loader2 className="size-4 animate-spin text-muted-foreground" />
               </div>
               : null}
-            {!displayLoading && visibleItems.length === 0 ? (
+            {!displayLoading && historyItems.length > 0 ? (
+              <div className="space-y-2 px-2 pb-3">
+                <div className="flex items-center gap-2 px-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  <Clock3 className="size-3.5" />
+                  <span>{tPublic("searchHistory.title")}</span>
+                </div>
+                <div className="space-y-1">
+                  {historyItems.map((entry) => (
+                    <div
+                      key={entry.id}
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 transition-colors hover:bg-muted"
+                    >
+                      <button
+                        type="button"
+                        onMouseDown={(event) => event.preventDefault()}
+                        onClick={() => onSelectHistoryItem(entry)}
+                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                      >
+                        <Avatar className="size-9 shrink-0">
+                          {entry.avatarUrl ? <AvatarImage src={entry.avatarUrl} alt={entry.title} /> : null}
+                          <AvatarFallback>{entry.title.slice(0, 1).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <span className="min-w-0">
+                          <p className="truncate text-sm font-medium text-foreground">{entry.title}</p>
+                          <p className="truncate text-xs text-muted-foreground">{entry.subtitle ?? tPublic("searchHistory.recentSearch")}</p>
+                        </span>
+                      </button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-xs"
+                        rounded="full"
+                        border="none"
+                        className="shrink-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
+                        aria-label={tPublic("searchHistory.remove")}
+                        onClick={() => removeSearchHistoryEntry(entry.id)}
+                      >
+                        <X className="size-3.5" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {!displayLoading && visibleItems.length === 0 && historyItems.length === 0 ? (
               <div className="px-3 py-10 text-center text-sm text-muted-foreground">
                 {emptyState}
               </div>
@@ -258,7 +327,11 @@ export function HeaderSearch() {
                 <Search className="size-4 shrink-0 text-muted-foreground" />
                 <Input
                   value={query}
-                  onChange={(event) => setQuery(event.target.value)}
+                  onChange={(event) => {
+                    setQuery(event.target.value);
+                    setMobileOpen(true);
+                  }}
+                  onFocus={openMobileSearch}
                   autoFocus
                   placeholder={t("search")}
                   className="min-h-0 flex-1 rounded-none border-0 !bg-transparent p-0 text-sm leading-none shadow-none outline-none ring-0 placeholder:text-muted-foreground/80 focus-visible:ring-0"
@@ -280,7 +353,51 @@ export function HeaderSearch() {
               </div>
               <div className="min-h-72">
                 <div className="min-h-0 flex-1 overflow-y-auto p-2">
-                  {!displayLoading && visibleItems.length === 0 ? (
+                  {!displayLoading && historyItems.length > 0 ? (
+                    <div className="space-y-2 px-2 pb-3">
+                      <div className="flex items-center gap-2 px-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                        <Clock3 className="size-3.5" />
+                        <span>{tPublic("searchHistory.title")}</span>
+                      </div>
+                      <div className="space-y-1">
+                        {historyItems.map((entry) => (
+                          <div
+                            key={entry.id}
+                            className="flex items-center gap-2 rounded-2xl px-3 py-2 transition-colors hover:bg-muted"
+                          >
+                          <button
+                              type="button"
+                              onMouseDown={(event) => event.preventDefault()}
+                              onClick={() => onSelectHistoryItem(entry)}
+                              className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                            >
+                              <Avatar className="size-9 shrink-0">
+                                {entry.avatarUrl ? <AvatarImage src={entry.avatarUrl} alt={entry.title} /> : null}
+                                <AvatarFallback>{entry.title.slice(0, 1).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              <span className="min-w-0">
+                                <p className="truncate text-sm font-medium text-foreground">{entry.title}</p>
+                                <p className="truncate text-xs text-muted-foreground">{entry.subtitle ?? tPublic("searchHistory.recentSearch")}</p>
+                              </span>
+                            </button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon-xs"
+                              rounded="full"
+                              border="none"
+                              className="shrink-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
+                              aria-label={tPublic("searchHistory.remove")}
+                              onClick={() => removeSearchHistoryEntry(entry.id)}
+                            >
+                              <X className="size-3.5" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                  {!displayLoading && visibleItems.length === 0 && historyItems.length === 0 ? (
                     <div className="px-3 py-10 text-center text-sm text-muted-foreground">
                       {emptyState}
                     </div>

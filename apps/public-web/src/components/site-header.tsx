@@ -12,6 +12,7 @@ import {
   LifeBuoy,
   LogIn,
   LogOut,
+  MessageCircle,
   Monitor,
   Moon,
   Settings2,
@@ -111,8 +112,6 @@ export function SiteHeader() {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [displayModeOpen, setDisplayModeOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState<ThemePreference>(theme);
-  const [selectedLocale, setSelectedLocale] = useState(currentLocale);
 
   useEffect(() => {
     let cancelled = false;
@@ -152,29 +151,12 @@ export function SiteHeader() {
     window.location.reload();
   }
 
-  function commitThemeSelection() {
-    setTheme(selectedTheme);
-    setDisplayModeOpen(false);
-  }
-
-  function commitLocaleSelection() {
-    setLanguageOpen(false);
-    if (selectedLocale === currentLocale) {
-      return;
-    }
-
-    document.cookie = `${LOCALE_COOKIE_NAME}=${encodeURIComponent(selectedLocale)}; Path=/; Max-Age=31536000; SameSite=Lax`;
-    window.location.reload();
-  }
-
   function openDisplayModeDialog() {
-    setSelectedTheme(theme);
     setAccountMenuOpen(false);
     setDisplayModeOpen(true);
   }
 
   function openLanguageDialog() {
-    setSelectedLocale(currentLocale);
     setAccountMenuOpen(false);
     setLanguageOpen(true);
   }
@@ -210,6 +192,12 @@ export function SiteHeader() {
                 </Button>
               </div>
             )}
+
+            {isAuthenticated ? (
+              <Link href="/messages" className={iconTriggerClass} aria-label={t("messages")}>
+                <MessageCircle className="size-5" />
+              </Link>
+            ) : null}
 
             {isAuthenticated ? <NotificationsDropdown /> : null}
 
@@ -300,16 +288,13 @@ export function SiteHeader() {
                   key={option.value}
                   icon={option.icon}
                   label={t(option.labelKey)}
-                  selected={selectedTheme === option.value}
-                  onClick={() => setSelectedTheme(option.value)}
+                  selected={theme === option.value}
+                  onClick={() => {
+                    setTheme(option.value);
+                    setDisplayModeOpen(false);
+                  }}
                 />
               ))}
-            </div>
-
-            <div className="flex justify-end pt-4">
-              <Button type="button" rounded="full" height="10" className="px-5" onClick={commitThemeSelection}>
-                {t("done")}
-              </Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -330,16 +315,18 @@ export function SiteHeader() {
                 <PreferenceRowButton
                   key={option.value}
                   label={option.label}
-                  selected={selectedLocale === option.value}
-                  onClick={() => setSelectedLocale(option.value)}
+                  selected={currentLocale === option.value}
+                  onClick={() => {
+                    setLanguageOpen(false);
+                    if (option.value === currentLocale) {
+                      return;
+                    }
+
+                    document.cookie = `${LOCALE_COOKIE_NAME}=${encodeURIComponent(option.value)}; Path=/; Max-Age=31536000; SameSite=Lax`;
+                    window.location.reload();
+                  }}
                 />
               ))}
-            </div>
-
-            <div className="flex justify-end pt-4">
-              <Button type="button" rounded="full" height="10" className="px-5" onClick={commitLocaleSelection}>
-                {t("done")}
-              </Button>
             </div>
           </DialogContent>
         </Dialog>

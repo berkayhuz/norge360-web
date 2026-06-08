@@ -8,6 +8,7 @@ import { FieldDescription } from "@workspace/ui/components/primitives/field"
 
 import { LocaleSelect } from "./locale-select"
 import { ThemeToggle } from "./theme-toggle"
+import { getPublicWebUrl } from "@/src/lib/public-web-url"
 
 type CompactAuthShellProps = {
   children: React.ReactNode
@@ -27,7 +28,6 @@ type CompactAuthShellProps = {
 export function CompactAuthShell({
   children,
   footer,
-  footerDescription,
   localeLabel,
   logoAlt,
   primaryActionHref,
@@ -67,7 +67,20 @@ export function CompactAuthShell({
           </FieldDescription>
         </div>
         {children}
-        <FieldDescription className="px-2 text-center">{footerDescription}</FieldDescription>
+        <FieldDescription className="px-2 text-center">
+          {t.rich("footerLegal", {
+            privacy: (chunks) => (
+              <a className="underline underline-offset-2 hover:text-foreground" href={getPublicWebUrl("/privacy-policy")}>
+                {chunks}
+              </a>
+            ),
+            terms: (chunks) => (
+              <a className="underline underline-offset-2 hover:text-foreground" href={getPublicWebUrl("/terms-of-service")}>
+                {chunks}
+              </a>
+            ),
+          })}
+        </FieldDescription>
         {footer ? <div className="mt-4 text-center text-sm text-muted-foreground">{footer}</div> : null}
       </div>
       <section className="fixed bottom-0 left-0 right-0 w-full border-t border-border bg-background max-md:mt-12">
@@ -79,17 +92,17 @@ export function CompactAuthShell({
               <nav aria-label="Footer links">
                 <ul className="flex items-center gap-3">
                   <li>
-                    <a href="/terms" className="transition-colors hover:text-foreground">
+                    <a href={getPublicWebUrl("/terms-of-service")} className="transition-colors hover:text-foreground">
                       {t("footerLinks.terms")}
                     </a>
                   </li>
                   <li>
-                    <a href="/privacy" className="transition-colors hover:text-foreground">
+                    <a href={getPublicWebUrl("/privacy-policy")} className="transition-colors hover:text-foreground">
                       {t("footerLinks.privacy")}
                     </a>
                   </li>
                   <li>
-                    <a href="/security" className="transition-colors hover:text-foreground">
+                    <a href={getPublicWebUrl("/settings/password-security")} className="transition-colors hover:text-foreground">
                       {t("footerLinks.security")}
                     </a>
                   </li>

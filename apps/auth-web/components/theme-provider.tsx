@@ -49,6 +49,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   React.useEffect(() => {
     const root = document.documentElement
     root.classList.toggle("dark", resolvedTheme === "dark")
+    root.style.colorScheme = resolvedTheme
     window.localStorage.setItem(THEME_STORAGE_KEY, theme)
   }, [resolvedTheme, theme])
 

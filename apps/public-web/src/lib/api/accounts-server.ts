@@ -299,6 +299,17 @@ export async function resolveAuthUserIdByProfileId(profileId: string): Promise<s
   return typeof authUserId === "string" ? authUserId : null;
 }
 
+export async function resolveAuthUserIdByUsername(username: string): Promise<string | null> {
+  const value = username.trim();
+  if (!value) return null;
+
+  const response = await requestGateway(`/api/accounts/internal/users/resolve-by-username/${encodeURIComponent(value)}`);
+  if ("error" in response) return null;
+  if (response.status !== 200 || !response.data || typeof response.data !== "object") return null;
+  const authUserId = (response.data as Record<string, unknown>).authUserId;
+  return typeof authUserId === "string" ? authUserId : null;
+}
+
 export async function checkUsernameAvailability(
   username: string,
 ): Promise<CheckUsernameAvailabilityResult> {

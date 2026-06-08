@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Ban, Bell, Heart, Lock, MessageCircle, Search, Shield, User, X } from "lucide-react";
+import { Ban, Bell, Heart, History, Lock, MessageCircle, Search, Shield, User, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -16,7 +16,7 @@ type ProfileSettingsSidebarProps = {
   description: string;
   items: ReadonlyArray<{
     href: string;
-    iconKey: "user" | "shield" | "lock" | "messageCircle" | "heart" | "ban" | "bell";
+    iconKey: "user" | "shield" | "lock" | "messageCircle" | "heart" | "ban" | "bell" | "history";
     label: string;
     searchTerms?: readonly string[];
   }>;
@@ -31,6 +31,7 @@ const ICONS = {
   heart: Heart,
   lock: Lock,
   messageCircle: MessageCircle,
+  history: History,
   shield: Shield,
   user: User,
 } as const;

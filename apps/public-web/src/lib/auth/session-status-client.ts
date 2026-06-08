@@ -6,13 +6,8 @@ type ClientAuthSessionStatus = {
 };
 
 let inFlightSessionStatusPromise: Promise<ClientAuthSessionStatus> | null = null;
-let cachedSessionStatus: ClientAuthSessionStatus | null = null;
 
 export async function getClientAuthSessionStatus(): Promise<ClientAuthSessionStatus> {
-  if (cachedSessionStatus) {
-    return cachedSessionStatus;
-  }
-
   if (inFlightSessionStatusPromise) {
     return inFlightSessionStatusPromise;
   }
@@ -25,25 +20,22 @@ export async function getClientAuthSessionStatus(): Promise<ClientAuthSessionSta
       });
 
       if (!response.ok) {
-        cachedSessionStatus = {
+        return {
           authenticated: false,
           status: response.status,
         };
-        return cachedSessionStatus;
       }
 
       const payload = (await response.json().catch(() => null)) as
         | { authenticated?: boolean }
         | null;
 
-      cachedSessionStatus = {
+      return {
         authenticated: Boolean(payload?.authenticated),
         status: response.status,
       };
-      return cachedSessionStatus;
     } catch {
-      cachedSessionStatus = { authenticated: false };
-      return cachedSessionStatus;
+      return { authenticated: false };
     } finally {
       inFlightSessionStatusPromise = null;
     }
@@ -54,5 +46,4 @@ export async function getClientAuthSessionStatus(): Promise<ClientAuthSessionSta
 
 export function resetClientAuthSessionStatusCache() {
   inFlightSessionStatusPromise = null;
-  cachedSessionStatus = null;
 }
